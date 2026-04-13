@@ -10,115 +10,223 @@
 
 ### 1.1 Vision
 #### 1.1.1 Tóm tắt định hướng dự án
-Đề tài xây dựng một hệ thống web quản lý hồ sơ và bảo dưỡng phương tiện cho mô hình garage, nhằm thay thế cách vận hành thủ công đang gây phân tán dữ liệu và thiếu kiểm soát quy trình. Hệ thống được định hướng giải quyết đồng thời ba mục tiêu: chuẩn hóa tác nghiệp liên phòng ban, nâng độ chính xác dữ liệu nghiệp vụ và cung cấp thông tin quản trị kịp thời. Kết quả kỳ vọng là một sản phẩm có thể vận hành đầy đủ theo chu trình dịch vụ thực tế, đồng thời đáp ứng yêu cầu học thuật về quy trình phát triển phần mềm hoàn chỉnh.
+Vehicle Service Management System là hệ thống web được xây dựng nhằm số hóa toàn bộ vòng đời dịch vụ tại garage, từ tiếp nhận phương tiện đến hoàn tất thanh toán và theo dõi lịch sử bảo dưỡng. Tầm nhìn của dự án là hình thành một nền tảng dữ liệu tập trung, giúp các bộ phận lễ tân, kỹ thuật, kho và thu ngân phối hợp trên cùng một nguồn thông tin chuẩn, từ đó nâng độ chính xác vận hành, giảm thất thoát nghiệp vụ và tăng năng lực kiểm soát của quản lý. Trong phạm vi đồ án, hệ thống đồng thời đóng vai trò minh chứng cho quy trình phát triển phần mềm hoàn chỉnh, có khả năng truy vết từ nhu cầu nghiệp vụ đến thiết kế, triển khai và kiểm thử.
 
 #### 1.1.2 Bài toán nghiệp vụ và cơ hội cải tiến
-Trong bối cảnh vận hành truyền thống, dữ liệu khách hàng, phương tiện, phiếu dịch vụ, phụ tùng và hóa đơn thường được lưu ở nhiều kênh khác nhau như sổ tay, file bảng tính hoặc trao đổi miệng. Thực trạng này làm phát sinh các hạn chế trọng yếu:
-- Khó truy xuất lịch sử dịch vụ theo phương tiện, đặc biệt khi xe quay lại nhiều lần.
-- Dễ phát sinh sai lệch giữa công việc thực hiện, phụ tùng xuất kho và dữ liệu hóa đơn.
-- Thiếu khả năng theo dõi tiến độ xử lý xe theo thời gian thực giữa lễ tân, kỹ thuật và kho.
-- Bộ phận quản lý không có báo cáo tổng hợp đủ tin cậy để điều hành hoạt động.
+Mô hình vận hành thủ công tại garage hiện nay tạo ra nhiều điểm nghẽn:
+- Dữ liệu phân tán giữa sổ tay, bảng tính và trao đổi trực tiếp, dẫn đến thiếu nhất quán khi đối soát.
+- Lịch sử dịch vụ theo phương tiện khó truy xuất nhanh, đặc biệt với khách hàng quay lại nhiều lần.
+- Trạng thái xử lý xe không đồng bộ giữa các bộ phận, gây chậm tiến độ và khó chủ động giao tiếp với khách hàng.
+- Thông tin phụ tùng xuất kho và dữ liệu hóa đơn dễ sai lệch nếu nhập liệu lặp lại nhiều điểm.
+- Quản lý thiếu báo cáo tin cậy theo thời gian gần thực để điều hành công việc hằng ngày.
 
-Việc xây dựng hệ thống là cơ hội chuyển đổi từ mô hình ghi nhận rời rạc sang mô hình dữ liệu tập trung, tạo nền tảng cho kiểm soát chất lượng dịch vụ và tối ưu hiệu suất vận hành.
+Hệ thống được định hướng giải quyết các điểm nghẽn trên bằng cơ chế chuẩn hóa quy trình và quản trị dữ liệu tập trung theo từng vai trò nghiệp vụ, tạo nền tảng cho vận hành minh bạch và cải tiến hiệu suất dài hạn.
 
 #### 1.1.3 Động lực kinh doanh
-Các động lực chính của dự án bao gồm:
-- Nhu cầu chuẩn hóa quy trình nghiệp vụ tại garage để giảm phụ thuộc vào kinh nghiệm cá nhân.
-- Nhu cầu minh bạch dữ liệu doanh thu, chi phí phụ tùng và trạng thái xử lý công việc.
-- Nhu cầu nâng chất lượng phục vụ thông qua tra cứu lịch sử nhanh và nhắc lịch bảo dưỡng định kỳ.
-- Nhu cầu xây dựng sản phẩm có khả năng trình diễn và đánh giá đầy đủ trong phạm vi đồ án thực tập cơ sở.
+Các động lực chính thúc đẩy dự án gồm:
+- Nhu cầu chuẩn hóa quy trình dịch vụ để giảm phụ thuộc vào kinh nghiệm cá nhân.
+- Nhu cầu kiểm soát chặt chẽ doanh thu, chi phí phụ tùng và chất lượng thực thi công việc.
+- Nhu cầu rút ngắn thời gian phản hồi cho khách hàng thông qua tra cứu lịch sử và trạng thái xử lý nhanh.
+- Nhu cầu tạo cơ sở dữ liệu phục vụ phân tích vận hành, ra quyết định và lập kế hoạch tài nguyên.
+- Nhu cầu hoàn thiện sản phẩm có giá trị ứng dụng thực tế, đồng thời đáp ứng yêu cầu học thuật của đồ án.
 
 #### 1.1.4 Mục tiêu dự án và thước đo thành công
-Mục tiêu 1: Chuẩn hóa và số hóa quy trình tiếp nhận, xử lý dịch vụ, lập hóa đơn và thanh toán.
-- Chỉ số đánh giá: hoàn tất được luồng nghiệp vụ đầy đủ từ tiếp nhận xe đến thanh toán trong phiên demo.
+Mục tiêu 1: Chuẩn hóa luồng nghiệp vụ chính (tiếp nhận xe, tạo phiếu dịch vụ, thực hiện kỹ thuật, xuất phụ tùng, lập hóa đơn, thanh toán) trong một hệ thống thống nhất.
+- Chỉ số đánh giá: hoàn tất trọn vẹn luồng nghiệp vụ end-to-end trong phiên kiểm thử tích hợp và phiên demo cuối kỳ.
 
-Mục tiêu 2: Bảo đảm tính nhất quán dữ liệu giữa phiếu dịch vụ, kho phụ tùng và hóa đơn.
-- Chỉ số đánh giá: dữ liệu hóa đơn phản ánh đầy đủ các hạng mục dịch vụ và phụ tùng đã ghi nhận trong phiếu.
+Mục tiêu 2: Tăng độ nhất quán dữ liệu giữa các mô-đun nghiệp vụ.
+- Chỉ số đánh giá: 100% hóa đơn trong bộ dữ liệu kiểm thử phản ánh đầy đủ hạng mục dịch vụ và phụ tùng đã xác nhận trên phiếu dịch vụ.
 
-Mục tiêu 3: Nâng hiệu quả truy xuất thông tin phục vụ vận hành và chăm sóc khách hàng.
-- Chỉ số đánh giá: thời gian tra cứu lịch sử dịch vụ của phương tiện trong bộ dữ liệu mẫu không vượt quá 10 giây.
+Mục tiêu 3: Nâng hiệu quả truy xuất thông tin phục vụ vận hành.
+- Chỉ số đánh giá: thời gian tra cứu hồ sơ khách hàng hoặc lịch sử dịch vụ phương tiện không vượt quá 10 giây trên bộ dữ liệu mẫu chuẩn.
 
-Mục tiêu 4: Cung cấp số liệu quản trị cơ bản cho người quản lý garage.
-- Chỉ số đánh giá: hệ thống hiển thị được báo cáo doanh thu, khối lượng công việc và cảnh báo tồn kho thấp.
+Mục tiêu 4: Cung cấp thông tin quản trị thiết yếu cho cấp quản lý.
+- Chỉ số đánh giá: hệ thống hiển thị được tối thiểu các nhóm báo cáo doanh thu, khối lượng công việc theo trạng thái và cảnh báo tồn kho thấp.
 
-Mục tiêu 5: Đáp ứng chuẩn đầu ra học thuật về vòng đời phát triển phần mềm.
-- Chỉ số đánh giá: bộ tài liệu và sản phẩm triển khai nhất quán, có khả năng truy vết từ yêu cầu đến kiểm thử.
+Mục tiêu 5: Bảo đảm chất lượng học thuật và khả năng bảo trì sản phẩm.
+- Chỉ số đánh giá: tài liệu phân tích, thiết kế, kiểm thử và mã nguồn nhất quán, có khả năng truy vết rõ ràng giữa yêu cầu và hiện thực hệ thống.
 
 #### 1.1.5 Tuyên bố phạm vi
-**Phạm vi triển khai trong giai đoạn hiện tại**
-- Quản lý truy cập hệ thống theo vai trò người dùng.
-- Quản lý khách hàng và phương tiện, bao gồm khách hàng cá nhân và doanh nghiệp.
-- Quản lý lịch hẹn, phiếu dịch vụ, công việc kỹ thuật và trạng thái xử lý.
+**Phạm vi triển khai trong giai đoạn hiện tại (MVP)**
+- Quản lý người dùng và phân quyền theo vai trò nghiệp vụ.
+- Quản lý hồ sơ khách hàng và phương tiện.
+- Quản lý lịch hẹn và phiếu dịch vụ.
+- Quản lý hạng mục công việc kỹ thuật và trạng thái xử lý xe.
 - Quản lý danh mục dịch vụ, danh mục phụ tùng và giao dịch kho cơ bản.
-- Lập hóa đơn, ghi nhận thanh toán, lưu vết lịch sử dịch vụ.
-- Thống kê vận hành cơ bản và quản lý danh sách nhắc lịch bảo dưỡng.
+- Lập hóa đơn, ghi nhận thanh toán và lưu trữ lịch sử dịch vụ.
+- Cung cấp báo cáo vận hành cơ bản và danh sách nhắc lịch bảo dưỡng.
 
 **Phạm vi không triển khai trong giai đoạn hiện tại**
-- Tích hợp cổng thanh toán trực tuyến hoặc hóa đơn điện tử theo chuẩn cơ quan thuế.
-- Quản lý đa chi nhánh theo mô hình đồng bộ tập trung thời gian thực.
-- Ứng dụng di động riêng cho khách hàng cuối.
-- Tích hợp sâu với hệ thống ERP hoặc kế toán doanh nghiệp bên ngoài.
+- Tích hợp cổng thanh toán trực tuyến.
+- Phát hành hóa đơn điện tử theo chuẩn tích hợp cơ quan thuế.
+- Quản lý đa chi nhánh với đồng bộ dữ liệu thời gian thực.
+- Ứng dụng di động riêng cho khách hàng.
+- Tích hợp sâu với ERP hoặc hệ thống kế toán doanh nghiệp bên ngoài.
+
+**Định hướng giai đoạn mở rộng**
+- Mở rộng quản lý đa chi nhánh.
+- Tăng cường phân tích dữ liệu dịch vụ để hỗ trợ dự báo nhu cầu bảo dưỡng.
+- Xem xét tích hợp kênh chăm sóc khách hàng số (thông báo lịch hẹn, nhắc lịch định kỳ).
 
 #### 1.1.6 Ràng buộc mức cao
-- Dự án triển khai theo quy mô đồ án học thuật, thời gian và nguồn lực giới hạn.
-- Giải pháp phải đủ đơn giản để hoàn thành đúng tiến độ nhưng vẫn bảo đảm tính thực tiễn nghiệp vụ.
-- Hệ thống được phát triển theo kiến trúc đơn khối phân mô-đun để giảm độ phức tạp vận hành.
+- Thời gian triển khai giới hạn theo kế hoạch đồ án học kỳ.
+- Nguồn lực thực hiện nhỏ, ưu tiên giải pháp khả thi và dễ kiểm soát phạm vi.
+- Hệ thống triển khai theo kiến trúc Modular Monolith để cân bằng tốc độ phát triển và khả năng mở rộng.
+- Công nghệ và quyết định kỹ thuật phải thống nhất với stack đã chốt của dự án.
 
 #### 1.1.7 Giả định chính
-- Garage vận hành theo mô hình một chi nhánh trong phiên bản đầu.
-- Người dùng nghiệp vụ tham gia cung cấp thông tin và phản hồi trong các mốc xác nhận yêu cầu.
-- Dữ liệu mẫu phục vụ trình diễn có thể được chuẩn bị đầy đủ trước giai đoạn kiểm thử tích hợp.
+- Garage mục tiêu vận hành theo mô hình một chi nhánh trong phiên bản đầu tiên.
+- Người dùng nghiệp vụ tham gia xác nhận yêu cầu và phản hồi trong các mốc phân tích, nghiệm thu.
+- Dữ liệu mẫu phục vụ kiểm thử và trình diễn được chuẩn bị đầy đủ trước giai đoạn tích hợp.
+- Hạ tầng triển khai thử nghiệm đáp ứng được yêu cầu vận hành cơ bản của hệ thống web nội bộ.
 
 #### 1.1.8 Rủi ro định hướng
-- Mở rộng phạm vi quá sớm dẫn đến quá tải khối lượng trong giai đoạn triển khai.
-- Thiếu thống nhất quy trình giữa các vai trò nghiệp vụ làm chậm quá trình đặc tả yêu cầu chi tiết.
-- Chậm hoàn thiện dữ liệu mẫu và kịch bản trình diễn làm giảm chất lượng đánh giá cuối kỳ.
+- Mở rộng phạm vi chức năng quá sớm làm ảnh hưởng tiến độ và chất lượng.
+- Khác biệt trong cách hiểu quy trình giữa các vai trò nghiệp vụ gây chậm chốt yêu cầu chi tiết.
+- Dữ liệu đầu vào không đầy đủ hoặc thiếu chuẩn hóa làm giảm hiệu quả kiểm thử và trình diễn.
+- Độ bao phủ kiểm thử chưa đủ rộng có thể làm phát sinh lỗi nghiệp vụ ở giai đoạn cuối.
 
 ### 1.2 Stakeholder
 #### 1.2.1 Mục tiêu phân tích stakeholder
-Phân tích stakeholder nhằm xác định đầy đủ các nhóm liên quan trực tiếp và gián tiếp đến hệ thống, từ đó bảo đảm yêu cầu phần mềm phản ánh đúng nhu cầu nghiệp vụ, giảm xung đột ưu tiên trong quá trình triển khai và nâng cao khả năng chấp nhận hệ thống khi đưa vào sử dụng.
+Phân tích stakeholder nhằm nhận diện đầy đủ các bên sử dụng, chịu tác động và có quyền ra quyết định đối với Vehicle Service Management System. Kết quả phân tích là cơ sở để thu thập yêu cầu đúng trọng tâm, ưu tiên đúng phạm vi nghiệp vụ, giảm xung đột giữa các phòng ban và tăng khả năng chấp nhận hệ thống khi đưa vào vận hành.
 
-#### 1.2.2 Danh mục stakeholder
-| Mã | Nhóm stakeholder | Vai trò trong nghiệp vụ | Mức ảnh hưởng | Mức quan tâm |
-|---|---|---|---|---|
-| SH-01 | Chủ garage / Ban quản lý | Định hướng mục tiêu kinh doanh, phê duyệt phạm vi | Cao | Cao |
-| SH-02 | Quản lý vận hành | Giám sát quy trình, theo dõi hiệu suất và báo cáo | Cao | Cao |
-| SH-03 | Lễ tân / Cố vấn dịch vụ | Tiếp nhận xe, tạo lịch hẹn, lập phiếu dịch vụ | Trung bình | Cao |
-| SH-04 | Kỹ thuật viên | Chẩn đoán, thực hiện công việc sửa chữa, cập nhật trạng thái | Trung bình | Cao |
-| SH-05 | Thủ kho phụ tùng | Quản lý nhập/xuất/điều chỉnh tồn kho | Trung bình | Cao |
-| SH-06 | Thu ngân / Kế toán nội bộ | Lập hóa đơn, ghi nhận thanh toán, đối soát dữ liệu | Trung bình | Cao |
-| SH-07 | Quản trị hệ thống | Quản lý người dùng, quyền truy cập, cấu hình cơ bản | Trung bình | Trung bình |
-| SH-08 | Khách hàng sử dụng dịch vụ | Cung cấp thông tin xe, nhận kết quả và chứng từ dịch vụ | Thấp | Trung bình |
-| SH-09 | Giảng viên hướng dẫn/đánh giá | Đánh giá tính học thuật và mức hoàn thiện sản phẩm | Cao | Cao |
+#### 1.2.2 Danh mục và phân loại stakeholder
+| Mã | Nhóm stakeholder | Nhóm phân loại | Vai trò trong nghiệp vụ | Mức ảnh hưởng | Mức quan tâm |
+|---|---|---|---|---|---|
+| SH-01 | Chủ garage / Ban quản lý | Primary (Decision) | Định hướng mục tiêu kinh doanh, phê duyệt phạm vi và tiêu chí vận hành | Cao | Cao |
+| SH-02 | Quản lý vận hành | Primary | Giám sát tiến độ xử lý xe, hiệu suất nhân sự, chất lượng báo cáo | Cao | Cao |
+| SH-03 | Lễ tân / Cố vấn dịch vụ | Primary (User) | Tiếp nhận xe, tạo lịch hẹn, lập phiếu dịch vụ, cập nhật thông tin khách | Trung bình | Cao |
+| SH-04 | Kỹ thuật viên | Primary (User) | Chẩn đoán, thực hiện sửa chữa/bảo dưỡng, cập nhật trạng thái công việc | Trung bình | Cao |
+| SH-05 | Thủ kho phụ tùng | Primary (User) | Quản lý nhập/xuất kho, kiểm soát tồn kho theo phiếu dịch vụ | Trung bình | Cao |
+| SH-06 | Thu ngân / Kế toán nội bộ | Primary (User) | Lập hóa đơn, ghi nhận thanh toán, đối soát số liệu doanh thu | Trung bình | Cao |
+| SH-07 | Quản trị hệ thống | Project | Quản trị tài khoản, phân quyền, cấu hình hệ thống và hỗ trợ vận hành | Trung bình | Trung bình |
+| SH-08 | Khách hàng sử dụng dịch vụ | Secondary | Cung cấp thông tin xe, nhận báo giá/chứng từ, phản hồi chất lượng dịch vụ | Thấp | Trung bình |
+| SH-09 | Giảng viên hướng dẫn/đánh giá | Project (Governance) | Đánh giá mức độ hoàn thiện học thuật và tính nhất quán của sản phẩm | Cao | Cao |
 
-#### 1.2.3 Nhu cầu và vấn đề chính theo từng nhóm
-- Chủ garage/Quản lý: cần số liệu chính xác, tức thời để kiểm soát doanh thu, tình trạng xử lý xe và hiệu quả sử dụng phụ tùng.
-- Lễ tân: cần thao tác nhanh khi tiếp nhận xe, tra cứu lịch sử thuận tiện, giảm ghi chép lặp lại.
-- Kỹ thuật viên: cần nhận việc rõ ràng, cập nhật tiến độ minh bạch, tránh bỏ sót hạng mục.
-- Thủ kho: cần kiểm soát xuất kho theo phiếu, cảnh báo tồn thấp, hạn chế sai lệch số lượng thực tế.
-- Thu ngân/Kế toán: cần lập hóa đơn nhất quán với dữ liệu thực hiện dịch vụ, theo dõi trạng thái thanh toán rõ ràng.
-- Khách hàng: kỳ vọng thông tin dịch vụ minh bạch, thời gian xử lý rõ ràng, lịch sử bảo dưỡng có thể tra cứu khi cần.
+#### 1.2.3 Nhu cầu và mối quan tâm chính theo từng nhóm
+- Chủ garage/Ban quản lý: cần dữ liệu tổng hợp đáng tin cậy để theo dõi doanh thu, năng suất xử lý xe và hiệu quả sử dụng phụ tùng.
+- Quản lý vận hành: cần theo dõi trạng thái công việc theo thời gian gần thực để điều phối nhân sự và xử lý điểm nghẽn.
+- Lễ tân/Cố vấn dịch vụ: cần thao tác tiếp nhận nhanh, tra cứu lịch sử thuận tiện, hạn chế nhập liệu lặp và sai sót thông tin.
+- Kỹ thuật viên: cần danh sách công việc rõ ràng, cập nhật tiến độ đơn giản, tránh bỏ sót hạng mục và nhầm lẫn yêu cầu.
+- Thủ kho: cần kiểm soát xuất kho theo phiếu, cảnh báo tồn thấp, giảm sai lệch giữa số liệu hệ thống và tồn thực tế.
+- Thu ngân/Kế toán nội bộ: cần hóa đơn đồng nhất với dữ liệu dịch vụ/phụ tùng và theo dõi trạng thái thanh toán minh bạch.
+- Quản trị hệ thống: cần mô hình phân quyền rõ, nhật ký thao tác đủ dùng cho kiểm tra và hỗ trợ vận hành.
+- Khách hàng: cần quy trình minh bạch, thời gian xử lý được thông báo rõ, lịch sử bảo dưỡng có thể truy xuất khi cần.
 
 #### 1.2.4 Phân tích quyền lực - mức quan tâm và chiến lược tương tác
 | Nhóm | Phân loại Power/Interest | Chiến lược tương tác |
 |---|---|---|
-| Chủ garage, Quản lý vận hành, Giảng viên hướng dẫn | Cao/Cao | Trao đổi định kỳ, xác nhận các mốc quyết định quan trọng |
-| Lễ tân, Kỹ thuật viên, Thủ kho, Thu ngân | Trung bình/Cao | Thu thập yêu cầu chi tiết, phản hồi thường xuyên theo luồng nghiệp vụ |
-| Quản trị hệ thống | Trung bình/Trung bình | Tham vấn khi chốt mô hình quyền và vận hành kỹ thuật |
-| Khách hàng | Thấp/Trung bình | Ghi nhận phản hồi gián tiếp thông qua quy trình phục vụ |
+| Chủ garage, Quản lý vận hành, Giảng viên hướng dẫn | Cao/Cao | Manage closely: làm việc định kỳ theo mốc, xác nhận phạm vi và tiêu chí nghiệm thu |
+| Lễ tân, Kỹ thuật viên, Thủ kho, Thu ngân | Trung bình/Cao | Keep informed + involve deeply: workshop quy trình, xác nhận use case và phản hồi theo vòng lặp ngắn |
+| Quản trị hệ thống | Trung bình/Trung bình | Keep satisfied: tham vấn ở các quyết định về phân quyền, bảo mật và vận hành hệ thống |
+| Khách hàng | Thấp/Trung bình | Monitor/feedback: thu thập phản hồi trải nghiệm qua các tình huống dịch vụ thực tế |
 
 #### 1.2.5 Vai trò phê duyệt và ra quyết định
-- Phê duyệt phạm vi nghiệp vụ: Chủ garage/Quản lý vận hành.
-- Phê duyệt tiêu chí học thuật và chất lượng báo cáo: Giảng viên hướng dẫn/đánh giá.
-- Phê duyệt thiết kế kỹ thuật chi tiết và thứ tự triển khai: Nhóm thực hiện dự án (vai trò Solution Architect/Developer).
+- Phê duyệt phạm vi nghiệp vụ và ưu tiên tính năng MVP: Chủ garage/Ban quản lý và Quản lý vận hành.
+- Phê duyệt tiêu chí học thuật, cấu trúc báo cáo và mức độ hoàn thiện đồ án: Giảng viên hướng dẫn/đánh giá.
+- Quyết định kỹ thuật chi tiết (thiết kế kiến trúc, API, dữ liệu, kiểm thử): Nhóm thực hiện dự án.
 
-#### 1.2.6 Kết luận phân tích stakeholder
-Hệ thống có đặc thù đa vai trò và phụ thuộc phối hợp liên phòng ban. Vì vậy, yêu cầu quan trọng nhất trong giai đoạn phân tích là bảo đảm luồng nghiệp vụ được mô hình hóa nhất quán giữa lễ tân, kỹ thuật, kho và thu ngân; đồng thời cấu hình phân quyền phải đủ chặt để bảo vệ dữ liệu nghiệp vụ nhưng vẫn thuận tiện cho thao tác hàng ngày.
+#### 1.2.6 Chân dung người dùng đại diện (User Persona)
+**Persona P1 - Lễ tân/Cố vấn dịch vụ**
+- Bối cảnh công việc: là điểm tiếp xúc đầu tiên với khách hàng, xử lý lượng yêu cầu lớn vào giờ cao điểm.
+- Mục tiêu chính: tiếp nhận xe nhanh, ghi nhận đúng nhu cầu dịch vụ, tra cứu lịch sử tức thời.
+- Điểm đau hiện tại: thông tin phân tán, phải ghi chép lặp nhiều nơi, dễ thiếu dữ liệu khi bàn giao cho kỹ thuật.
+- Mức thành thạo công nghệ: trung bình.
+- Tần suất sử dụng hệ thống: liên tục trong ca làm việc.
+
+**Persona P2 - Kỹ thuật viên**
+- Bối cảnh công việc: thực hiện nhiều hạng mục song song, phụ thuộc thông tin đầu vào từ lễ tân và kho.
+- Mục tiêu chính: nhận việc rõ ràng, cập nhật tiến độ đơn giản, hạn chế gián đoạn do thiếu phụ tùng.
+- Điểm đau hiện tại: thiếu một luồng theo dõi thống nhất về trạng thái công việc và vật tư liên quan.
+- Mức thành thạo công nghệ: cơ bản đến trung bình.
+- Tần suất sử dụng hệ thống: nhiều lần theo từng công việc trong ngày.
+
+**Persona P3 - Quản lý vận hành/Chủ garage**
+- Bối cảnh công việc: theo dõi hiệu suất toàn garage, ra quyết định điều phối nhân sự và kiểm soát doanh thu.
+- Mục tiêu chính: có báo cáo ngắn gọn, chính xác, cập nhật để điều hành.
+- Điểm đau hiện tại: dữ liệu tổng hợp chậm, khó đối soát giữa dịch vụ đã làm, phụ tùng đã xuất và hóa đơn.
+- Mức thành thạo công nghệ: trung bình.
+- Tần suất sử dụng hệ thống: hằng ngày theo mốc kiểm tra vận hành.
+
+#### 1.2.7 Ma trận trách nhiệm mức cao (RACI sơ bộ)
+| Hoạt động chính | Chủ garage/Quản lý | Lễ tân | Kỹ thuật viên | Thủ kho | Thu ngân | Quản trị hệ thống | Nhóm dự án |
+|---|---|---|---|---|---|---|---|
+| Xác nhận phạm vi nghiệp vụ | A | C | C | C | C | I | R |
+| Mô tả quy trình tiếp nhận và xử lý xe | C | R | R | C | I | I | A |
+| Chốt yêu cầu kho, hóa đơn và thanh toán | C | C | C | R | R | I | A |
+| Thiết kế phân quyền và cơ chế kiểm soát truy cập | C | I | I | I | I | R | A |
+| Kiểm thử nghiệp vụ và nghiệm thu kịch bản demo | A | R | R | R | R | C | C |
+
+Chú thích: R (Responsible) - trực tiếp thực hiện; A (Accountable) - chịu trách nhiệm cuối cùng; C (Consulted) - được tham vấn; I (Informed) - được thông báo.
+
+#### 1.2.8 Kết luận phân tích stakeholder
+Phân tích stakeholder cho thấy hệ thống có tính liên phòng ban cao, trong đó các nhóm trực tiếp vận hành gồm lễ tân, kỹ thuật viên, thủ kho và thu ngân là nguồn yêu cầu nghiệp vụ cốt lõi. Nhóm quản lý giữ vai trò quyết định phạm vi và tiêu chí thành công, trong khi quản trị hệ thống bảo đảm tính khả thi khi triển khai vận hành. Vì vậy, chiến lược phù hợp là thu thập yêu cầu theo luồng nghiệp vụ end-to-end, xác nhận liên tục theo mốc ngắn và duy trì cơ chế phê duyệt rõ ràng để hạn chế thay đổi phạm vi vào giai đoạn cuối.
 
 ### 1.3 System Context
-- [ ] System boundary
-- [ ] External actors/systems
-- [ ] Luồng thông tin vào/ra
+#### 1.3.1 Mục tiêu xác định ngữ cảnh hệ thống
+Mục tiêu của System Context là xác định rõ ranh giới giữa Vehicle Service Management System và môi trường vận hành bên ngoài, bao gồm các tác nhân sử dụng, hệ thống liên quan và các luồng thông tin trao đổi. Việc định nghĩa ngữ cảnh ở mức cao giúp kiểm soát phạm vi, hạn chế nhầm lẫn giữa yêu cầu tích hợp và thiết kế nội bộ, đồng thời tạo cơ sở cho các phần Use Case và Process Modeling ở chương sau.
+
+#### 1.3.2 Ranh giới hệ thống (System Boundary)
+Vehicle Service Management System được xem là một hệ thống thống nhất phục vụ nghiệp vụ garage trong phạm vi một chi nhánh ở giai đoạn MVP. Bên trong ranh giới hệ thống bao gồm các chức năng chính: quản lý khách hàng và phương tiện, lịch hẹn, phiếu dịch vụ, quy trình kỹ thuật, kho phụ tùng, hóa đơn thanh toán, báo cáo vận hành và phân quyền truy cập.
+
+Những thành phần ngoài ranh giới hệ thống:
+- Người dùng nghiệp vụ và khách hàng (đóng vai trò tác nhân tương tác).
+- Các dịch vụ liên lạc bên ngoài như Email/SMS (nếu kích hoạt nhắc lịch).
+- Cổng thanh toán trực tuyến, hệ thống hóa đơn điện tử, ERP kế toán (được xác định là ngoài phạm vi tích hợp ở MVP).
+
+#### 1.3.3 Tác nhân và hệ thống bên ngoài
+| Mã | Thực thể ngoài hệ thống | Loại | Vai trò tương tác chính | Tần suất tương tác |
+|---|---|---|---|---|
+| EX-01 | Lễ tân/Cố vấn dịch vụ | Actor | Tiếp nhận xe, tạo lịch hẹn, lập phiếu dịch vụ, theo dõi trạng thái | Liên tục trong ca làm việc |
+| EX-02 | Kỹ thuật viên | Actor | Nhận việc, cập nhật chẩn đoán và tiến độ thực hiện | Nhiều lần theo từng công việc |
+| EX-03 | Thủ kho phụ tùng | Actor | Xác nhận xuất kho, cập nhật tồn kho theo phiếu | Theo từng giao dịch kho |
+| EX-04 | Thu ngân/Kế toán nội bộ | Actor | Lập hóa đơn, ghi nhận thanh toán, đối soát dữ liệu | Theo từng ca và cuối ngày |
+| EX-05 | Quản lý vận hành/Chủ garage | Actor | Theo dõi báo cáo doanh thu, tiến độ xử lý, tồn kho cảnh báo | Hằng ngày/định kỳ |
+| EX-06 | Khách hàng sử dụng dịch vụ | Actor | Cung cấp thông tin xe, nhận báo giá/chứng từ, nhận thông báo | Theo từng lần sử dụng dịch vụ |
+| EX-07 | Dịch vụ Email/SMS | External System | Gửi thông báo lịch hẹn, nhắc lịch bảo dưỡng, trạng thái xử lý | Theo sự kiện hoặc lịch định kỳ |
+| EX-08 | Cổng thanh toán/ERP/Hóa đơn điện tử | External System (Future) | Tích hợp thanh toán và đồng bộ kế toán (định hướng mở rộng) | Chưa áp dụng ở MVP |
+
+#### 1.3.4 Luồng dữ liệu vào/ra mức cao
+| Mã luồng | Nguồn -> Đích | Nội dung thông tin | Hướng luồng | Cơ chế kích hoạt |
+|---|---|---|---|---|
+| DF-01 | Lễ tân -> Hệ thống | Thông tin khách hàng, phương tiện, yêu cầu dịch vụ, lịch hẹn | Vào hệ thống | Real-time theo thao tác tiếp nhận |
+| DF-02 | Kỹ thuật viên -> Hệ thống | Kết quả kiểm tra, hạng mục thực hiện, trạng thái công việc | Vào hệ thống | Real-time theo tiến độ xử lý |
+| DF-03 | Thủ kho -> Hệ thống | Phiếu xuất/điều chỉnh phụ tùng, xác nhận tồn | Vào hệ thống | Theo giao dịch phát sinh |
+| DF-04 | Thu ngân -> Hệ thống | Dữ liệu thanh toán, trạng thái hóa đơn | Vào hệ thống | Theo nghiệp vụ thanh toán |
+| DF-05 | Hệ thống -> Quản lý | Báo cáo doanh thu, hiệu suất xử lý xe, cảnh báo tồn kho | Ra hệ thống | On-demand và theo mốc kiểm tra |
+| DF-06 | Hệ thống <-> Khách hàng | Tiếp nhận thông tin xe và phản hồi kết quả dịch vụ/chứng từ | Hai chiều | Theo từng phiên phục vụ |
+| DF-07 | Hệ thống -> Email/SMS | Nội dung nhắc lịch, xác nhận lịch hẹn, thông báo trạng thái | Ra hệ thống | Theo sự kiện hoặc lịch đặt trước |
+| DF-08 | Cổng thanh toán/ERP/Hóa đơn điện tử <-> Hệ thống | Dữ liệu thanh toán/đồng bộ kế toán/hóa đơn điện tử | Hai chiều | Chưa áp dụng ở MVP |
+
+#### 1.3.5 Sơ đồ ngữ cảnh hệ thống mức cao
+```mermaid
+flowchart LR
+    LT[Lễ tân / Cố vấn dịch vụ]
+    KT[Kỹ thuật viên]
+    KHO[Thủ kho phụ tùng]
+    TN[Thu ngân / Kế toán nội bộ]
+    QL[Quản lý vận hành / Chủ garage]
+    KH[Khách hàng]
+    MSG[Dịch vụ Email/SMS]
+    EXT[Cổng thanh toán / ERP / HĐĐT (Future)]
+
+    SYS[Vehicle Service Management System]
+
+    LT -->|Tiếp nhận xe, lịch hẹn, phiếu dịch vụ| SYS
+    KT -->|Cập nhật chẩn đoán, tiến độ| SYS
+    KHO -->|Xuất kho, cập nhật tồn| SYS
+    TN -->|Hóa đơn, thanh toán| SYS
+    SYS -->|Báo cáo, cảnh báo| QL
+    KH -->|Thông tin xe, yêu cầu| SYS
+    SYS -->|Kết quả dịch vụ, chứng từ| KH
+    SYS -->|Nhắc lịch/Thông báo| MSG
+    SYS -.Định hướng mở rộng.- EXT
+```
+
+#### 1.3.6 Ghi chú phụ thuộc và ràng buộc ngữ cảnh
+- Tại phiên bản MVP, hệ thống ưu tiên mô hình vận hành nội bộ một chi nhánh và chưa phụ thuộc bắt buộc vào tích hợp bên thứ ba.
+- Luồng thông tin nghiệp vụ cốt lõi được thiết kế theo hướng real-time để giảm độ trễ giữa lễ tân, kỹ thuật, kho và thu ngân.
+- Các tích hợp ngoài phạm vi (thanh toán trực tuyến, ERP, hóa đơn điện tử) chỉ được nêu như phụ thuộc tương lai để tránh mở rộng phạm vi sớm.
 
 ### 2.1 Use Case
 - [ ] Danh sách use case theo FR

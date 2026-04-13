@@ -28,22 +28,22 @@
 - [DONE] Ghi artifact Role Matrix: `docs/report/artifacts/role-permission-matrix-v1.md`
 - [DONE] Tạo file báo cáo tổng (`docs/report/garage-thesis-report.md`)
 - [DONE] Tạo file audit ngày (`docs/audit/daily-progress-log.md`)
-
-### Đang làm
-- [IN_PROGRESS] Chuẩn bị viết nội dung chi tiết cho mục 1.2 Stakeholder theo đề tài garage
-
-### Bổ sung cuối ngày
 - [DONE] Đã viết đầy đủ mục 1.1 Vision trong `docs/report/garage-thesis-report.md`
 - [DONE] Đã chuẩn hóa lại văn phong học thuật cho mục 1.1 và hoàn thiện mục 1.2 Stakeholder trong `docs/report/garage-thesis-report.md`
+- [DONE] Đã hoàn thiện đầy đủ mục 1.3 System Context trong `docs/report/garage-thesis-report.md` (system boundary, external actors/systems, luồng thông tin vào/ra, context diagram)
 - [DONE] Đã thiết lập bộ quy tắc viết báo cáo chính thức tại `docs/report/report-writing-rules.md`
-- [DONE] Đã viết lại mục 1.1 theo đúng cấu trúc chuẩn vision document (business drivers, mục tiêu/metrics, scope, constraints, assumptions, risks)
 - [DONE] Đã tạo đặc tả làm việc với AI cho báo cáo tại `docs/ai/report-agent-spec.md`
 - [DONE] Đã tạo file hướng dẫn Copilot tại `.github/copilot-instructions.md`
+- [DONE] Đã mở rộng AI flow từ 1 lệnh lên 3 lệnh chuẩn: `Viết báo cáo mục X`, `Cập nhật progress`, `push code` trong `docs/ai/report-agent-spec.md`
+- [DONE] Đã đồng bộ `.github/copilot-instructions.md` để hỗ trợ 2 lệnh mới (`Cập nhật progress`, `push code`) theo đúng quy trình stage/commit/push
+
+### Đang làm
+- [IN_PROGRESS] Rà soát tính nhất quán giữa các mục 1.1, 1.2, 1.3 trước khi chuyển sang nhóm 2.x
 
 ### Kế hoạch ngày mai
-- [TODO] Hoàn thành nội dung chi tiết mục 1.1 Vision (có thể đưa thẳng vào báo cáo)
-- [TODO] Hoàn thành nội dung chi tiết mục 1.2 Stakeholder (persona + stakeholder register)
-- [TODO] Bắt đầu 1.3 System Context (system boundary + actor ngoài hệ thống)
+- [TODO] Hoàn thành mục 2.1 Use Case (danh sách use case theo FR + use case diagram tổng quan)
+- [TODO] Hoàn thành mục 2.2 Process Modeling cho 3 luồng chính (tiếp nhận xe, work order, hóa đơn/thanh toán)
+- [TODO] Bắt đầu mục 2.3 Data Modeling (domain model và ERD concept mức cao)
 
 ### Rủi ro/Ghi chú
 - Cần giữ scope MVP ổn định, tránh mở rộng sớm

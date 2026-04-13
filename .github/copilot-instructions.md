@@ -11,6 +11,17 @@ When asked to write report section X:
 4. Write directly as final report prose (not notes/checklist style).
 5. Update `docs/audit/daily-progress-log.md` with completed work.
 
+When asked to update progress:
+1. Check actual repo changes (`git status`, `git diff --name-only`).
+2. Update `docs/audit/daily-progress-log.md` to match real status (`DONE/IN_PROGRESS/TODO`).
+3. Do not mark tasks as done without evidence in changed files.
+
+When asked to push code:
+1. Stage current changes.
+2. Write proper commit message based on actual diff.
+3. Commit and push to current branch.
+4. Report commit hash, branch, and pushed files.
+
 ## Content constraints
 - Use formal Vietnamese academic style.
 - Keep consistency with approved architecture, stack, FR scope, and role matrix.

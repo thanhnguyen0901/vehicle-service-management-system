@@ -57,7 +57,9 @@ Mục tiêu là bảo đảm mọi nội dung sinh ra đều đúng chuẩn họ
 - 7.4 -> `docs/technique/7.4-development standard.txt`
 - 7.5 -> `docs/technique/7.5-implementation plan.txt`
 
-## 6. Quy trình bắt buộc khi nhận yêu cầu "viết mục X"
+## 6. AI Flow Commands (3 lệnh chuẩn)
+
+### Lệnh 1: `Viết báo cáo mục X`
 1. Xác định đúng mục X trong `garage-thesis-report.md`.
 2. Đọc file `docs/technique` tương ứng của mục X.
 3. Trích các thành phần bắt buộc phải có cho mục X.
@@ -65,6 +67,41 @@ Mục tiêu là bảo đảm mọi nội dung sinh ra đều đúng chuẩn họ
 5. Viết nội dung trực tiếp vào `garage-thesis-report.md` bằng văn phong báo cáo chính thức.
 6. Tự rà soát theo checklist chất lượng trước khi chốt.
 7. Cập nhật `docs/audit/daily-progress-log.md` với thay đổi đã thực hiện.
+
+### Lệnh 2: `Cập nhật progress`
+Mục tiêu: cập nhật đúng trạng thái công việc hiện tại dựa trên thay đổi thực tế trong repo.
+
+Quy trình bắt buộc:
+1. Kiểm tra thay đổi hiện tại bằng `git status` và (nếu cần) `git diff --name-only`.
+2. Đối chiếu các file đã thay đổi với checklist/mốc tiến độ trong:
+   - `docs/report/garage-thesis-report.md`
+   - `docs/report/artifacts/*`
+   - `docs/audit/daily-progress-log.md`
+3. Cập nhật `docs/audit/daily-progress-log.md`:
+   - Chuyển các mục đã hoàn tất sang `DONE`
+   - Cập nhật mục đang thực hiện sang `IN_PROGRESS`
+   - Điều chỉnh kế hoạch ngày tiếp theo theo trạng thái mới nhất
+4. Không tự ý đánh dấu `DONE` cho hạng mục chưa có bằng chứng thay đổi trong repo.
+5. Sau khi cập nhật, rà lại để bảo đảm trạng thái trong log phản ánh đúng code/docs hiện tại.
+
+### Lệnh 3: `push code`
+Mục tiêu: stage các thay đổi hiện có, tạo commit message phù hợp và push lên remote branch hiện tại.
+
+Quy trình bắt buộc:
+1. Kiểm tra working tree bằng `git status`.
+2. Review nhanh thay đổi bằng `git diff --stat` và/hoặc `git diff`.
+3. Stage các file thay đổi hiện tại bằng `git add ...` (theo phạm vi người dùng yêu cầu).
+4. Viết commit message rõ nghĩa theo nội dung thực tế thay đổi.
+5. Commit bằng `git commit -m "<message>"`.
+6. Push bằng `git push` lên branch hiện tại.
+7. Báo lại kết quả gồm:
+   - Danh sách file đã commit
+   - Commit hash
+   - Branch/remote đã push
+
+Ràng buộc:
+- Không dùng `--amend`, `rebase`, `reset --hard` hoặc thao tác phá hủy lịch sử trừ khi có yêu cầu rõ ràng.
+- Nếu commit/push thất bại do quyền hoặc conflict, phải báo lỗi cụ thể và dừng ở trạng thái an toàn.
 
 ## 7. Checklist chất lượng trước khi chốt
 - [ ] Đã đọc đúng file `docs/technique` của mục đang viết.
@@ -85,6 +122,8 @@ Mục tiêu là bảo đảm mọi nội dung sinh ra đều đúng chuẩn họ
 - "Viết mục 1.3 trong garage-thesis-report.md theo chuẩn technique và rule hiện tại."
 - "Viết lại mục 3.1 theo văn phong học thuật, bám FR-01..FR-19 đã chốt."
 - "Soát mục 5.2 và chỉnh cho nhất quán với API convention /api/v1."
+- "Cập nhật progress theo thay đổi mới nhất trong repo."
+- "Push code giúp mình: stage, commit và push toàn bộ thay đổi hiện tại."
 
 ## 10. Đầu ra mong đợi sau mỗi lần cập nhật
 - Nội dung mục được viết/chỉnh sửa trực tiếp trong `docs/report/garage-thesis-report.md`.
