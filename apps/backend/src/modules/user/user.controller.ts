@@ -10,6 +10,7 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
+  ForbiddenException,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import {
@@ -69,7 +70,7 @@ export class UserController {
   ) {
     // Users can only change their own password unless Admin
     if (currentUser.role !== Role.Admin && currentUser.id !== id) {
-      return { error: { code: 'FORBIDDEN', message: 'Cannot change another user\'s password' } };
+      throw new ForbiddenException('Cannot change another user\'s password');
     }
     return this.userService.changePassword(id, dto);
   }

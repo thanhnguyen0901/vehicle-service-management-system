@@ -49,6 +49,15 @@ const authSlice = createSlice({
       state.isAuthenticated = false;
       state.error = action.payload;
     },
+    authCheckRequest(state) {
+      state.isLoading = true;
+      state.error = null;
+    },
+    authCheckFailure(state) {
+      state.isLoading = false;
+      state.isAuthenticated = false;
+      state.user = null;
+    },
     logoutRequest(state) {
       state.isLoading = true;
     },
@@ -66,6 +75,8 @@ const authSlice = createSlice({
 });
 
 export const {
+  authCheckRequest,
+  authCheckFailure,
   loginRequest,
   loginSuccess,
   loginFailure,

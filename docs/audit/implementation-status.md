@@ -1,6 +1,6 @@
 # Implementation Status — Vehicle Service Management System
 
-> Cập nhật: 14/06/2026  
+> Cập nhật: 16/06/2026  
 > Phiên bản MVP: FR-01 → FR-19
 
 ---
@@ -8,11 +8,21 @@
 ## Tổng quan tiến độ
 
 ```
-Backend  ██████░░░░░░░░░░░░░░  ~25%  (2/11 modules hoàn thành)
-Frontend ████░░░░░░░░░░░░░░░░  ~20%  (auth + skeleton layout, 0/9 feature pages)
+Backend  ██████░░░░░░░░░░░░░░  ~25%  (Auth/User + shared infra, chưa có business modules)
+Frontend █████░░░░░░░░░░░░░░░  ~25%  (auth + layout + UserManagementPage, còn thiếu business pages)
 Schema   ████████████████░░░░  ~80%  (15/15 bảng, thiếu 1 enum CustomerType)
-Infra    ████████████████████  100%  (filters, guards, pipes, interceptors)
+Infra    ████████████████████  100%  (filters, guards, pipes, interceptors, health endpoint)
+E2E      ██░░░░░░░░░░░░░░░░░░  setup có Auth/User specs, runtime đang blocked bởi DB local credential/port
 ```
+
+**Recheck 16/06/2026:**
+- ✅ Backend build pass.
+- ✅ Frontend build pass.
+- ✅ Đã sửa `UserController.changePassword` để trả HTTP 403 qua `ForbiddenException`.
+- ✅ Đã thêm `GET /api/v1/health` phục vụ readiness cho Playwright.
+- ✅ Đã thêm frontend `UserManagementPage` tích hợp API thật `/users`.
+- ✅ Đã thêm Playwright config + specs cho Auth và User Management.
+- ⚠️ `npm run test:e2e` chưa pass do backend không kết nối được DB: port `5432` đang trỏ tới PostgreSQL khác, credential `vsms_user` không hợp lệ.
 
 ---
 
@@ -284,21 +294,26 @@ GET    /api/v1/reports/low-stock      parts có stockQuantity <= reorderLevel
 | File | Trạng thái |
 |---|---|
 | `features/auth/LoginPage.tsx` | ✅ Formik + Yup, kết nối Redux action `loginRequest` |
-| `features/auth/authSlice.ts` | ✅ Redux slice: login/logout/setUser states |
-| `features/auth/authSaga.ts` | ✅ Saga: handleLogin → authApi.login → dispatch loginSuccess/Failure |
+| `features/auth/authSlice.ts` | ✅ Redux slice: login/logout/authCheck states |
+| `features/auth/authSaga.ts` | ✅ Saga: login/logout/authCheck, authCheck thử refresh rồi gọi me |
 | `features/auth/authApi.ts` | ✅ axios calls: login, logout, me, refresh |
-| `shared/components/ProtectedRoute.tsx` | ✅ Redirect /login nếu chưa auth |
-| `shared/layouts/DashboardLayout.tsx` | ✅ Sidebar + Outlet, logout button |
+| `shared/components/ProtectedRoute.tsx` | ✅ Loading khi authCheck, redirect /login nếu chưa auth |
+| `shared/layouts/DashboardLayout.tsx` | ✅ Sidebar + Outlet, logout button, menu `/dashboard/users` theo role |
 | `features/dashboard/DashboardHome.tsx` | ✅ Placeholder cards (data hardcoded `—`) |
 | `services/api.ts` | ✅ Axios instance + auto refresh interceptor (retry on 401) |
 | `store/index.ts` | ✅ Redux store + sagaMiddleware |
 | `store/rootSaga.ts` | ✅ Root saga, combine authSaga |
 
+### ✅/⚠️ Feature Pages đã có nhưng chưa DONE theo vertical slice
+
+| FR | Page/API | Route | Trạng thái |
+|---|---|---|---|
+| FR-02 | `features/users/UserManagementPage.tsx`, `features/users/userApi.ts` | `/dashboard/users` | ✅ UI + API thật đã có; ⚠️ Playwright spec đã có nhưng runtime blocked bởi DB local credential/port |
+
 ### ❌ Feature Pages chưa tạo
 
 | FR | Page | Route |
 |---|---|---|
-| FR-02 | UserManagementPage | `/dashboard/users` |
 | FR-03, FR-04 | CustomerListPage | `/dashboard/customers` |
 | FR-03, FR-04 | CustomerFormPage (create/edit) | `/dashboard/customers/new`, `/:id/edit` |
 | FR-05 | VehicleListPage | `/dashboard/vehicles` |
@@ -363,6 +378,7 @@ Phase 4 — Frontend pages (có thể làm song song từ Phase 1):
 ```
 apps/backend/src/
 ├── app.module.ts                        ✅
+├── health.controller.ts                 ✅
 ├── main.ts                              ✅
 ├── common/
 │   ├── decorators/
@@ -394,14 +410,17 @@ apps/backend/src/
     └── report/                          ❌ chưa tạo
 
 apps/frontend/src/
-├── App.tsx                              ✅ (routes: /login, /dashboard)
+├── App.tsx                              ✅ (routes: /login, /dashboard, /dashboard/users)
 ├── main.tsx                             ✅
 ├── index.css                            ✅
 ├── vite-env.d.ts                        ✅
 ├── features/
 │   ├── auth/                            ✅ (5 files)
-│   └── dashboard/
-│       └── DashboardHome.tsx            ✅ (placeholder)
+│   ├── dashboard/
+│   │   └── DashboardHome.tsx            ✅ (placeholder)
+│   └── users/                           ✅ UI + API thật, ⚠️ e2e blocked bởi DB
+│       ├── UserManagementPage.tsx       ✅
+│       └── userApi.ts                   ✅
 ├── services/
 │   └── api.ts                           ✅ (axios + refresh interceptor)
 ├── shared/
@@ -412,4 +431,11 @@ apps/frontend/src/
 └── store/
     ├── index.ts                         ✅
     └── rootSaga.ts                      ✅
+
+apps/frontend/
+├── playwright.config.ts                 ✅
+└── e2e/
+    ├── auth.spec.ts                     ✅ spec có, runtime blocked bởi DB
+    ├── users.spec.ts                    ✅ spec có, runtime blocked bởi DB
+    └── helpers/auth.ts                  ✅
 ```

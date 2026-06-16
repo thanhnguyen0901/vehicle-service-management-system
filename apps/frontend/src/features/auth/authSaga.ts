@@ -1,14 +1,35 @@
-import { call, put, takeLatest } from 'redux-saga/effects';
+import { call, put, select, takeLatest } from 'redux-saga/effects';
 import {
+  authCheckRequest,
+  authCheckFailure,
   loginRequest,
   loginSuccess,
   loginFailure,
   logoutRequest,
   logoutSuccess,
+  selectIsAuthenticated,
   type LoginPayload,
 } from './authSlice';
 import { authApi } from './authApi';
 import type { PayloadAction } from '@reduxjs/toolkit';
+
+function* handleAuthCheck() {
+  try {
+    let response: Awaited<ReturnType<typeof authApi.me>>;
+    try {
+      response = yield call(authApi.me);
+    } catch {
+      yield call(authApi.refresh);
+      response = yield call(authApi.me);
+    }
+    yield put(loginSuccess(response.user));
+  } catch {
+    const isAuthenticated: boolean = yield select(selectIsAuthenticated);
+    if (!isAuthenticated) {
+      yield put(authCheckFailure());
+    }
+  }
+}
 
 function* handleLogin(action: PayloadAction<LoginPayload>) {
   try {
@@ -34,6 +55,7 @@ function* handleLogout() {
 }
 
 export function* authSaga() {
+  yield takeLatest(authCheckRequest.type, handleAuthCheck);
   yield takeLatest(loginRequest.type, handleLogin);
   yield takeLatest(logoutRequest.type, handleLogout);
 }

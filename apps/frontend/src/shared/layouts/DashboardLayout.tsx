@@ -3,8 +3,17 @@ import { useDispatch, useSelector } from 'react-redux';
 import { selectCurrentUser, logoutRequest } from '../../features/auth/authSlice';
 import { Button } from 'primereact/button';
 
-const navItems = [
+interface NavItem {
+  to: string;
+  icon: string;
+  label: string;
+  end?: boolean;
+  roles?: string[];
+}
+
+const navItems: NavItem[] = [
   { to: '/dashboard', icon: 'pi-home', label: 'Tổng quan', end: true },
+  { to: '/dashboard/users', icon: 'pi-users', label: 'Người dùng', roles: ['Admin', 'Manager'] },
 ];
 
 export function DashboardLayout() {
@@ -32,7 +41,9 @@ export function DashboardLayout() {
         </div>
 
         <nav className="flex-1 py-4">
-          {navItems.map((item) => (
+          {navItems
+            .filter((item) => !item.roles || item.roles.includes(user?.role ?? ''))
+            .map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
