@@ -1,0 +1,313 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum Role {
+  Admin
+  ServiceAdvisor
+  Technician
+  InventoryClerk
+  Cashier
+  Manager
+}
+
+enum WorkOrderStatus {
+  Received
+  Diagnosing
+  Repairing
+  WaitingParts
+  ReadyForDelivery
+  Delivered
+  Cancelled
+}
+
+enum AppointmentStatus {
+  Scheduled
+  Arrived
+  Cancelled
+}
+
+enum InvoiceStatus {
+  Unpaid
+  Paid
+}
+
+enum PaymentMethod {
+  Cash
+  BankTransfer
+  Card
+}
+
+enum TransactionType {
+  Import
+  Export
+  Adjustment
+}
+
+// ─── Tables ───────────────────────────────────────────────────────────────────
+
+model UserAccount {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  username     String   @unique @db.VarChar(50)
+  passwordHash String   @map("password_hash") @db.VarChar(255)
+  fullName     String   @map("full_name") @db.VarChar(100)
+  email        String?  @unique @db.VarChar(150)
+  phone        String?  @db.VarChar(20)
+  role         Role
+  isActive     Boolean  @default(true) @map("is_active")
+  refreshToken String?  @map("refresh_token") @db.Text
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  auditLogs    AuditLog[]
+
+  @@map("user_accounts")
+}
+
+model Customer {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  fullName  String   @map("full_name") @db.VarChar(100)
+  phone     String   @unique @db.VarChar(20)
+  email     String?  @unique @db.VarChar(150)
+  address   String?  @db.Text
+  notes     String?  @db.Text
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  vehicles              Vehicle[]
+  maintenanceReminders  MaintenanceReminder[]
+
+  @@map("customers")
+}
+
+model Vehicle {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  customerId   String   @map("customer_id") @db.Uuid
+  licensePlate String   @unique @map("license_plate") @db.VarChar(20)
+  make         String   @db.VarChar(50)
+  model        String   @db.VarChar(50)
+  year         Int      @db.SmallInt
+  color        String?  @db.VarChar(30)
+  vin          String?  @unique @db.VarChar(17)
+  mileage      Int?
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  customer     Customer @relation(fields: [customerId], references: [id])
+  workOrders   WorkOrder[]
+  appointments Appointment[]
+  reminders    MaintenanceReminder[]
+
+  @@map("vehicles")
+}
+
+model Appointment {
+  id            String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  vehicleId     String            @map("vehicle_id") @db.Uuid
+  scheduledAt   DateTime          @map("scheduled_at") @db.Timestamptz
+  serviceNote   String?           @map("service_note") @db.Text
+  status        AppointmentStatus @default(Scheduled)
+  createdBy     String?           @map("created_by") @db.Uuid
+  createdAt     DateTime          @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt     DateTime          @updatedAt @map("updated_at") @db.Timestamptz
+
+  vehicle       Vehicle  @relation(fields: [vehicleId], references: [id])
+  workOrder     WorkOrder?
+
+  @@map("appointments")
+}
+
+model WorkOrder {
+  id            String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  vehicleId     String          @map("vehicle_id") @db.Uuid
+  appointmentId String?         @unique @map("appointment_id") @db.Uuid
+  status        WorkOrderStatus @default(Received)
+  diagnosis     String?         @db.Text
+  technicianId  String?         @map("technician_id") @db.Uuid
+  advisorId     String?         @map("advisor_id") @db.Uuid
+  receivedAt    DateTime        @default(now()) @map("received_at") @db.Timestamptz
+  deliveredAt   DateTime?       @map("delivered_at") @db.Timestamptz
+  createdAt     DateTime        @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt     DateTime        @updatedAt @map("updated_at") @db.Timestamptz
+
+  vehicle       Vehicle       @relation(fields: [vehicleId], references: [id])
+  appointment   Appointment?  @relation(fields: [appointmentId], references: [id])
+  items         WorkOrderItem[]
+  invoice       Invoice?
+
+  @@map("work_orders")
+}
+
+model Service {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String   @db.VarChar(150)
+  description String?  @db.Text
+  unitPrice   Decimal  @map("unit_price") @db.Decimal(12, 2)
+  durationMin Int?     @map("duration_min")
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  workOrderItems WorkOrderItem[]
+
+  @@map("services")
+}
+
+model Part {
+  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  partNumber       String   @unique @map("part_number") @db.VarChar(50)
+  name             String   @db.VarChar(150)
+  description      String?  @db.Text
+  unitCost         Decimal  @map("unit_cost") @db.Decimal(12, 2)
+  unitPrice        Decimal  @map("unit_price") @db.Decimal(12, 2)
+  stockQuantity    Int      @default(0) @map("stock_quantity")
+  reorderLevel     Int      @default(5) @map("reorder_level")
+  isActive         Boolean  @default(true) @map("is_active")
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt        DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  partUsages       PartUsage[]
+  inventoryTxns    InventoryTransaction[]
+
+  @@map("parts")
+}
+
+model WorkOrderItem {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  workOrderId String   @map("work_order_id") @db.Uuid
+  serviceId   String?  @map("service_id") @db.Uuid
+  description String   @db.VarChar(255)
+  quantity    Int      @default(1)
+  unitPrice   Decimal  @map("unit_price") @db.Decimal(12, 2)
+  amount      Decimal  @db.Decimal(12, 2)
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  workOrder   WorkOrder @relation(fields: [workOrderId], references: [id])
+  service     Service?  @relation(fields: [serviceId], references: [id])
+  partUsages  PartUsage[]
+
+  @@map("work_order_items")
+}
+
+model PartUsage {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  workOrderItemId String   @map("work_order_item_id") @db.Uuid
+  partId          String   @map("part_id") @db.Uuid
+  quantity        Int
+  unitPrice       Decimal  @map("unit_price") @db.Decimal(12, 2)
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  workOrderItem   WorkOrderItem @relation(fields: [workOrderItemId], references: [id])
+  part            Part          @relation(fields: [partId], references: [id])
+
+  @@map("part_usages")
+}
+
+model InventoryTransaction {
+  id              String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  partId          String          @map("part_id") @db.Uuid
+  type            TransactionType
+  quantityDelta   Int             @map("quantity_delta")
+  referenceId     String?         @map("reference_id") @db.Uuid
+  note            String?         @db.Text
+  performedBy     String?         @map("performed_by") @db.Uuid
+  createdAt       DateTime        @default(now()) @map("created_at") @db.Timestamptz
+
+  part            Part @relation(fields: [partId], references: [id])
+
+  @@map("inventory_transactions")
+}
+
+model Invoice {
+  id          String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  workOrderId String        @unique @map("work_order_id") @db.Uuid
+  status      InvoiceStatus @default(Unpaid)
+  totalAmount Decimal       @map("total_amount") @db.Decimal(14, 2)
+  discount    Decimal       @default(0) @db.Decimal(12, 2)
+  tax         Decimal       @default(0) @db.Decimal(12, 2)
+  notes       String?       @db.Text
+  issuedAt    DateTime      @default(now()) @map("issued_at") @db.Timestamptz
+  paidAt      DateTime?     @map("paid_at") @db.Timestamptz
+  createdAt   DateTime      @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime      @updatedAt @map("updated_at") @db.Timestamptz
+
+  workOrder   WorkOrder     @relation(fields: [workOrderId], references: [id])
+  lines       InvoiceLine[]
+  payments    Payment[]
+
+  @@map("invoices")
+}
+
+model InvoiceLine {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  invoiceId   String   @map("invoice_id") @db.Uuid
+  description String   @db.VarChar(255)
+  quantity    Int      @default(1)
+  unitPrice   Decimal  @map("unit_price") @db.Decimal(12, 2)
+  amount      Decimal  @db.Decimal(12, 2)
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  invoice     Invoice @relation(fields: [invoiceId], references: [id])
+
+  @@map("invoice_lines")
+}
+
+model Payment {
+  id            String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  invoiceId     String        @map("invoice_id") @db.Uuid
+  amount        Decimal       @db.Decimal(12, 2)
+  method        PaymentMethod
+  transactionRef String?      @map("transaction_ref") @db.VarChar(100)
+  paidAt        DateTime      @default(now()) @map("paid_at") @db.Timestamptz
+  receivedBy    String?       @map("received_by") @db.Uuid
+  createdAt     DateTime      @default(now()) @map("created_at") @db.Timestamptz
+
+  invoice       Invoice @relation(fields: [invoiceId], references: [id])
+
+  @@map("payments")
+}
+
+model MaintenanceReminder {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  customerId  String    @map("customer_id") @db.Uuid
+  vehicleId   String    @map("vehicle_id") @db.Uuid
+  message     String    @db.Text
+  dueDate     DateTime  @map("due_date") @db.Date
+  sentAt      DateTime? @map("sent_at") @db.Timestamptz
+  isSent      Boolean   @default(false) @map("is_sent")
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+
+  customer    Customer @relation(fields: [customerId], references: [id])
+  vehicle     Vehicle  @relation(fields: [vehicleId], references: [id])
+
+  @@map("maintenance_reminders")
+}
+
+model AuditLog {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId     String?  @map("user_id") @db.Uuid
+  action     String   @db.VarChar(100)
+  entity     String   @db.VarChar(50)
+  entityId   String?  @map("entity_id") @db.Uuid
+  before     Json?
+  after      Json?
+  ipAddress  String?  @map("ip_address") @db.VarChar(45)
+  userAgent  String?  @map("user_agent") @db.Text
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  user       UserAccount? @relation(fields: [userId], references: [id])
+
+  @@map("audit_logs")
+}
