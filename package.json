@@ -1,0 +1,17 @@
+{
+  "name": "vehicle-service-management-system",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Vehicle Service Management System",
+  "scripts": {
+    "dev:backend": "npm run dev --prefix apps/backend",
+    "dev:frontend": "npm run dev --prefix apps/frontend",
+    "build:backend": "npm run build --prefix apps/backend",
+    "build:frontend": "npm run build --prefix apps/frontend"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  }
+}
+
