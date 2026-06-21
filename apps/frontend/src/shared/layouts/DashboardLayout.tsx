@@ -27,10 +27,10 @@ export function DashboardLayout() {
   };
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen flex-col md:flex-row">
       {/* Sidebar */}
-      <aside className="w-64 bg-primary-900 text-white flex flex-col">
-        <div className="p-6 border-b border-primary-700">
+      <aside className="flex w-full flex-col bg-primary-900 text-white md:w-64">
+        <div className="border-b border-primary-700 p-4 md:p-6">
           <div className="flex items-center gap-3">
             <i className="pi pi-car text-2xl" />
             <div>
@@ -40,7 +40,7 @@ export function DashboardLayout() {
           </div>
         </div>
 
-        <nav className="flex-1 py-4">
+        <nav className="flex gap-1 overflow-x-auto px-2 py-2 md:flex-1 md:flex-col md:gap-0 md:px-0 md:py-4">
           {navItems
             .filter((item) => !item.roles || item.roles.includes(user?.role ?? ''))
             .map((item) => (
@@ -49,7 +49,7 @@ export function DashboardLayout() {
               to={item.to}
               end={item.end}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-6 py-3 text-sm transition-colors ${
+                `flex shrink-0 items-center gap-2 rounded-md px-4 py-3 text-sm transition-colors md:rounded-none md:px-6 ${
                   isActive
                     ? 'bg-primary-700 text-white font-medium'
                     : 'text-primary-200 hover:bg-primary-800 hover:text-white'
@@ -63,8 +63,8 @@ export function DashboardLayout() {
         </nav>
 
         {/* User info + logout */}
-        <div className="p-4 border-t border-primary-700">
-          <div className="text-xs text-primary-300 mb-2">
+        <div className="flex items-center justify-between gap-3 border-t border-primary-700 p-3 md:block md:p-4">
+          <div className="mb-0 min-w-0 text-xs text-primary-300 md:mb-2">
             <div className="font-medium text-white truncate">{user?.fullName}</div>
             <div>{user?.role}</div>
           </div>
@@ -73,14 +73,14 @@ export function DashboardLayout() {
             icon="pi pi-sign-out"
             severity="secondary"
             size="small"
-            className="w-full text-xs"
+            className="shrink-0 text-xs md:w-full"
             onClick={handleLogout}
           />
         </div>
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 overflow-auto bg-gray-50">
+      <main className="min-w-0 flex-1 overflow-auto bg-gray-50">
         <Outlet />
       </main>
     </div>

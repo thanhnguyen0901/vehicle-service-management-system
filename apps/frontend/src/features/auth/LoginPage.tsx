@@ -71,7 +71,7 @@ export function LoginPage() {
               Mật khẩu
             </label>
             <Password
-              id="password"
+              inputId="password"
               name="password"
               value={formik.values.password}
               onChange={formik.handleChange}

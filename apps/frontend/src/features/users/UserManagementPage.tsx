@@ -143,14 +143,14 @@ export function UserManagementPage() {
 
   if (!canRead) {
     return (
-      <div className="p-8">
+      <div className="p-4 sm:p-6 lg:p-8">
         <Message severity="warn" text="Bạn không có quyền truy cập quản lý người dùng." />
       </div>
     );
   }
 
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-6 lg:p-8">
       <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h1 className="mb-2 text-2xl font-bold text-gray-800">Người dùng</h1>
@@ -181,50 +181,52 @@ export function UserManagementPage() {
         </div>
       )}
 
-      <DataTable
-        value={filteredUsers}
-        loading={isLoading}
-        dataKey="id"
-        paginator
-        rows={10}
-        emptyMessage="Chưa có người dùng phù hợp"
-        className="rounded-lg bg-white shadow-sm"
-      >
-        <Column field="username" header="Tên đăng nhập" sortable />
-        <Column field="fullName" header="Họ tên" sortable />
-        <Column field="email" header="Email" />
-        <Column field="phone" header="SĐT" />
-        <Column field="role" header="Vai trò" sortable />
-        <Column
-          header="Trạng thái"
-          body={(row: UserAccount) => (
-            <Tag value={row.isActive ? 'Hoạt động' : 'Đã khóa'} severity={row.isActive ? 'success' : 'danger'} />
-          )}
-        />
-        <Column
-          header="Thao tác"
-          body={(row: UserAccount) => (
-            <div className="flex gap-2">
-              <Button
-                icon="pi pi-pencil"
-                rounded
-                text
-                aria-label={`Sửa ${row.username}`}
-                onClick={() => openEditDialog(row)}
-              />
-              <Button
-                icon="pi pi-ban"
-                rounded
-                text
-                severity="danger"
-                aria-label={`Khóa ${row.username}`}
-                disabled={!canDeactivate || !row.isActive || row.id === currentUser?.id}
-                onClick={() => void handleDeactivate(row)}
-              />
-            </div>
-          )}
-        />
-      </DataTable>
+      <div className="overflow-x-auto rounded-lg bg-white shadow-sm">
+        <DataTable
+          value={filteredUsers}
+          loading={isLoading}
+          dataKey="id"
+          paginator
+          rows={10}
+          emptyMessage="Chưa có người dùng phù hợp"
+          tableStyle={{ minWidth: '64rem' }}
+        >
+          <Column field="username" header="Tên đăng nhập" sortable />
+          <Column field="fullName" header="Họ tên" sortable />
+          <Column field="email" header="Email" />
+          <Column field="phone" header="SĐT" />
+          <Column field="role" header="Vai trò" sortable />
+          <Column
+            header="Trạng thái"
+            body={(row: UserAccount) => (
+              <Tag value={row.isActive ? 'Hoạt động' : 'Đã khóa'} severity={row.isActive ? 'success' : 'danger'} />
+            )}
+          />
+          <Column
+            header="Thao tác"
+            body={(row: UserAccount) => (
+              <div className="flex gap-2">
+                <Button
+                  icon="pi pi-pencil"
+                  rounded
+                  text
+                  aria-label={`Sửa ${row.username}`}
+                  onClick={() => openEditDialog(row)}
+                />
+                <Button
+                  icon="pi pi-ban"
+                  rounded
+                  text
+                  severity="danger"
+                  aria-label={`Khóa ${row.username}`}
+                  disabled={!canDeactivate || !row.isActive || row.id === currentUser?.id}
+                  onClick={() => void handleDeactivate(row)}
+                />
+              </div>
+            )}
+          />
+        </DataTable>
+      </div>
 
       <Dialog
         header={editingUser ? 'Cập nhật người dùng' : 'Tạo người dùng'}
@@ -245,14 +247,16 @@ export function UserManagementPage() {
               />
             </label>
             {!editingUser && (
-              <label className="flex flex-col gap-1 text-sm font-medium text-gray-700">
+              <label htmlFor="user-password" className="flex flex-col gap-1 text-sm font-medium text-gray-700">
                 Mật khẩu
                 <Password
+                  inputId="user-password"
                   value={form.password}
                   required
                   feedback={false}
                   toggleMask
                   inputClassName="w-full"
+                  autoComplete="new-password"
                   onChange={(event) => setForm((prev) => ({ ...prev, password: event.target.value }))}
                 />
               </label>
@@ -278,6 +282,7 @@ export function UserManagementPage() {
               <InputText
                 type="email"
                 value={form.email}
+                autoComplete="off"
                 onChange={(event) => setForm((prev) => ({ ...prev, email: event.target.value }))}
               />
             </label>

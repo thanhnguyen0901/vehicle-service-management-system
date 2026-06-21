@@ -20,7 +20,7 @@ test('admin can create, search, update and deactivate a user', async ({ page }) 
   await page.getByLabel('SĐT').fill('0900000000');
   await page.getByRole('button', { name: 'Lưu' }).click();
 
-  await expect(page.getByText(username)).toBeVisible();
+  await expect(page.getByRole('cell', { name: username, exact: true })).toBeVisible();
 
   await page.getByPlaceholder('Tìm người dùng').fill(username);
   await expect(page.getByText(email)).toBeVisible();
