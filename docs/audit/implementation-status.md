@@ -1,6 +1,6 @@
 # Implementation Status — Vehicle Service Management System
 
-> Cập nhật: 22/06/2026  
+> Cập nhật: 23/06/2026  
 > Phiên bản MVP: FR-01 → FR-19
 
 ---
@@ -8,12 +8,21 @@
 ## Tổng quan tiến độ
 
 ```
-Backend  ██████████░░░░░░░░░░  ~45%  (Auth/User/Customer/Vehicle/ServiceCatalog/Parts + shared infra)
-Frontend █████████░░░░░░░░░░░  ~45%  (auth + layout + User/Customer/Vehicle/Service/Parts pages)
+Backend  ███████████░░░░░░░░░  ~52%  (Auth/User/Customer/Vehicle/ServiceCatalog/Parts/Appointment + shared infra)
+Frontend ██████████░░░░░░░░░░  ~52%  (auth + layout + User/Customer/Vehicle/Service/Parts/Appointment pages)
 Schema   ██████████████████░░  ~90%  (15/15 bảng, đã bổ sung CustomerType và Part.unit; còn thiếu migration file chính thức)
 Infra    ████████████████████  100%  (filters, guards, pipes, interceptors, health endpoint)
-E2E      ████████░░░░░░░░░░░░  Auth/User/Customer/Vehicle/Service/Parts specs pass; các business module còn lại chưa có E2E
+E2E      █████████░░░░░░░░░░░  Auth/User/Customer/Vehicle/Service/Parts/Appointment specs pass; các business module còn lại chưa có E2E
 ```
+
+**Recheck 23/06/2026:**
+- ✅ Appointment slice DONE: backend create/list/detail/update/cancel/delete + RBAC + Zod validation.
+- ✅ Appointment frontend DONE: menu/route/page/API thật, chọn xe thật, list/search/filter/create/update/cancel/delete flow.
+- ✅ `appointments.spec.ts` pass.
+- ✅ `npm run test:e2e` trong `apps/frontend` pass: `auth.spec.ts`, `users.spec.ts`, `customers.spec.ts`, `vehicles.spec.ts`, `services.spec.ts`, `parts.spec.ts`, `appointments.spec.ts` (7/7).
+- ✅ Backend build pass.
+- ✅ Frontend build pass.
+- ▶️ Active slice tiếp theo: Work Order (FR-07, FR-08, FR-09).
 
 **Recheck 22/06/2026:**
 - ✅ Docker Postgres dev đã chạy được qua port host `5434`.
@@ -30,7 +39,7 @@ E2E      ████████░░░░░░░░░░░░  Auth/User
 - ✅ `npm run test:e2e` trong `apps/frontend` pass: `auth.spec.ts`, `users.spec.ts`, `customers.spec.ts`, `vehicles.spec.ts`, `services.spec.ts`, `parts.spec.ts` (6/6).
 - ✅ Backend build pass sau Parts.
 - ✅ Frontend build pass sau Parts.
-- ▶️ Active slice tiếp theo: Appointment (FR-06).
+- ✅ Appointment đã được triển khai hoàn tất ngày 23/06/2026.
 
 **Recheck 16/06/2026:**
 - ✅ Backend build pass.
@@ -172,18 +181,24 @@ DELETE /api/v1/vehicles/:id           [Admin]
 
 ---
 
-### ❌ AppointmentModule — CHƯA IMPLEMENT
+### ✅ AppointmentModule — `src/modules/appointment/`
 
 **Cần cho:** FR-06
 
-**Endpoints cần tạo:**
+**Endpoints đã có:**
 ```
-GET    /api/v1/appointments           filter by date range, status
-GET    /api/v1/appointments/:id
+GET    /api/v1/appointments           [Admin, ServiceAdvisor, Technician, Manager] filter by search/date range/status
+GET    /api/v1/appointments/:id       [Admin, ServiceAdvisor, Technician, Manager]
 POST   /api/v1/appointments           [ServiceAdvisor, Admin]
 PATCH  /api/v1/appointments/:id       update status (Scheduled→Arrived, Cancelled)
 DELETE /api/v1/appointments/:id       [Admin]
 ```
+
+**Business rules đã có:**
+- Validate DTO bằng Zod.
+- `createdBy` lấy từ user hiện tại.
+- Không cho cập nhật lịch đã `Cancelled`.
+- Chỉ cho chuyển `Scheduled → Arrived` hoặc `Scheduled → Cancelled`.
 
 ---
 
@@ -327,7 +342,7 @@ GET    /api/v1/reports/low-stock      parts có stockQuantity <= reorderLevel
 | `store/index.ts` | ✅ Redux store + sagaMiddleware |
 | `store/rootSaga.ts` | ✅ Root saga, combine authSaga |
 
-### ✅/⚠️ Feature Pages đã có nhưng chưa DONE theo vertical slice
+### ✅ Feature Pages đã DONE theo vertical slice
 
 | FR | Page/API | Route | Trạng thái |
 |---|---|---|---|
@@ -336,12 +351,12 @@ GET    /api/v1/reports/low-stock      parts có stockQuantity <= reorderLevel
 | FR-05, FR-16 | `features/vehicles/VehicleListPage.tsx`, `features/vehicles/vehicleApi.ts` | `/dashboard/vehicles` | ✅ UI + API thật đã có; ✅ Playwright vehicle CRUD/search flow pass ngày 22/06/2026 |
 | FR-10 | `features/services/ServiceCatalogPage.tsx`, `features/services/serviceCatalogApi.ts` | `/dashboard/services` | ✅ UI + API thật đã có; ✅ Playwright service CRUD/toggle flow pass ngày 22/06/2026 |
 | FR-11 | `features/parts/PartsPage.tsx`, `features/parts/partApi.ts` | `/dashboard/parts` | ✅ UI + API thật đã có; ✅ Playwright parts CRUD/low-stock flow pass ngày 22/06/2026 |
+| FR-06 | `features/appointments/AppointmentListPage.tsx`, `features/appointments/appointmentApi.ts` | `/dashboard/appointments` | ✅ UI + API thật đã có; ✅ Playwright appointment create/search/update/delete flow pass ngày 23/06/2026 |
 
 ### ❌ Feature Pages chưa tạo
 
 | FR | Page | Route |
 |---|---|---|
-| FR-06 | AppointmentPage | `/dashboard/appointments` |
 | FR-07~09 | WorkOrderListPage | `/dashboard/work-orders` |
 | FR-07~09 | WorkOrderDetailPage | `/dashboard/work-orders/:id` |
 | FR-13 | InventoryTransactionPage | `/dashboard/inventory` |
@@ -370,7 +385,7 @@ Phase 1 — Core data (không phụ thuộc gì):
   [x] InventoryModule — parts CRUD + frontend + Playwright (backend FR-11)
 
 Phase 2 — Operations (phụ thuộc Phase 1):
-  [ ] AppointmentModule (backend FR-06)
+  [x] AppointmentModule + frontend + Playwright (FR-06)
   [ ] WorkOrderModule (backend FR-07~09) — bao gồm state machine
   [ ] InventoryModule — nhập/xuất kho (backend FR-12, FR-13)
 
@@ -385,7 +400,7 @@ Phase 4 — Frontend pages (có thể làm song song từ Phase 1):
   [x] VehicleListPage + form dialog
   [x] ServiceCatalogPage
   [x] PartsPage
-  [ ] AppointmentPage
+  [x] AppointmentPage
   [ ] WorkOrderListPage + WorkOrderDetailPage (phức tạp nhất)
   [ ] InvoicePage + InvoiceDetailPage
   [ ] RemindersPage
