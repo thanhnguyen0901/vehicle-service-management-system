@@ -17,6 +17,12 @@ dist/
 build/
 coverage/
 
+# Test outputs
+test-results/
+playwright-report/
+apps/frontend/test-results/
+apps/frontend/playwright-report/
+
 # Env files
 .env
 .env.*
