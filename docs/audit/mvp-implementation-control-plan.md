@@ -3,7 +3,7 @@
 > Muc dich: lam tai lieu dieu khien trien khai code cho Vehicle Service Management System, dam bao source code bam dung `garage-thesis-report.md`, `mvp-functional-requirements.md`, `role-permission-matrix-v1.md` va trang thai hien tai trong `implementation-status.md`.
 >
 > Pham vi: MVP FR-01 den FR-19.
-> Trang thai code hien tai: backend da co AuthModule, UserModule, infrastructure chung va health endpoint; frontend da co login, protected route, dashboard layout, UserManagementPage; Playwright Auth/User specs da co nhung runtime dang blocked boi DB local credential/port; schema con thieu CustomerType cho FR-04.
+> Trang thai code hien tai: backend da co AuthModule, UserModule, CustomerModule, VehicleModule, ServiceCatalogModule, InventoryModule parts catalog, infrastructure chung va health endpoint; frontend da co login, protected route, dashboard layout, UserManagementPage, CustomerListPage, VehicleListPage, ServiceCatalogPage, PartsPage; Playwright Auth/User/Customer/Vehicle/Service/Parts specs da pass ngay 22/06/2026; active slice tiep theo la Appointment.
 
 ---
 
@@ -64,13 +64,13 @@ Bang status hien tai, dua tren code da recheck:
 | Module / Area | FR | Backend | Frontend UI | Playwright UI Test | Overall | Ghi chu |
 |---|---|---|---|---|---|---|
 | Infrastructure & shared | Cross-cutting | DONE | N/A | N/A | DONE | Main bootstrap, health endpoint, PrismaModule, guards, filters, pipes, interceptor da co |
-| Auth | FR-01 | DONE | DONE | BLOCKED | IN_PROGRESS | Login/logout/me/refresh da co; auth Playwright spec da co nhung test runtime dang bi chan boi DB local sai credential |
-| User management | FR-02 | DONE | DONE | BLOCKED | IN_PROGRESS | Backend CRUD + UserManagement UI da co; Playwright spec da co nhung test runtime dang bi chan boi DB local sai credential |
-| Customer | FR-03, FR-04 | NEW | NEW | NEW | NEW | Can patch Customer schema truoc |
-| Vehicle | FR-05, FR-16 | NEW | NEW | NEW | NEW | Phu thuoc Customer |
-| Service catalog | FR-10 | NEW | NEW | NEW | NEW | Nen lam truoc WorkOrder item |
-| Parts catalog | FR-11 | NEW | NEW | NEW | NEW | Nen lam truoc Inventory/PartUsage |
-| Inventory transactions | FR-12 | NEW | NEW | NEW | NEW | Phu thuoc Parts |
+| Auth | FR-01 | DONE | DONE | DONE | DONE | Login/logout/me/refresh da co; auth Playwright spec pass ngay 22/06/2026 |
+| User management | FR-02 | DONE | DONE | DONE | DONE | Backend CRUD + UserManagement UI da co; Playwright user CRUD spec pass ngay 22/06/2026 |
+| Customer | FR-03, FR-04 | DONE | DONE | DONE | DONE | Corporate customer CRUD/search flow pass ngay 22/06/2026 |
+| Vehicle | FR-05, FR-16 | DONE | DONE | DONE | DONE | Vehicle CRUD/search flow pass ngay 22/06/2026 |
+| Service catalog | FR-10 | DONE | DONE | DONE | DONE | Service CRUD/toggle flow pass ngay 22/06/2026 |
+| Parts catalog | FR-11 | DONE | DONE | DONE | DONE | Parts CRUD/low-stock flow pass ngay 22/06/2026 |
+| Inventory transactions | FR-12 | NEW | NEW | NEW | NEW | Phu thuoc Parts; parts CRUD da xong |
 | Appointment | FR-06 | NEW | NEW | NEW | NEW | Phu thuoc Customer/Vehicle |
 | Work order | FR-07, FR-08, FR-09 | NEW | NEW | NEW | NEW | Module nghiep vu loi |
 | Part usage | FR-13 | NEW | NEW | NEW | NEW | Phu thuoc WorkOrder + Parts + Inventory |
@@ -97,7 +97,7 @@ Quy tac cap nhat status:
 | Task | FR | Viec can lam | Tieu chi nghiem thu |
 |---|---|---|---|
 | Fix User change-password error | FR-01, FR-02 | Doi return object loi sang `ForbiddenException` | User khong phai Admin khong doi duoc password nguoi khac, HTTP 403 |
-| Patch Customer schema | FR-04 | Them `CustomerType`, `type`, `companyName`, `taxCode` | Prisma schema/migration co du field doanh nghiep |
+| Patch Customer schema | FR-04 | Them `CustomerType`, `type`, `companyName`, `taxCode` | DONE bang Prisma schema + db push ngay 22/06/2026 |
 | RBAC baseline | FR-01, FR-02 | Chuan hoa role enum theo Prisma: `Admin`, `ServiceAdvisor`, `Technician`, `InventoryClerk`, `Cashier`, `Manager` | Tat ca endpoint moi dung role enum hien co |
 
 ### Phase 1 - Du Lieu Nen

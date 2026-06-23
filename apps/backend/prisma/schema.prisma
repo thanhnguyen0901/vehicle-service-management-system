@@ -54,6 +54,11 @@ enum TransactionType {
   Adjustment
 }
 
+enum CustomerType {
+  Individual
+  Corporate
+}
+
 // ─── Tables ───────────────────────────────────────────────────────────────────
 
 model UserAccount {
@@ -75,14 +80,17 @@ model UserAccount {
 }
 
 model Customer {
-  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  fullName  String   @map("full_name") @db.VarChar(100)
-  phone     String   @unique @db.VarChar(20)
-  email     String?  @unique @db.VarChar(150)
-  address   String?  @db.Text
-  notes     String?  @db.Text
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
-  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz
+  id          String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  fullName    String       @map("full_name") @db.VarChar(100)
+  phone       String       @unique @db.VarChar(20)
+  email       String?      @unique @db.VarChar(150)
+  address     String?      @db.Text
+  type        CustomerType @default(Individual)
+  companyName String?      @map("company_name") @db.VarChar(150)
+  taxCode     String?      @map("tax_code") @db.VarChar(20)
+  notes       String?      @db.Text
+  createdAt   DateTime     @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime     @updatedAt @map("updated_at") @db.Timestamptz
 
   vehicles              Vehicle[]
   maintenanceReminders  MaintenanceReminder[]
@@ -168,6 +176,7 @@ model Part {
   partNumber       String   @unique @map("part_number") @db.VarChar(50)
   name             String   @db.VarChar(150)
   description      String?  @db.Text
+  unit             String   @default("piece") @db.VarChar(30)
   unitCost         Decimal  @map("unit_cost") @db.Decimal(12, 2)
   unitPrice        Decimal  @map("unit_price") @db.Decimal(12, 2)
   stockQuantity    Int      @default(0) @map("stock_quantity")

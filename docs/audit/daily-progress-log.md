@@ -11,6 +11,28 @@
 
 ---
 
+## 2026-06-22
+### Đã hoàn thành hôm nay
+- [DONE] Thiết lập checklist triển khai theo vertical slice tại `docs/audit/vertical-slice-implementation-checklist.md`.
+- [DONE] Verify lại Auth/User sau khi DB dev chạy qua port `5434`: backend build pass, frontend build pass, Playwright Auth/User pass.
+- [DONE] Hoàn thành Customer slice FR-03/FR-04: schema CustomerType, backend CRUD/search, frontend CustomerListPage, Playwright customer flow.
+- [DONE] Hoàn thành Vehicle slice FR-05/FR-16: backend CRUD/search/history endpoint, frontend VehicleListPage, Playwright vehicle flow.
+- [DONE] Hoàn thành Service Catalog slice FR-10: backend CRUD/toggle, frontend ServiceCatalogPage, Playwright service flow.
+- [DONE] Hoàn thành Parts Catalog slice FR-11: thêm `Part.unit`, backend CRUD/toggle/low-stock filter, frontend PartsPage, Playwright parts flow.
+- [DONE] Full regression hiện tại pass: `npm run test:e2e` trong `apps/frontend` pass 6/6 specs.
+
+### Đang làm
+- [IN_PROGRESS] Active slice tiếp theo: Appointment FR-06.
+
+### Kế hoạch tiếp theo
+- [TODO] Implement Appointment theo vertical slice: database review, backend create/update/cancel/list, frontend page, Playwright flow.
+
+### Rủi ro/Ghi chú
+- Prisma đang dùng `db push` cho môi trường dev; cần tạo migration chính thức trước khi chốt release/demo nếu yêu cầu nộp migration.
+- Playwright config chạy `workers: 1` để tránh dữ liệu E2E song song làm nhiễu flow CRUD.
+
+---
+
 ## 2026-04-13
 ### Đã hoàn thành hôm nay
 - [DONE] Chốt hướng xây dựng: Web app

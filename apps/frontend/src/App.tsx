@@ -7,6 +7,10 @@ import { ProtectedRoute } from './shared/components/ProtectedRoute';
 import { DashboardLayout } from './shared/layouts/DashboardLayout';
 import { DashboardHome } from './features/dashboard/DashboardHome';
 import { UserManagementPage } from './features/users/UserManagementPage';
+import { CustomerListPage } from './features/customers/CustomerListPage';
+import { VehicleListPage } from './features/vehicles/VehicleListPage';
+import { ServiceCatalogPage } from './features/services/ServiceCatalogPage';
+import { PartsPage } from './features/parts/PartsPage';
 
 export default function App() {
   const dispatch = useDispatch();
@@ -32,6 +36,10 @@ export default function App() {
       >
         <Route index element={<DashboardHome />} />
         <Route path="users" element={<UserManagementPage />} />
+        <Route path="customers" element={<CustomerListPage />} />
+        <Route path="vehicles" element={<VehicleListPage />} />
+        <Route path="services" element={<ServiceCatalogPage />} />
+        <Route path="parts" element={<PartsPage />} />
       </Route>
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
