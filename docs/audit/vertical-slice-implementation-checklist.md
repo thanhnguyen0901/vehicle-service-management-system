@@ -1,6 +1,6 @@
 # Vertical Slice Implementation Checklist
 
-> Last updated: 2026-06-23 00:00 +07
+> Last updated: 2026-06-23 19:30 +07
 >
 > Scope: MVP FR-01 to FR-19.
 >
@@ -46,8 +46,8 @@ Use this checklist for each module before marking it `DONE`.
 | 5 | Service Catalog | FR-10 | DONE | DONE | DONE | DONE | DONE | Service catalog CRUD/toggle E2E passed on 2026-06-22 |
 | 6 | Parts Catalog | FR-11 | DONE | DONE | DONE | DONE | DONE | Parts CRUD/low-stock E2E passed on 2026-06-22 |
 | 7 | Appointment | FR-06 | DONE | DONE | DONE | DONE | DONE | Appointment create/update/cancel/list E2E passed on 2026-06-23 |
-| 8 | Work Order | FR-07, FR-08, FR-09 | TODO | TODO | TODO | TODO | TODO | Next slice: core business state flow |
-| 9 | Inventory Transaction | FR-12 | TODO | TODO | TODO | TODO | TODO | Import/export/adjustment |
+| 8 | Work Order | FR-07, FR-08, FR-09 | DONE | DONE | DONE | DONE | DONE | Work order create/status/items E2E passed on 2026-06-23 |
+| 9 | Inventory Transaction | FR-12 | TODO | TODO | TODO | TODO | TODO | Next slice: import/export/adjustment |
 | 10 | Part Usage | FR-13 | TODO | TODO | TODO | TODO | TODO | Must decrement stock transactionally |
 | 11 | Invoice | FR-14 | TODO | TODO | TODO | TODO | TODO | Snapshot invoice lines from work order |
 | 12 | Payment | FR-15 | TODO | TODO | TODO | TODO | TODO | Cashier/Admin only |
@@ -59,15 +59,15 @@ Use this checklist for each module before marking it `DONE`.
 
 ## Current Active Slice
 
-Active slice: None. Appointment is complete; next slice is Work Order.
+Active slice: None. Work Order is complete; next slice is Inventory Transaction.
 
 Next slice exit criteria:
-- [ ] Work Order backend create/list/detail/status/item endpoints pass RBAC.
-- [ ] Work Order frontend list/detail/create/status/items flow uses real API.
-- [ ] Work Order Playwright flow passes.
+- [ ] Inventory backend import/export/adjustment/list endpoints pass RBAC.
+- [ ] Inventory frontend transaction flow uses real API.
+- [ ] Inventory Playwright flow passes.
 - [ ] Backend build passes.
 - [ ] Frontend build passes.
-- [ ] `implementation-status.md` updated with Work Order result.
+- [ ] `implementation-status.md` updated with Inventory Transaction result.
 
 Latest completed verification:
 - [x] `auth.spec.ts` passed on 2026-06-22.
@@ -77,10 +77,12 @@ Latest completed verification:
 - [x] `services.spec.ts` passed on 2026-06-22.
 - [x] `parts.spec.ts` passed on 2026-06-22.
 - [x] `appointments.spec.ts` passed on 2026-06-23.
+- [x] `work-orders.spec.ts` passed on 2026-06-23.
 - [x] Backend build passed on 2026-06-22.
 - [x] Frontend build passed on 2026-06-22.
 - [x] Backend build passed on 2026-06-23.
 - [x] Frontend build passed on 2026-06-23.
 - [x] Full frontend Playwright suite passed on 2026-06-23 (7/7).
+- [x] Full frontend Playwright suite passed on 2026-06-23 (8/8).
 
-Next slice after pass: Inventory Transaction.
+Next slice after pass: Part Usage.

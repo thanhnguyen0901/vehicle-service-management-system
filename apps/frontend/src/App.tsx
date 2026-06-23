@@ -12,6 +12,7 @@ import { VehicleListPage } from './features/vehicles/VehicleListPage';
 import { ServiceCatalogPage } from './features/services/ServiceCatalogPage';
 import { PartsPage } from './features/parts/PartsPage';
 import { AppointmentListPage } from './features/appointments/AppointmentListPage';
+import { WorkOrderListPage } from './features/work-orders/WorkOrderListPage';
 
 export default function App() {
   const dispatch = useDispatch();
@@ -40,6 +41,7 @@ export default function App() {
         <Route path="customers" element={<CustomerListPage />} />
         <Route path="vehicles" element={<VehicleListPage />} />
         <Route path="appointments" element={<AppointmentListPage />} />
+        <Route path="work-orders" element={<WorkOrderListPage />} />
         <Route path="services" element={<ServiceCatalogPage />} />
         <Route path="parts" element={<PartsPage />} />
       </Route>

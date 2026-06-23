@@ -16,6 +16,7 @@ const navItems: NavItem[] = [
   { to: '/dashboard/customers', icon: 'pi-id-card', label: 'Khách hàng' },
   { to: '/dashboard/vehicles', icon: 'pi-car', label: 'Phương tiện' },
   { to: '/dashboard/appointments', icon: 'pi-calendar', label: 'Lịch hẹn' },
+  { to: '/dashboard/work-orders', icon: 'pi-clipboard', label: 'Phiếu sửa chữa' },
   { to: '/dashboard/services', icon: 'pi-wrench', label: 'Dịch vụ' },
   { to: '/dashboard/parts', icon: 'pi-box', label: 'Phụ tùng' },
   { to: '/dashboard/users', icon: 'pi-users', label: 'Người dùng', roles: ['Admin', 'Manager'] },

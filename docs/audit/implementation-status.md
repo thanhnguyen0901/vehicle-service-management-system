@@ -8,21 +8,28 @@
 ## Tổng quan tiến độ
 
 ```
-Backend  ███████████░░░░░░░░░  ~52%  (Auth/User/Customer/Vehicle/ServiceCatalog/Parts/Appointment + shared infra)
-Frontend ██████████░░░░░░░░░░  ~52%  (auth + layout + User/Customer/Vehicle/Service/Parts/Appointment pages)
+Backend  ████████████░░░░░░░░  ~60%  (Auth/User/Customer/Vehicle/ServiceCatalog/Parts/Appointment/WorkOrder + shared infra)
+Frontend ████████████░░░░░░░░  ~60%  (auth + layout + User/Customer/Vehicle/Service/Parts/Appointment/WorkOrder pages)
 Schema   ██████████████████░░  ~90%  (15/15 bảng, đã bổ sung CustomerType và Part.unit; còn thiếu migration file chính thức)
 Infra    ████████████████████  100%  (filters, guards, pipes, interceptors, health endpoint)
-E2E      █████████░░░░░░░░░░░  Auth/User/Customer/Vehicle/Service/Parts/Appointment specs pass; các business module còn lại chưa có E2E
+E2E      ███████████░░░░░░░░░  Auth/User/Customer/Vehicle/Service/Parts/Appointment/WorkOrder specs pass; các business module còn lại chưa có E2E
 ```
 
 **Recheck 23/06/2026:**
+- ✅ Work Order slice DONE: backend create/list/detail/status/items + RBAC + Zod validation + state machine.
+- ✅ Work Order frontend DONE: menu/route/page/API thật, tạo phiếu từ lịch hẹn hoặc walk-in, xem chi tiết, đổi trạng thái, thêm/sửa/xóa hạng mục dịch vụ.
+- ✅ `work-orders.spec.ts` pass.
+- ✅ `npm run test:e2e` trong `apps/frontend` pass: `auth.spec.ts`, `users.spec.ts`, `customers.spec.ts`, `vehicles.spec.ts`, `services.spec.ts`, `parts.spec.ts`, `appointments.spec.ts`, `work-orders.spec.ts` (8/8).
+- ✅ Backend build pass sau Work Order.
+- ✅ Frontend build pass sau Work Order.
+- ▶️ Active slice tiếp theo: Inventory Transaction (FR-12).
 - ✅ Appointment slice DONE: backend create/list/detail/update/cancel/delete + RBAC + Zod validation.
 - ✅ Appointment frontend DONE: menu/route/page/API thật, chọn xe thật, list/search/filter/create/update/cancel/delete flow.
 - ✅ `appointments.spec.ts` pass.
 - ✅ `npm run test:e2e` trong `apps/frontend` pass: `auth.spec.ts`, `users.spec.ts`, `customers.spec.ts`, `vehicles.spec.ts`, `services.spec.ts`, `parts.spec.ts`, `appointments.spec.ts` (7/7).
 - ✅ Backend build pass.
 - ✅ Frontend build pass.
-- ▶️ Active slice tiếp theo: Work Order (FR-07, FR-08, FR-09).
+- ✅ Work Order đã được triển khai hoàn tất ngày 23/06/2026.
 
 **Recheck 22/06/2026:**
 - ✅ Docker Postgres dev đã chạy được qua port host `5434`.
@@ -202,27 +209,34 @@ DELETE /api/v1/appointments/:id       [Admin]
 
 ---
 
-### ❌ WorkOrderModule — CHƯA IMPLEMENT
+### ✅ WorkOrderModule — `src/modules/work-order/`
 
 **Cần cho:** FR-07, FR-08, FR-09 — **module quan trọng nhất**
 
-**Endpoints cần tạo:**
+**Endpoints đã có:**
 ```
-GET    /api/v1/work-orders
-GET    /api/v1/work-orders/:id
-POST   /api/v1/work-orders            tạo từ appointment hoặc walk-in
+GET    /api/v1/work-orders            [Admin, ServiceAdvisor, Technician, Manager] filter by search/status/vehicle
+GET    /api/v1/work-orders/:id        [Admin, ServiceAdvisor, Technician, Manager]
+POST   /api/v1/work-orders            [Admin, ServiceAdvisor] tạo từ appointment hoặc walk-in
 PATCH  /api/v1/work-orders/:id/status [Technician, ServiceAdvisor, Admin] — state machine
-POST   /api/v1/work-orders/:id/items  thêm hạng mục (service/parts)
-PATCH  /api/v1/work-orders/:id/items/:itemId
-DELETE /api/v1/work-orders/:id/items/:itemId
-POST   /api/v1/work-orders/:id/parts  ghi nhận part usage → trừ kho (Prisma $transaction)
+POST   /api/v1/work-orders/:id/items  [Technician, ServiceAdvisor, Admin] thêm hạng mục dịch vụ
+PATCH  /api/v1/work-orders/:id/items/:itemId [Technician, ServiceAdvisor, Admin]
+DELETE /api/v1/work-orders/:id/items/:itemId [Technician, ServiceAdvisor, Admin]
 ```
 
-**State machine cần implement:**
+**State machine đã có:**
 ```
 Received → Diagnosing → Repairing ⇄ WaitingParts → ReadyForDelivery → Delivered
                                                                       → Cancelled (từ mọi state trừ Delivered)
 ```
+
+**Business rules đã có:**
+- Tạo work order từ appointment hoặc walk-in vehicle.
+- Tạo từ appointment chạy trong transaction và tự chuyển appointment sang `Arrived`.
+- Không cho tạo work order từ appointment đã hủy hoặc appointment đã có work order.
+- Không cho sửa item khi work order đã `Delivered` hoặc `Cancelled`.
+- Hạng mục dịch vụ tự tính `amount = quantity * unitPrice`.
+- Part usage/trừ kho được tách sang FR-13 theo checklist.
 
 ---
 
@@ -352,13 +366,12 @@ GET    /api/v1/reports/low-stock      parts có stockQuantity <= reorderLevel
 | FR-10 | `features/services/ServiceCatalogPage.tsx`, `features/services/serviceCatalogApi.ts` | `/dashboard/services` | ✅ UI + API thật đã có; ✅ Playwright service CRUD/toggle flow pass ngày 22/06/2026 |
 | FR-11 | `features/parts/PartsPage.tsx`, `features/parts/partApi.ts` | `/dashboard/parts` | ✅ UI + API thật đã có; ✅ Playwright parts CRUD/low-stock flow pass ngày 22/06/2026 |
 | FR-06 | `features/appointments/AppointmentListPage.tsx`, `features/appointments/appointmentApi.ts` | `/dashboard/appointments` | ✅ UI + API thật đã có; ✅ Playwright appointment create/search/update/delete flow pass ngày 23/06/2026 |
+| FR-07~09 | `features/work-orders/WorkOrderListPage.tsx`, `features/work-orders/workOrderApi.ts` | `/dashboard/work-orders` | ✅ UI + API thật đã có; ✅ Playwright work order create/status/items flow pass ngày 23/06/2026 |
 
 ### ❌ Feature Pages chưa tạo
 
 | FR | Page | Route |
 |---|---|---|
-| FR-07~09 | WorkOrderListPage | `/dashboard/work-orders` |
-| FR-07~09 | WorkOrderDetailPage | `/dashboard/work-orders/:id` |
 | FR-13 | InventoryTransactionPage | `/dashboard/inventory` |
 | FR-14~15 | InvoicePage | `/dashboard/invoices` |
 | FR-14~15 | InvoiceDetailPage | `/dashboard/invoices/:id` |
@@ -386,8 +399,9 @@ Phase 1 — Core data (không phụ thuộc gì):
 
 Phase 2 — Operations (phụ thuộc Phase 1):
   [x] AppointmentModule + frontend + Playwright (FR-06)
-  [ ] WorkOrderModule (backend FR-07~09) — bao gồm state machine
-  [ ] InventoryModule — nhập/xuất kho (backend FR-12, FR-13)
+  [x] WorkOrderModule + frontend + Playwright (FR-07~09) — bao gồm state machine
+  [ ] InventoryModule — nhập/xuất kho (backend FR-12)
+  [ ] PartUsage — ghi nhận phụ tùng theo work order và trừ kho (FR-13)
 
 Phase 3 — Billing & Reports (phụ thuộc Phase 2):
   [ ] InvoiceModule (backend FR-14, FR-15)
@@ -401,7 +415,7 @@ Phase 4 — Frontend pages (có thể làm song song từ Phase 1):
   [x] ServiceCatalogPage
   [x] PartsPage
   [x] AppointmentPage
-  [ ] WorkOrderListPage + WorkOrderDetailPage (phức tạp nhất)
+  [x] WorkOrderListPage + detail dialog
   [ ] InvoicePage + InvoiceDetailPage
   [ ] RemindersPage
   [ ] ReportsPage (Recharts charts)
