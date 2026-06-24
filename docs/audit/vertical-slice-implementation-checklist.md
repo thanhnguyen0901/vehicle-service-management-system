@@ -1,6 +1,6 @@
 # Vertical Slice Implementation Checklist
 
-> Last updated: 2026-06-23 19:30 +07
+> Last updated: 2026-06-24 20:30 +07
 >
 > Scope: MVP FR-01 to FR-19.
 >
@@ -47,7 +47,7 @@ Use this checklist for each module before marking it `DONE`.
 | 6 | Parts Catalog | FR-11 | DONE | DONE | DONE | DONE | DONE | Parts CRUD/low-stock E2E passed on 2026-06-22 |
 | 7 | Appointment | FR-06 | DONE | DONE | DONE | DONE | DONE | Appointment create/update/cancel/list E2E passed on 2026-06-23 |
 | 8 | Work Order | FR-07, FR-08, FR-09 | DONE | DONE | DONE | DONE | DONE | Work order create/status/items E2E passed on 2026-06-23 |
-| 9 | Inventory Transaction | FR-12 | TODO | TODO | TODO | TODO | TODO | Next slice: import/export/adjustment |
+| 9 | Inventory Transaction | FR-12 | DONE | DONE | DONE | DONE | DONE | Import/export/adjustment/history E2E passed on 2026-06-24 |
 | 10 | Part Usage | FR-13 | TODO | TODO | TODO | TODO | TODO | Must decrement stock transactionally |
 | 11 | Invoice | FR-14 | TODO | TODO | TODO | TODO | TODO | Snapshot invoice lines from work order |
 | 12 | Payment | FR-15 | TODO | TODO | TODO | TODO | TODO | Cashier/Admin only |
@@ -59,15 +59,15 @@ Use this checklist for each module before marking it `DONE`.
 
 ## Current Active Slice
 
-Active slice: None. Work Order is complete; next slice is Inventory Transaction.
+Active slice: None. Inventory Transaction is complete; next slice is Part Usage.
 
 Next slice exit criteria:
-- [ ] Inventory backend import/export/adjustment/list endpoints pass RBAC.
-- [ ] Inventory frontend transaction flow uses real API.
-- [ ] Inventory Playwright flow passes.
+- [ ] Part Usage backend add/update/delete endpoints decrement/restore stock transactionally.
+- [ ] Part Usage frontend integrates into work order detail using real API.
+- [ ] Part Usage Playwright flow covers stock decrement and insufficient-stock rejection.
 - [ ] Backend build passes.
 - [ ] Frontend build passes.
-- [ ] `implementation-status.md` updated with Inventory Transaction result.
+- [ ] `implementation-status.md` updated with Part Usage result.
 
 Latest completed verification:
 - [x] `auth.spec.ts` passed on 2026-06-22.
@@ -78,11 +78,15 @@ Latest completed verification:
 - [x] `parts.spec.ts` passed on 2026-06-22.
 - [x] `appointments.spec.ts` passed on 2026-06-23.
 - [x] `work-orders.spec.ts` passed on 2026-06-23.
+- [x] `inventory-transactions.spec.ts` passed on 2026-06-24.
 - [x] Backend build passed on 2026-06-22.
 - [x] Frontend build passed on 2026-06-22.
 - [x] Backend build passed on 2026-06-23.
 - [x] Frontend build passed on 2026-06-23.
 - [x] Full frontend Playwright suite passed on 2026-06-23 (7/7).
 - [x] Full frontend Playwright suite passed on 2026-06-23 (8/8).
+- [x] Backend build passed on 2026-06-24.
+- [x] Frontend build passed on 2026-06-24.
+- [x] Full frontend Playwright suite passed on 2026-06-24 (9/9).
 
-Next slice after pass: Part Usage.
+Next slice after pass: Invoice.

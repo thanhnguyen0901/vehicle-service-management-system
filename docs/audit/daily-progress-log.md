@@ -11,6 +11,42 @@
 
 ---
 
+## 2026-06-24
+### Đã hoàn thành hôm nay
+- [DONE] Hoàn thành Inventory Transaction slice FR-12: backend nhập/xuất/điều chỉnh/list lịch sử với RBAC và Zod.
+- [DONE] Bảo đảm cập nhật tồn kho và ghi `InventoryTransaction` trong cùng Prisma transaction.
+- [DONE] Bổ sung giao dịch `Adjustment` khi tồn khởi tạo/thay đổi từ danh mục phụ tùng để lịch sử không bị thiếu.
+- [DONE] Chặn xuất hoặc điều chỉnh làm tồn âm; chặn giao dịch với phụ tùng ngưng hoạt động.
+- [DONE] Hoàn thành frontend `InventoryTransactionsPage` và API thật, gồm bộ lọc phụ tùng/loại giao dịch.
+- [DONE] `inventory-transactions.spec.ts` pass cho nhập, xuất, điều chỉnh, lọc và insufficient stock.
+- [DONE] Backend build pass, frontend build pass, full Playwright regression pass 9/9.
+
+### Đang làm
+- [DONE] Không còn slice đang dở.
+
+### Kế hoạch tiếp theo
+- [TODO] Implement Part Usage FR-13 theo full flow trong Work Order, trừ/hoàn tồn kho transactionally và có Playwright E2E.
+
+### Rủi ro/Ghi chú
+- Schema `InventoryTransaction` đã tồn tại nên FR-12 không cần migration mới.
+- Migration chính thức cho schema hiện tại vẫn cần được tạo trước khi chốt release/demo.
+
+---
+
+## 2026-06-23
+### Đã hoàn thành hôm nay
+- [DONE] Hoàn thành Appointment slice FR-06: backend, frontend và Playwright create/search/update/delete.
+- [DONE] Hoàn thành Work Order slice FR-07/FR-08/FR-09: tạo từ appointment/walk-in, state machine và service items.
+- [DONE] Backend build pass, frontend build pass, full Playwright regression pass 8/8.
+
+### Đang làm
+- [DONE] Không còn slice đang dở.
+
+### Kế hoạch tiếp theo
+- [DONE] Implement Inventory Transaction FR-12 theo full flow vào ngày 24/06/2026.
+
+---
+
 ## 2026-06-22
 ### Đã hoàn thành hôm nay
 - [DONE] Thiết lập checklist triển khai theo vertical slice tại `docs/audit/vertical-slice-implementation-checklist.md`.

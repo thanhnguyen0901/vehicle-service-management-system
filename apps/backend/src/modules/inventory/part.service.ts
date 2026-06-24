@@ -1,5 +1,5 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma, TransactionType } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreatePartDto, PartQueryDto, TogglePartDto, UpdatePartDto } from './dto/part.dto';
 
@@ -60,21 +60,37 @@ export class PartService {
     return part;
   }
 
-  async create(dto: CreatePartDto) {
+  async create(dto: CreatePartDto, performedBy: string) {
     try {
-      return await this.prisma.part.create({
-        data: {
-          partNumber: dto.partNumber,
-          name: dto.name,
-          description: dto.description || null,
-          unit: dto.unit,
-          unitCost: dto.unitCost,
-          unitPrice: dto.unitPrice,
-          stockQuantity: dto.stockQuantity,
-          reorderLevel: dto.reorderLevel,
-          isActive: dto.isActive ?? true,
-        },
-        select: partSelect,
+      return await this.prisma.$transaction(async (tx) => {
+        const part = await tx.part.create({
+          data: {
+            partNumber: dto.partNumber,
+            name: dto.name,
+            description: dto.description || null,
+            unit: dto.unit,
+            unitCost: dto.unitCost,
+            unitPrice: dto.unitPrice,
+            stockQuantity: dto.stockQuantity,
+            reorderLevel: dto.reorderLevel,
+            isActive: dto.isActive ?? true,
+          },
+          select: partSelect,
+        });
+
+        if (dto.stockQuantity > 0) {
+          await tx.inventoryTransaction.create({
+            data: {
+              partId: part.id,
+              type: TransactionType.Adjustment,
+              quantityDelta: dto.stockQuantity,
+              note: 'Initial stock',
+              performedBy,
+            },
+          });
+        }
+
+        return part;
       });
     } catch (error) {
       this.handleUniqueError(error);
@@ -82,17 +98,35 @@ export class PartService {
     }
   }
 
-  async update(id: string, dto: UpdatePartDto) {
-    await this.findById(id);
+  async update(id: string, dto: UpdatePartDto, performedBy: string) {
+    const currentPart = await this.findById(id);
 
     try {
-      return await this.prisma.part.update({
-        where: { id },
-        data: {
-          ...dto,
-          description: dto.description === undefined ? undefined : dto.description || null,
-        },
-        select: partSelect,
+      return await this.prisma.$transaction(async (tx) => {
+        const part = await tx.part.update({
+          where: { id },
+          data: {
+            ...dto,
+            description: dto.description === undefined ? undefined : dto.description || null,
+          },
+          select: partSelect,
+        });
+
+        const quantityDelta =
+          dto.stockQuantity === undefined ? 0 : dto.stockQuantity - currentPart.stockQuantity;
+        if (quantityDelta !== 0) {
+          await tx.inventoryTransaction.create({
+            data: {
+              partId: id,
+              type: TransactionType.Adjustment,
+              quantityDelta,
+              note: 'Stock changed from part catalog',
+              performedBy,
+            },
+          });
+        }
+
+        return part;
       });
     } catch (error) {
       this.handleUniqueError(error);
@@ -124,4 +158,3 @@ export class PartService {
     }
   }
 }
-

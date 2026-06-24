@@ -12,7 +12,8 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { Role } from '@prisma/client';
+import { Role, UserAccount } from '@prisma/client';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
@@ -49,8 +50,11 @@ export class PartController {
   @Post()
   @Roles(Role.Admin, Role.InventoryClerk)
   @HttpCode(HttpStatus.CREATED)
-  create(@Body(new ZodValidationPipe(CreatePartSchema)) dto: CreatePartDto) {
-    return this.partService.create(dto);
+  create(
+    @Body(new ZodValidationPipe(CreatePartSchema)) dto: CreatePartDto,
+    @CurrentUser() user: UserAccount,
+  ) {
+    return this.partService.create(dto, user.id);
   }
 
   @Patch(':id')
@@ -58,8 +62,9 @@ export class PartController {
   update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body(new ZodValidationPipe(UpdatePartSchema)) dto: UpdatePartDto,
+    @CurrentUser() user: UserAccount,
   ) {
-    return this.partService.update(id, dto);
+    return this.partService.update(id, dto, user.id);
   }
 
   @Patch(':id/toggle')
@@ -78,4 +83,3 @@ export class PartController {
     return this.partService.deactivate(id);
   }
 }
-
