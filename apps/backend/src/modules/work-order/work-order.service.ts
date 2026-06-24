@@ -1,9 +1,11 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { AppointmentStatus, Prisma, WorkOrderStatus } from '@prisma/client';
+import { AppointmentStatus, Prisma, TransactionType, WorkOrderStatus } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import {
   CreateWorkOrderDto,
   CreateWorkOrderItemDto,
+  CreatePartUsageDto,
+  UpdatePartUsageDto,
   UpdateWorkOrderItemDto,
   UpdateWorkOrderStatusDto,
   WorkOrderQueryDto,
@@ -61,6 +63,25 @@ const workOrderSelect = {
           id: true,
           name: true,
         },
+      },
+      partUsages: {
+        select: {
+          id: true,
+          partId: true,
+          quantity: true,
+          unitPrice: true,
+          createdAt: true,
+          part: {
+            select: {
+              id: true,
+              partNumber: true,
+              name: true,
+              unit: true,
+              stockQuantity: true,
+            },
+          },
+        },
+        orderBy: { createdAt: 'asc' },
       },
     },
     orderBy: { createdAt: 'asc' },
@@ -210,8 +231,148 @@ export class WorkOrderService {
   async deleteItem(workOrderId: string, itemId: string) {
     await this.assertEditableWorkOrder(workOrderId);
     await this.assertItemBelongsToWorkOrder(workOrderId, itemId);
+    const usageCount = await this.prisma.partUsage.count({ where: { workOrderItemId: itemId } });
+    if (usageCount > 0) {
+      throw new ConflictException('Remove linked part usages before deleting this work order item');
+    }
     await this.prisma.workOrderItem.delete({ where: { id: itemId } });
     return { id: itemId };
+  }
+
+  async addPartUsage(workOrderId: string, dto: CreatePartUsageDto, performedBy: string) {
+    await this.assertEditableWorkOrder(workOrderId);
+    await this.assertItemBelongsToWorkOrder(workOrderId, dto.workOrderItemId);
+
+    return this.prisma.$transaction(async (tx) => {
+      const part = await this.findActivePart(tx, dto.partId);
+      await this.decrementStock(tx, part.id, dto.quantity, part.stockQuantity);
+
+      const usage = await tx.partUsage.create({
+        data: {
+          workOrderItemId: dto.workOrderItemId,
+          partId: dto.partId,
+          quantity: dto.quantity,
+          unitPrice: dto.unitPrice ?? part.unitPrice,
+        },
+        include: { part: true },
+      });
+
+      await this.recordStockMovement(
+        tx,
+        part.id,
+        TransactionType.Export,
+        -dto.quantity,
+        usage.id,
+        `Part usage for work order ${workOrderId}`,
+        performedBy,
+      );
+
+      return usage;
+    });
+  }
+
+  async updatePartUsage(
+    workOrderId: string,
+    usageId: string,
+    dto: UpdatePartUsageDto,
+    performedBy: string,
+  ) {
+    await this.assertEditableWorkOrder(workOrderId);
+    const usage = await this.assertUsageBelongsToWorkOrder(workOrderId, usageId);
+    const nextPartId = dto.partId ?? usage.partId;
+    const nextQuantity = dto.quantity ?? usage.quantity;
+
+    return this.prisma.$transaction(async (tx) => {
+      if (nextPartId === usage.partId) {
+        const quantityDelta = nextQuantity - usage.quantity;
+        if (quantityDelta > 0) {
+          const part = await this.findActivePart(tx, usage.partId);
+          await this.decrementStock(tx, part.id, quantityDelta, part.stockQuantity);
+          await this.recordStockMovement(
+            tx,
+            part.id,
+            TransactionType.Export,
+            -quantityDelta,
+            usage.id,
+            `Part usage increased for work order ${workOrderId}`,
+            performedBy,
+          );
+        } else if (quantityDelta < 0) {
+          await tx.part.update({
+            where: { id: usage.partId },
+            data: { stockQuantity: { increment: Math.abs(quantityDelta) } },
+          });
+          await this.recordStockMovement(
+            tx,
+            usage.partId,
+            TransactionType.Import,
+            Math.abs(quantityDelta),
+            usage.id,
+            `Part usage reduced for work order ${workOrderId}`,
+            performedBy,
+          );
+        }
+      } else {
+        const nextPart = await this.findActivePart(tx, nextPartId);
+        await this.decrementStock(tx, nextPart.id, nextQuantity, nextPart.stockQuantity);
+        await tx.part.update({
+          where: { id: usage.partId },
+          data: { stockQuantity: { increment: usage.quantity } },
+        });
+        await this.recordStockMovement(
+          tx,
+          usage.partId,
+          TransactionType.Import,
+          usage.quantity,
+          usage.id,
+          `Part usage replaced for work order ${workOrderId}`,
+          performedBy,
+        );
+        await this.recordStockMovement(
+          tx,
+          nextPart.id,
+          TransactionType.Export,
+          -nextQuantity,
+          usage.id,
+          `Part usage replacement for work order ${workOrderId}`,
+          performedBy,
+        );
+      }
+
+      return tx.partUsage.update({
+        where: { id: usage.id },
+        data: {
+          partId: dto.partId,
+          quantity: dto.quantity,
+          unitPrice: dto.unitPrice,
+        },
+        include: { part: true },
+      });
+    });
+  }
+
+  async deletePartUsage(workOrderId: string, usageId: string, performedBy: string) {
+    await this.assertEditableWorkOrder(workOrderId);
+    const usage = await this.assertUsageBelongsToWorkOrder(workOrderId, usageId);
+
+    await this.prisma.$transaction(async (tx) => {
+      await tx.part.update({
+        where: { id: usage.partId },
+        data: { stockQuantity: { increment: usage.quantity } },
+      });
+      await tx.partUsage.delete({ where: { id: usage.id } });
+      await this.recordStockMovement(
+        tx,
+        usage.partId,
+        TransactionType.Import,
+        usage.quantity,
+        usage.id,
+        `Part usage removed from work order ${workOrderId}`,
+        performedBy,
+      );
+    });
+
+    return { id: usage.id };
   }
 
   private async resolveVehicleSource(dto: CreateWorkOrderDto) {
@@ -262,6 +423,70 @@ export class WorkOrderService {
     });
     if (!item) throw new NotFoundException(`Work order item ${itemId} not found`);
     return item;
+  }
+
+  private async assertUsageBelongsToWorkOrder(workOrderId: string, usageId: string) {
+    const usage = await this.prisma.partUsage.findFirst({
+      where: {
+        id: usageId,
+        workOrderItem: { workOrderId },
+      },
+    });
+    if (!usage) throw new NotFoundException(`Part usage ${usageId} not found`);
+    return usage;
+  }
+
+  private async findActivePart(tx: Prisma.TransactionClient, partId: string) {
+    const part = await tx.part.findUnique({
+      where: { id: partId },
+      select: {
+        id: true,
+        isActive: true,
+        stockQuantity: true,
+        unitPrice: true,
+      },
+    });
+    if (!part || !part.isActive) throw new NotFoundException(`Active part ${partId} not found`);
+    return part;
+  }
+
+  private async decrementStock(
+    tx: Prisma.TransactionClient,
+    partId: string,
+    quantity: number,
+    currentQuantity: number,
+  ) {
+    const updated = await tx.part.updateMany({
+      where: {
+        id: partId,
+        stockQuantity: { gte: quantity },
+      },
+      data: { stockQuantity: { decrement: quantity } },
+    });
+    if (updated.count === 0) {
+      throw new BadRequestException(`Insufficient stock: current quantity is ${currentQuantity}`);
+    }
+  }
+
+  private recordStockMovement(
+    tx: Prisma.TransactionClient,
+    partId: string,
+    type: TransactionType,
+    quantityDelta: number,
+    referenceId: string,
+    note: string,
+    performedBy: string,
+  ) {
+    return tx.inventoryTransaction.create({
+      data: {
+        partId,
+        type,
+        quantityDelta,
+        referenceId,
+        note,
+        performedBy,
+      },
+    });
   }
 
   private async assertServiceExists(serviceId: string) {

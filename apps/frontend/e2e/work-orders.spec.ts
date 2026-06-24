@@ -37,6 +37,7 @@ test('admin can create a work order from appointment and manage service items', 
   await page.getByLabel('Thời gian hẹn').fill('2026-08-10T10:00');
   await page.getByLabel('Nhu cầu dịch vụ').fill(`Work order appointment ${suffix}`);
   await page.getByRole('button', { name: 'Lưu' }).click();
+  await page.getByPlaceholder('Tìm lịch hẹn').fill(licensePlate);
   await expect(page.getByRole('cell', { name: licensePlate, exact: true })).toBeVisible();
 
   await page.getByRole('link', { name: /Dịch vụ/ }).click();
@@ -58,7 +59,7 @@ test('admin can create a work order from appointment and manage service items', 
 
   await expect(page.getByRole('cell', { name: licensePlate, exact: true })).toBeVisible();
   await expect(page.getByRole('cell', { name: customerName, exact: true })).toBeVisible();
-  await expect(page.getByRole('cell', { name: 'Tiếp nhận', exact: true })).toBeVisible();
+  await expect(page.getByRole('row', { name: new RegExp(licensePlate) })).toContainText('Tiếp nhận');
 
   await page.getByPlaceholder('Tìm phiếu').fill(licensePlate);
   await expect(page.getByText(diagnosis)).toBeVisible();
@@ -70,13 +71,13 @@ test('admin can create a work order from appointment and manage service items', 
 
   await page.locator('.p-dialog .p-dropdown').nth(1).click();
   await page.locator('.p-dropdown-items [role="option"]', { hasText: serviceName }).click();
-  await page.getByLabel('SL').fill('2');
+  await page.getByLabel('SL', { exact: true }).fill('2');
   await page.getByRole('button', { name: 'Thêm' }).click();
   await expect(page.getByRole('cell', { name: serviceName, exact: true })).toBeVisible();
   await expect(page.getByRole('cell', { name: /500\.000/ })).toBeVisible();
 
   await page.getByLabel(`Sửa hạng mục ${serviceName}`).click();
-  await page.getByRole('textbox', { name: 'Hạng mục' }).fill(updatedItem);
+  await page.locator('.p-dialog form').first().getByLabel('Hạng mục').fill(updatedItem);
   await page.getByRole('button', { name: 'Lưu' }).click();
   await expect(page.getByRole('cell', { name: updatedItem, exact: true })).toBeVisible();
 

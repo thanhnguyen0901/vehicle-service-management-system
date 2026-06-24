@@ -1,6 +1,7 @@
 import api from '../../services/api';
 import type { Appointment } from '../appointments/appointmentApi';
 import type { RepairService } from '../services/serviceCatalogApi';
+import type { Part } from '../parts/partApi';
 import type { Vehicle } from '../vehicles/vehicleApi';
 
 export const WORK_ORDER_STATUSES = [
@@ -25,6 +26,16 @@ export interface WorkOrderItem {
   createdAt: string;
   updatedAt: string;
   service: Pick<RepairService, 'id' | 'name'> | null;
+  partUsages: PartUsage[];
+}
+
+export interface PartUsage {
+  id: string;
+  partId: string;
+  quantity: number;
+  unitPrice: string;
+  createdAt: string;
+  part: Pick<Part, 'id' | 'partNumber' | 'name' | 'unit' | 'stockQuantity'>;
 }
 
 export interface WorkOrder {
@@ -63,6 +74,13 @@ export interface WorkOrderListParams {
   vehicleId?: string;
 }
 
+export interface PartUsageInput {
+  workOrderItemId: string;
+  partId: string;
+  quantity: number;
+  unitPrice?: number;
+}
+
 export const workOrderApi = {
   list: (params: WorkOrderListParams = {}): Promise<WorkOrder[]> =>
     api.get<WorkOrder[]>('/work-orders', { params }).then((r) => r.data),
@@ -84,4 +102,17 @@ export const workOrderApi = {
 
   deleteItem: (id: string, itemId: string): Promise<{ id: string }> =>
     api.delete<{ id: string }>(`/work-orders/${id}/items/${itemId}`).then((r) => r.data),
+
+  addPartUsage: (id: string, data: PartUsageInput): Promise<PartUsage> =>
+    api.post<PartUsage>(`/work-orders/${id}/part-usages`, data).then((r) => r.data),
+
+  updatePartUsage: (
+    id: string,
+    usageId: string,
+    data: Partial<Omit<PartUsageInput, 'workOrderItemId'>>,
+  ): Promise<PartUsage> =>
+    api.patch<PartUsage>(`/work-orders/${id}/part-usages/${usageId}`, data).then((r) => r.data),
+
+  deletePartUsage: (id: string, usageId: string): Promise<{ id: string }> =>
+    api.delete<{ id: string }>(`/work-orders/${id}/part-usages/${usageId}`).then((r) => r.data),
 };

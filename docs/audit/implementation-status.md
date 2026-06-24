@@ -8,14 +8,22 @@
 ## Tổng quan tiến độ
 
 ```
-Backend  █████████████░░░░░░░  ~65%  (Auth/User/Customer/Vehicle/ServiceCatalog/Parts/Appointment/WorkOrder/Inventory Transaction + shared infra)
-Frontend █████████████░░░░░░░  ~65%  (auth + layout + User/Customer/Vehicle/Service/Parts/Appointment/WorkOrder/Inventory pages)
+Backend  ██████████████░░░░░░  ~70%  (Auth/User/Customer/Vehicle/ServiceCatalog/Parts/Appointment/WorkOrder/Inventory/Part Usage + shared infra)
+Frontend ██████████████░░░░░░  ~70%  (auth + layout + User/Customer/Vehicle/Service/Parts/Appointment/WorkOrder/Inventory/Part Usage)
 Schema   ██████████████████░░  ~90%  (15/15 bảng, đã bổ sung CustomerType và Part.unit; còn thiếu migration file chính thức)
 Infra    ████████████████████  100%  (filters, guards, pipes, interceptors, health endpoint)
-E2E      ████████████░░░░░░░░  Auth/User/Customer/Vehicle/Service/Parts/Appointment/WorkOrder/Inventory specs pass
+E2E      █████████████░░░░░░░  Auth/User/Customer/Vehicle/Service/Parts/Appointment/WorkOrder/Inventory/Part Usage specs pass
 ```
 
 **Recheck 24/06/2026:**
+- ✅ Part Usage FR-13 DONE: backend add/update/delete + RBAC + Zod validation.
+- ✅ Mỗi thao tác usage cập nhật tồn kho và ghi `InventoryTransaction` trong cùng Prisma transaction.
+- ✅ Sửa quantity chỉ áp dụng phần chênh lệch; đổi part hoàn part cũ và trừ part mới; xóa usage hoàn tồn kho.
+- ✅ Chặn thiếu tồn, phụ tùng ngưng hoạt động và chỉnh sửa trên work order Delivered/Cancelled.
+- ✅ Frontend Part Usage tích hợp trong Work Order detail, gắn usage với từng service item và snapshot đơn giá.
+- ✅ `part-usages.spec.ts` pass; full Playwright regression pass 10/10.
+- ✅ Backend build pass; frontend build pass.
+- ▶️ Active slice tiếp theo: Invoice (FR-14).
 - ✅ Inventory Transaction FR-12 DONE: backend import/export/adjustment/list + RBAC + Zod validation.
 - ✅ Cập nhật tồn kho và tạo lịch sử chạy trong cùng Prisma transaction; chặn xuất/điều chỉnh làm tồn âm và chặn phụ tùng ngưng hoạt động.
 - ✅ Frontend DONE: menu/route/page/API thật, lọc theo phụ tùng/loại, hiển thị tồn và lịch sử giao dịch.
@@ -224,13 +232,16 @@ DELETE /api/v1/appointments/:id       [Admin]
 
 **Endpoints đã có:**
 ```
-GET    /api/v1/work-orders            [Admin, ServiceAdvisor, Technician, Manager] filter by search/status/vehicle
-GET    /api/v1/work-orders/:id        [Admin, ServiceAdvisor, Technician, Manager]
+GET    /api/v1/work-orders            [mọi role] filter by search/status/vehicle
+GET    /api/v1/work-orders/:id        [mọi role]
 POST   /api/v1/work-orders            [Admin, ServiceAdvisor] tạo từ appointment hoặc walk-in
 PATCH  /api/v1/work-orders/:id/status [Technician, ServiceAdvisor, Admin] — state machine
 POST   /api/v1/work-orders/:id/items  [Technician, ServiceAdvisor, Admin] thêm hạng mục dịch vụ
 PATCH  /api/v1/work-orders/:id/items/:itemId [Technician, ServiceAdvisor, Admin]
 DELETE /api/v1/work-orders/:id/items/:itemId [Technician, ServiceAdvisor, Admin]
+POST   /api/v1/work-orders/:id/part-usages [Admin, ServiceAdvisor, Technician, InventoryClerk]
+PATCH  /api/v1/work-orders/:id/part-usages/:usageId [Admin, ServiceAdvisor, Technician, InventoryClerk]
+DELETE /api/v1/work-orders/:id/part-usages/:usageId [Admin, ServiceAdvisor, Technician, InventoryClerk]
 ```
 
 **State machine đã có:**
@@ -245,7 +256,8 @@ Received → Diagnosing → Repairing ⇄ WaitingParts → ReadyForDelivery → 
 - Không cho tạo work order từ appointment đã hủy hoặc appointment đã có work order.
 - Không cho sửa item khi work order đã `Delivered` hoặc `Cancelled`.
 - Hạng mục dịch vụ tự tính `amount = quantity * unitPrice`.
-- Part usage/trừ kho được tách sang FR-13 theo checklist.
+- Không cho xóa service item khi vẫn còn part usage liên kết.
+- Part usage trừ/hoàn tồn và ghi inventory transaction atomically.
 
 ---
 
@@ -264,7 +276,7 @@ PATCH  /api/v1/services/:id/toggle    bật/tắt isActive
 
 ---
 
-### ✅/⚠️ InventoryModule — `src/modules/inventory/`
+### ✅ InventoryModule — `src/modules/inventory/`
 
 **Cần cho:** FR-11, FR-12, FR-13
 
@@ -293,16 +305,12 @@ GET    /api/v1/inventory/transactions filter by partId, type, date
 - Không cho xuất hoặc điều chỉnh làm tồn kho âm.
 - Không cho giao dịch với phụ tùng đã ngưng hoạt động.
 
-**FR-13 cần tạo tiếp:** Khi WorkOrder thêm PartUsage:
-```typescript
-await prisma.$transaction(async (tx) => {
-  const part = await tx.part.findUnique({ where: { id }, ...lockForUpdate });
-  if (part.stockQuantity < quantity) throw new ConflictException('Insufficient stock');
-  await tx.part.update({ data: { stockQuantity: { decrement: quantity } } });
-  await tx.partUsage.create({ ... });
-  await tx.inventoryTransaction.create({ type: 'Export', quantityDelta: -quantity, ... });
-});
-```
+**Business rules FR-13 đã có:**
+- Part usage gắn với một `WorkOrderItem`, lưu quantity và snapshot unit price.
+- Create/update/delete chạy trong Prisma transaction cùng cập nhật stock và inventory ledger.
+- Tăng quantity chỉ trừ phần chênh lệch; giảm quantity hoàn phần chênh lệch.
+- Đổi part hoàn toàn bộ part cũ rồi trừ part mới; xóa usage hoàn tồn.
+- Không cho tồn âm hoặc dùng part đã ngưng hoạt động.
 
 ---
 
@@ -384,12 +392,12 @@ GET    /api/v1/reports/low-stock      parts có stockQuantity <= reorderLevel
 | FR-06 | `features/appointments/AppointmentListPage.tsx`, `features/appointments/appointmentApi.ts` | `/dashboard/appointments` | ✅ UI + API thật đã có; ✅ Playwright appointment create/search/update/delete flow pass ngày 23/06/2026 |
 | FR-07~09 | `features/work-orders/WorkOrderListPage.tsx`, `features/work-orders/workOrderApi.ts` | `/dashboard/work-orders` | ✅ UI + API thật đã có; ✅ Playwright work order create/status/items flow pass ngày 23/06/2026 |
 | FR-12 | `features/inventory/InventoryTransactionsPage.tsx`, `features/inventory/inventoryApi.ts` | `/dashboard/inventory` | ✅ UI + API thật đã có; ✅ Playwright import/export/adjustment/filter flow pass ngày 24/06/2026 |
+| FR-13 | Part Usage panel trong `features/work-orders/WorkOrderListPage.tsx` | `/dashboard/work-orders` | ✅ UI + API thật đã có; ✅ Playwright create/update/delete/stock rollback flow pass ngày 24/06/2026 |
 
 ### ❌ Feature Pages chưa tạo
 
 | FR | Page | Route |
 |---|---|---|
-| FR-13 | Part Usage trong WorkOrder detail | `/dashboard/work-orders` |
 | FR-14~15 | InvoicePage | `/dashboard/invoices` |
 | FR-14~15 | InvoiceDetailPage | `/dashboard/invoices/:id` |
 | FR-16 | MaintenanceHistoryPage | `/dashboard/vehicles/:id/history` |
@@ -418,7 +426,7 @@ Phase 2 — Operations (phụ thuộc Phase 1):
   [x] AppointmentModule + frontend + Playwright (FR-06)
   [x] WorkOrderModule + frontend + Playwright (FR-07~09) — bao gồm state machine
   [x] InventoryModule — nhập/xuất/điều chỉnh kho + frontend + Playwright (FR-12)
-  [ ] PartUsage — ghi nhận phụ tùng theo work order và trừ kho (FR-13)
+  [x] PartUsage — ghi nhận/sửa/xóa theo work order + trừ/hoàn kho + Playwright (FR-13)
 
 Phase 3 — Billing & Reports (phụ thuộc Phase 2):
   [ ] InvoiceModule (backend FR-14, FR-15)
@@ -471,9 +479,9 @@ apps/backend/src/
     ├── customer/                        ✅ (4 files)
     ├── vehicle/                         ✅ (4 files)
     ├── appointment/                     ✅
-    ├── work-order/                      ✅
+    ├── work-order/                      ✅ FR-07~09 + FR-13
     ├── service-catalog/                 ✅ (4 files)
-    ├── inventory/                       ✅ FR-11/FR-12, ⚠️ FR-13 chưa xong
+    ├── inventory/                       ✅ FR-11/FR-12
     ├── invoice/                         ❌ chưa tạo
     ├── reminder/                        ❌ chưa tạo
     └── report/                          ❌ chưa tạo
@@ -528,5 +536,6 @@ apps/frontend/
     ├── appointments.spec.ts             ✅ pass ngày 23/06/2026
     ├── work-orders.spec.ts              ✅ pass ngày 23/06/2026
     ├── inventory-transactions.spec.ts   ✅ pass ngày 24/06/2026
+    ├── part-usages.spec.ts              ✅ pass ngày 24/06/2026
     └── helpers/auth.ts                  ✅
 ```

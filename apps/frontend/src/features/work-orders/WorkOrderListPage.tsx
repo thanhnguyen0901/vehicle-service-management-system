@@ -10,9 +10,16 @@ import { InputText } from 'primereact/inputtext';
 import { Message } from 'primereact/message';
 import { selectCurrentUser } from '../auth/authSlice';
 import { appointmentApi, type Appointment } from '../appointments/appointmentApi';
+import { partApi, type Part } from '../parts/partApi';
 import { serviceCatalogApi, type RepairService } from '../services/serviceCatalogApi';
 import { vehicleApi, type Vehicle } from '../vehicles/vehicleApi';
-import { workOrderApi, type WorkOrder, type WorkOrderItem, type WorkOrderStatus } from './workOrderApi';
+import {
+  workOrderApi,
+  type PartUsage,
+  type WorkOrder,
+  type WorkOrderItem,
+  type WorkOrderStatus,
+} from './workOrderApi';
 
 interface WorkOrderFormState {
   source: 'appointment' | 'vehicle';
@@ -26,6 +33,18 @@ interface ItemFormState {
   description: string;
   quantity: number;
   unitPrice: number;
+}
+
+interface PartUsageFormState {
+  workOrderItemId: string;
+  partId: string;
+  quantity: number;
+  unitPrice: number;
+}
+
+interface PartUsageRow extends PartUsage {
+  workOrderItemId: string;
+  workOrderItemDescription: string;
 }
 
 const statusOptions: Array<{ label: string; value: WorkOrderStatus }> = [
@@ -57,14 +76,23 @@ const emptyItemForm: ItemFormState = {
   unitPrice: 0,
 };
 
+const emptyPartUsageForm: PartUsageFormState = {
+  workOrderItemId: '',
+  partId: '',
+  quantity: 1,
+  unitPrice: 0,
+};
+
 export function WorkOrderListPage() {
   const currentUser = useSelector(selectCurrentUser);
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [services, setServices] = useState<RepairService[]>([]);
+  const [parts, setParts] = useState<Part[]>([]);
   const [selectedWorkOrder, setSelectedWorkOrder] = useState<WorkOrder | null>(null);
   const [editingItem, setEditingItem] = useState<WorkOrderItem | null>(null);
+  const [editingPartUsage, setEditingPartUsage] = useState<PartUsageRow | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -73,6 +101,7 @@ export function WorkOrderListPage() {
   const [detailOpen, setDetailOpen] = useState(false);
   const [form, setForm] = useState<WorkOrderFormState>(emptyWorkOrderForm);
   const [itemForm, setItemForm] = useState<ItemFormState>(emptyItemForm);
+  const [partUsageForm, setPartUsageForm] = useState<PartUsageFormState>(emptyPartUsageForm);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<WorkOrderStatus | null>(null);
 
@@ -82,6 +111,11 @@ export function WorkOrderListPage() {
     currentUser?.role === 'Admin' ||
     currentUser?.role === 'ServiceAdvisor' ||
     currentUser?.role === 'Technician';
+  const canManageParts =
+    currentUser?.role === 'Admin' ||
+    currentUser?.role === 'ServiceAdvisor' ||
+    currentUser?.role === 'Technician' ||
+    currentUser?.role === 'InventoryClerk';
 
   const appointmentOptions = useMemo(
     () =>
@@ -114,6 +148,38 @@ export function WorkOrderListPage() {
     [services],
   );
 
+  const partOptions = useMemo(
+    () =>
+      parts
+        .filter((part) => part.isActive)
+        .map((part) => ({
+          label: `${part.partNumber} - ${part.name} (tồn ${part.stockQuantity} ${part.unit})`,
+          value: part.id,
+        })),
+    [parts],
+  );
+
+  const workOrderItemOptions = useMemo(
+    () =>
+      selectedWorkOrder?.items.map((item) => ({
+        label: item.description,
+        value: item.id,
+      })) ?? [],
+    [selectedWorkOrder],
+  );
+
+  const partUsageRows = useMemo<PartUsageRow[]>(
+    () =>
+      selectedWorkOrder?.items.flatMap((item) =>
+        item.partUsages.map((usage) => ({
+          ...usage,
+          workOrderItemId: item.id,
+          workOrderItemDescription: item.description,
+        })),
+      ) ?? [],
+    [selectedWorkOrder],
+  );
+
   const filteredWorkOrders = useMemo(() => {
     const keyword = search.trim().toLowerCase();
     return workOrders.filter((workOrder) => {
@@ -141,16 +207,18 @@ export function WorkOrderListPage() {
     setIsLoading(true);
     setError(null);
     try {
-      const [workOrderRows, appointmentRows, vehicleRows, serviceRows] = await Promise.all([
+      const [workOrderRows, appointmentRows, vehicleRows, serviceRows, partRows] = await Promise.all([
         workOrderApi.list(),
-        appointmentApi.list(),
+        canCreate ? appointmentApi.list() : Promise.resolve([]),
         vehicleApi.list(),
         serviceCatalogApi.list(),
+        partApi.list(),
       ]);
       setWorkOrders(workOrderRows);
       setAppointments(appointmentRows);
       setVehicles(vehicleRows);
       setServices(serviceRows);
+      setParts(partRows);
       if (selectedWorkOrder) {
         setSelectedWorkOrder(workOrderRows.find((row) => row.id === selectedWorkOrder.id) ?? null);
       }
@@ -181,7 +249,14 @@ export function WorkOrderListPage() {
       const detail = await workOrderApi.get(workOrder.id);
       setSelectedWorkOrder(detail);
       setEditingItem(null);
+      setEditingPartUsage(null);
       setItemForm(emptyItemForm);
+      setPartUsageForm({
+        ...emptyPartUsageForm,
+        workOrderItemId: detail.items[0]?.id ?? '',
+        partId: parts.find((part) => part.isActive)?.id ?? '',
+        unitPrice: Number(parts.find((part) => part.isActive)?.unitPrice ?? 0),
+      });
       setDetailOpen(true);
     } catch (err: unknown) {
       setError(getErrorMessage(err, 'Không tải được chi tiết phiếu'));
@@ -248,6 +323,10 @@ export function WorkOrderListPage() {
       }
       const detail = await workOrderApi.get(selectedWorkOrder.id);
       setSelectedWorkOrder(detail);
+      setPartUsageForm((previous) => ({
+        ...previous,
+        workOrderItemId: previous.workOrderItemId || detail.items[0]?.id || '',
+      }));
       setEditingItem(null);
       setItemForm(emptyItemForm);
       await loadData();
@@ -299,6 +378,92 @@ export function WorkOrderListPage() {
   const resetItemForm = () => {
     setEditingItem(null);
     setItemForm(emptyItemForm);
+  };
+
+  const refreshWorkOrderDetail = async (workOrderId: string) => {
+    const [detail, partRows] = await Promise.all([workOrderApi.get(workOrderId), partApi.list()]);
+    setSelectedWorkOrder(detail);
+    setParts(partRows);
+    await loadData();
+  };
+
+  const handlePartSelect = (partId: string) => {
+    const part = parts.find((item) => item.id === partId);
+    setPartUsageForm((previous) => ({
+      ...previous,
+      partId,
+      unitPrice: part ? Number(part.unitPrice) : previous.unitPrice,
+    }));
+  };
+
+  const handleSavePartUsage = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!selectedWorkOrder) return;
+    setIsSaving(true);
+    setError(null);
+    setSuccess(null);
+    try {
+      if (editingPartUsage) {
+        await workOrderApi.updatePartUsage(selectedWorkOrder.id, editingPartUsage.id, {
+          partId: partUsageForm.partId,
+          quantity: partUsageForm.quantity,
+          unitPrice: partUsageForm.unitPrice,
+        });
+        setSuccess('Đã cập nhật phụ tùng sử dụng');
+      } else {
+        await workOrderApi.addPartUsage(selectedWorkOrder.id, partUsageForm);
+        setSuccess('Đã ghi nhận phụ tùng sử dụng');
+      }
+      setEditingPartUsage(null);
+      setPartUsageForm({
+        ...emptyPartUsageForm,
+        workOrderItemId: selectedWorkOrder.items[0]?.id ?? '',
+        partId: parts.find((part) => part.isActive)?.id ?? '',
+        unitPrice: Number(parts.find((part) => part.isActive)?.unitPrice ?? 0),
+      });
+      await refreshWorkOrderDetail(selectedWorkOrder.id);
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, 'Không lưu được phụ tùng sử dụng'));
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const openEditPartUsage = (usage: PartUsageRow) => {
+    setEditingPartUsage(usage);
+    setPartUsageForm({
+      workOrderItemId: usage.workOrderItemId,
+      partId: usage.partId,
+      quantity: usage.quantity,
+      unitPrice: Number(usage.unitPrice),
+    });
+  };
+
+  const resetPartUsageForm = () => {
+    setEditingPartUsage(null);
+    setPartUsageForm({
+      ...emptyPartUsageForm,
+      workOrderItemId: selectedWorkOrder?.items[0]?.id ?? '',
+      partId: parts.find((part) => part.isActive)?.id ?? '',
+      unitPrice: Number(parts.find((part) => part.isActive)?.unitPrice ?? 0),
+    });
+  };
+
+  const handleDeletePartUsage = async (usage: PartUsageRow) => {
+    if (!selectedWorkOrder) return;
+    setIsSaving(true);
+    setError(null);
+    setSuccess(null);
+    try {
+      await workOrderApi.deletePartUsage(selectedWorkOrder.id, usage.id);
+      setSuccess('Đã xóa phụ tùng sử dụng và hoàn tồn kho');
+      resetPartUsageForm();
+      await refreshWorkOrderDetail(selectedWorkOrder.id);
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, 'Không xóa được phụ tùng sử dụng'));
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const detailIsLocked =
@@ -565,6 +730,145 @@ export function WorkOrderListPage() {
 
             <div className="flex justify-end text-base font-semibold text-gray-800">
               Tổng tạm tính: {formatMoney(totalAmount)}
+            </div>
+
+            <div className="border-t border-gray-200 pt-5">
+              <div className="mb-3">
+                <h2 className="text-lg font-semibold text-gray-800">Phụ tùng sử dụng</h2>
+                <p className="text-sm text-gray-500">Ghi nhận phụ tùng theo hạng mục và đồng bộ tồn kho.</p>
+              </div>
+
+              <form
+                className="mb-4 grid gap-3 md:grid-cols-[1fr_1.4fr_7rem_10rem_auto]"
+                onSubmit={handleSavePartUsage}
+              >
+                <div className="flex flex-col gap-1 text-sm font-medium text-gray-700">
+                  <label htmlFor="part-usage-item">Hạng mục</label>
+                  <Dropdown
+                    inputId="part-usage-item"
+                    value={partUsageForm.workOrderItemId}
+                    options={workOrderItemOptions}
+                    disabled={detailIsLocked || Boolean(editingPartUsage)}
+                    onChange={(event) =>
+                      setPartUsageForm((previous) => ({
+                        ...previous,
+                        workOrderItemId: event.value as string,
+                      }))
+                    }
+                  />
+                </div>
+                <div className="flex flex-col gap-1 text-sm font-medium text-gray-700">
+                  <label htmlFor="part-usage-part">Phụ tùng</label>
+                  <Dropdown
+                    inputId="part-usage-part"
+                    value={partUsageForm.partId}
+                    options={partOptions}
+                    filter
+                    disabled={detailIsLocked}
+                    onChange={(event) => handlePartSelect(event.value as string)}
+                  />
+                </div>
+                <label className="flex flex-col gap-1 text-sm font-medium text-gray-700">
+                  SL phụ tùng
+                  <InputNumber
+                    value={partUsageForm.quantity}
+                    min={1}
+                    useGrouping={false}
+                    disabled={detailIsLocked}
+                    inputClassName="w-full"
+                    onValueChange={(event) =>
+                      setPartUsageForm((previous) => ({
+                        ...previous,
+                        quantity: Number(event.value ?? 1),
+                      }))
+                    }
+                  />
+                </label>
+                <label className="flex flex-col gap-1 text-sm font-medium text-gray-700">
+                  Giá phụ tùng
+                  <InputNumber
+                    value={partUsageForm.unitPrice}
+                    min={0}
+                    useGrouping={false}
+                    disabled={detailIsLocked}
+                    inputClassName="w-full"
+                    onValueChange={(event) =>
+                      setPartUsageForm((previous) => ({
+                        ...previous,
+                        unitPrice: Number(event.value ?? 0),
+                      }))
+                    }
+                  />
+                </label>
+                <div className="flex items-end gap-2">
+                  <Button
+                    type="submit"
+                    label={editingPartUsage ? 'Lưu' : 'Ghi nhận'}
+                    icon={editingPartUsage ? 'pi pi-save' : 'pi pi-plus'}
+                    loading={isSaving}
+                    disabled={
+                      !canManageParts ||
+                      detailIsLocked ||
+                      !partUsageForm.workOrderItemId ||
+                      !partUsageForm.partId
+                    }
+                  />
+                  {editingPartUsage && (
+                    <Button
+                      type="button"
+                      icon="pi pi-times"
+                      severity="secondary"
+                      outlined
+                      aria-label="Hủy sửa phụ tùng"
+                      onClick={resetPartUsageForm}
+                    />
+                  )}
+                </div>
+              </form>
+
+              <DataTable
+                value={partUsageRows}
+                dataKey="id"
+                emptyMessage="Chưa ghi nhận phụ tùng"
+                tableStyle={{ minWidth: '58rem' }}
+              >
+                <Column field="workOrderItemDescription" header="Hạng mục" />
+                <Column field="part.partNumber" header="Mã phụ tùng" />
+                <Column field="part.name" header="Phụ tùng" />
+                <Column field="quantity" header="SL" />
+                <Column
+                  header="Đơn giá"
+                  body={(row: PartUsageRow) => formatMoney(Number(row.unitPrice))}
+                />
+                <Column
+                  header="Thành tiền"
+                  body={(row: PartUsageRow) => formatMoney(Number(row.unitPrice) * row.quantity)}
+                />
+                <Column
+                  header="Thao tác"
+                  body={(row: PartUsageRow) => (
+                    <div className="flex gap-2">
+                      <Button
+                        icon="pi pi-pencil"
+                        rounded
+                        text
+                        aria-label={`Sửa phụ tùng ${row.part.partNumber}`}
+                        disabled={!canManageParts || detailIsLocked}
+                        onClick={() => openEditPartUsage(row)}
+                      />
+                      <Button
+                        icon="pi pi-trash"
+                        rounded
+                        text
+                        severity="danger"
+                        aria-label={`Xóa phụ tùng ${row.part.partNumber}`}
+                        disabled={!canManageParts || detailIsLocked}
+                        onClick={() => void handleDeletePartUsage(row)}
+                      />
+                    </div>
+                  )}
+                />
+              </DataTable>
             </div>
           </div>
         )}

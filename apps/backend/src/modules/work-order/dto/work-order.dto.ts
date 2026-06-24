@@ -48,3 +48,24 @@ export const UpdateWorkOrderItemSchema = CreateWorkOrderItemSchema.partial().ref
 );
 
 export type UpdateWorkOrderItemDto = z.infer<typeof UpdateWorkOrderItemSchema>;
+
+export const CreatePartUsageSchema = z.object({
+  workOrderItemId: z.string().uuid(),
+  partId: z.string().uuid(),
+  quantity: z.coerce.number().int().positive(),
+  unitPrice: z.coerce.number().min(0).optional(),
+});
+
+export type CreatePartUsageDto = z.infer<typeof CreatePartUsageSchema>;
+
+export const UpdatePartUsageSchema = z
+  .object({
+    partId: z.string().uuid().optional(),
+    quantity: z.coerce.number().int().positive().optional(),
+    unitPrice: z.coerce.number().min(0).optional(),
+  })
+  .refine((value) => Object.keys(value).length > 0, {
+    message: 'At least one field is required',
+  });
+
+export type UpdatePartUsageDto = z.infer<typeof UpdatePartUsageSchema>;

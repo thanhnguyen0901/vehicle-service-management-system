@@ -20,15 +20,22 @@
 - [DONE] Hoàn thành frontend `InventoryTransactionsPage` và API thật, gồm bộ lọc phụ tùng/loại giao dịch.
 - [DONE] `inventory-transactions.spec.ts` pass cho nhập, xuất, điều chỉnh, lọc và insufficient stock.
 - [DONE] Backend build pass, frontend build pass, full Playwright regression pass 9/9.
+- [DONE] Hoàn thành Part Usage slice FR-13 trong Work Order detail: thêm/sửa/xóa usage theo từng service item.
+- [DONE] Đồng bộ `PartUsage`, `Part.stockQuantity` và `InventoryTransaction` atomically cho create/update/delete.
+- [DONE] Sửa số lượng chỉ trừ/hoàn phần chênh lệch; đổi part hoàn part cũ; xóa usage hoàn tồn.
+- [DONE] Chặn insufficient stock, part ngưng hoạt động và work order đã khóa.
+- [DONE] `part-usages.spec.ts` pass; full Playwright regression sau FR-13 pass 10/10.
+- [DONE] Backend build pass và frontend build pass sau FR-13.
 
 ### Đang làm
 - [DONE] Không còn slice đang dở.
 
 ### Kế hoạch tiếp theo
-- [TODO] Implement Part Usage FR-13 theo full flow trong Work Order, trừ/hoàn tồn kho transactionally và có Playwright E2E.
+- [TODO] Implement Invoice FR-14 theo full flow, snapshot service/part lines từ Work Order và có Playwright E2E.
 
 ### Rủi ro/Ghi chú
 - Schema `InventoryTransaction` đã tồn tại nên FR-12 không cần migration mới.
+- Schema `PartUsage` đã tồn tại nên FR-13 không cần migration mới.
 - Migration chính thức cho schema hiện tại vẫn cần được tạo trước khi chốt release/demo.
 
 ---

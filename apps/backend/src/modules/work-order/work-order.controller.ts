@@ -23,6 +23,10 @@ import {
   CreateWorkOrderItemDto,
   CreateWorkOrderItemSchema,
   CreateWorkOrderSchema,
+  CreatePartUsageDto,
+  CreatePartUsageSchema,
+  UpdatePartUsageDto,
+  UpdatePartUsageSchema,
   UpdateWorkOrderItemDto,
   UpdateWorkOrderItemSchema,
   UpdateWorkOrderStatusDto,
@@ -38,13 +42,27 @@ export class WorkOrderController {
   constructor(private readonly workOrderService: WorkOrderService) {}
 
   @Get()
-  @Roles(Role.Admin, Role.ServiceAdvisor, Role.Technician, Role.Manager)
+  @Roles(
+    Role.Admin,
+    Role.ServiceAdvisor,
+    Role.Technician,
+    Role.InventoryClerk,
+    Role.Cashier,
+    Role.Manager,
+  )
   findAll(@Query(new ZodValidationPipe(WorkOrderQuerySchema)) query: WorkOrderQueryDto) {
     return this.workOrderService.findAll(query);
   }
 
   @Get(':id')
-  @Roles(Role.Admin, Role.ServiceAdvisor, Role.Technician, Role.Manager)
+  @Roles(
+    Role.Admin,
+    Role.ServiceAdvisor,
+    Role.Technician,
+    Role.InventoryClerk,
+    Role.Cashier,
+    Role.Manager,
+  )
   findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.workOrderService.findById(id);
   }
@@ -93,5 +111,38 @@ export class WorkOrderController {
   @HttpCode(HttpStatus.OK)
   deleteItem(@Param('id', ParseUUIDPipe) id: string, @Param('itemId', ParseUUIDPipe) itemId: string) {
     return this.workOrderService.deleteItem(id, itemId);
+  }
+
+  @Post(':id/part-usages')
+  @Roles(Role.Admin, Role.ServiceAdvisor, Role.Technician, Role.InventoryClerk)
+  @HttpCode(HttpStatus.CREATED)
+  addPartUsage(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body(new ZodValidationPipe(CreatePartUsageSchema)) dto: CreatePartUsageDto,
+    @CurrentUser() user: UserAccount,
+  ) {
+    return this.workOrderService.addPartUsage(id, dto, user.id);
+  }
+
+  @Patch(':id/part-usages/:usageId')
+  @Roles(Role.Admin, Role.ServiceAdvisor, Role.Technician, Role.InventoryClerk)
+  updatePartUsage(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('usageId', ParseUUIDPipe) usageId: string,
+    @Body(new ZodValidationPipe(UpdatePartUsageSchema)) dto: UpdatePartUsageDto,
+    @CurrentUser() user: UserAccount,
+  ) {
+    return this.workOrderService.updatePartUsage(id, usageId, dto, user.id);
+  }
+
+  @Delete(':id/part-usages/:usageId')
+  @Roles(Role.Admin, Role.ServiceAdvisor, Role.Technician, Role.InventoryClerk)
+  @HttpCode(HttpStatus.OK)
+  deletePartUsage(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('usageId', ParseUUIDPipe) usageId: string,
+    @CurrentUser() user: UserAccount,
+  ) {
+    return this.workOrderService.deletePartUsage(id, usageId, user.id);
   }
 }
