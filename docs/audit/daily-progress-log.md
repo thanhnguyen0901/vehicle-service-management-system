@@ -21,15 +21,22 @@
 - [DONE] Hoàn thành frontend Invoice list/create/detail, tìm kiếm/lọc trạng thái và API thật.
 - [DONE] `invoices.spec.ts` pass cho service/part snapshot, tổng tiền và duplicate rejection.
 - [DONE] Backend build pass, frontend build pass, full Playwright regression pass 11/11.
+- [DONE] Hoàn thành Payment slice FR-15 trong Invoice detail: thanh toán từng phần, thanh toán đủ và lịch sử payment.
+- [DONE] Tạo Payment và cập nhật Invoice status/paidAt trong transaction `Serializable`.
+- [DONE] Chặn payment không hợp lệ, overpayment và thanh toán thêm cho invoice đã `Paid`.
+- [DONE] Bổ sung rule Work Order chỉ được chuyển `Delivered` khi invoice đã thanh toán đủ.
+- [DONE] `payments.spec.ts` pass; full Playwright regression sau FR-15 pass 12/12.
+- [DONE] Backend build pass và frontend build pass sau FR-15.
 
 ### Đang làm
 - [DONE] Không còn slice đang dở.
 
 ### Kế hoạch tiếp theo
-- [TODO] Implement Payment FR-15 theo full flow trong Invoice detail, cập nhật trạng thái thanh toán transactionally và có Playwright E2E.
+- [TODO] Implement Maintenance History FR-16 theo full flow, tra cứu theo xe/khách hàng và có Playwright E2E.
 
 ### Rủi ro/Ghi chú
 - Schema `Invoice` và `InvoiceLine` đã tồn tại nên FR-14 không cần migration mới.
+- Schema `Payment` đã tồn tại nên FR-15 không cần migration mới.
 - Migration chính thức cho schema hiện tại vẫn cần được tạo trước khi chốt release/demo.
 
 ---

@@ -1,4 +1,4 @@
-import { InvoiceStatus } from '@prisma/client';
+import { InvoiceStatus, PaymentMethod } from '@prisma/client';
 import { z } from 'zod';
 
 export const CreateInvoiceSchema = z.object({
@@ -23,3 +23,11 @@ export const InvoiceQuerySchema = z
   });
 
 export type InvoiceQueryDto = z.infer<typeof InvoiceQuerySchema>;
+
+export const CreatePaymentSchema = z.object({
+  amount: z.coerce.number().positive(),
+  method: z.nativeEnum(PaymentMethod),
+  transactionRef: z.string().trim().max(100).optional().nullable(),
+});
+
+export type CreatePaymentDto = z.infer<typeof CreatePaymentSchema>;

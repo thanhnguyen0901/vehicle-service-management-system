@@ -8,14 +8,22 @@
 ## Tổng quan tiến độ
 
 ```
-Backend  ███████████████░░░░░  ~75%  (Auth/User/Customer/Vehicle/ServiceCatalog/Parts/Appointment/WorkOrder/Inventory/Part Usage/Invoice + shared infra)
-Frontend ███████████████░░░░░  ~75%  (auth + layout + User/Customer/Vehicle/Service/Parts/Appointment/WorkOrder/Inventory/Part Usage/Invoice)
+Backend  ████████████████░░░░  ~80%  (Auth/User/Customer/Vehicle/ServiceCatalog/Parts/Appointment/WorkOrder/Inventory/Part Usage/Invoice/Payment + shared infra)
+Frontend ████████████████░░░░  ~80%  (auth + layout + User/Customer/Vehicle/Service/Parts/Appointment/WorkOrder/Inventory/Part Usage/Invoice/Payment)
 Schema   ██████████████████░░  ~90%  (15/15 bảng, đã bổ sung CustomerType và Part.unit; còn thiếu migration file chính thức)
 Infra    ████████████████████  100%  (filters, guards, pipes, interceptors, health endpoint)
-E2E      ██████████████░░░░░░  Auth/User/Customer/Vehicle/Service/Parts/Appointment/WorkOrder/Inventory/Part Usage/Invoice specs pass
+E2E      ███████████████░░░░░  Auth/User/Customer/Vehicle/Service/Parts/Appointment/WorkOrder/Inventory/Part Usage/Invoice/Payment specs pass
 ```
 
 **Recheck 25/06/2026:**
+- ✅ Payment FR-15 DONE: backend create payment + payment history trong invoice response, RBAC và Zod.
+- ✅ Hỗ trợ thanh toán nhiều lần; trạng thái `Paid` khi tổng payment bằng `totalAmount`.
+- ✅ Payment và cập nhật Invoice status chạy trong transaction `Serializable`; chặn overpayment và invoice đã paid.
+- ✅ Work Order chỉ được chuyển `Delivered` khi có invoice `Paid`.
+- ✅ Frontend Payment panel DONE: số đã trả/còn lại, form phương thức/mã giao dịch và lịch sử thanh toán.
+- ✅ `payments.spec.ts` pass; full Playwright regression pass 12/12.
+- ✅ Backend build pass; frontend build pass.
+- ▶️ Active slice tiếp theo: Maintenance History (FR-16).
 - ✅ Invoice FR-14 DONE: backend list/detail/create + RBAC + Zod validation.
 - ✅ Chỉ tạo từ Work Order `ReadyForDelivery`, có dòng tính tiền và chưa có invoice.
 - ✅ Snapshot service items và part usages thành immutable `InvoiceLine` trong cùng Prisma transaction.
@@ -270,6 +278,7 @@ Received → Diagnosing → Repairing ⇄ WaitingParts → ReadyForDelivery → 
 - Không cho xóa service item khi vẫn còn part usage liên kết.
 - Part usage trừ/hoàn tồn và ghi inventory transaction atomically.
 - Work order đã có invoice không cho sửa service item hoặc part usage.
+- Work order chỉ được chuyển `Delivered` khi invoice đã `Paid`.
 
 ---
 
@@ -326,7 +335,7 @@ GET    /api/v1/inventory/transactions filter by partId, type, date
 
 ---
 
-### ✅/⚠️ InvoiceModule — `src/modules/invoice/`
+### ✅ InvoiceModule — `src/modules/invoice/`
 
 **Cần cho:** FR-14, FR-15
 
@@ -344,11 +353,17 @@ POST   /api/v1/invoices               từ workOrderId → snapshot InvoiceLines
 - `totalAmount = sum(lines.amount) - discount + tax`, không cho tổng âm.
 - Không có endpoint sửa/xóa InvoiceLine; Work Order đã invoiced bị khóa phần billable data.
 
-**FR-15 endpoints cần tạo tiếp:**
+**FR-15 endpoint đã có:**
 ```
 POST   /api/v1/invoices/:id/payments  ghi nhận thanh toán [Cashier, Admin]
-GET    /api/v1/invoices/:id/payments
 ```
+
+**Business rules FR-15 đã có:**
+- Invoice detail/list trả payment history để tính tổng đã trả và số còn lại.
+- Cho phép thanh toán nhiều lần; payment phải dương và không vượt số còn lại.
+- Tạo Payment và cập nhật Invoice status/paidAt trong transaction `Serializable`.
+- Khi tổng payment bằng `totalAmount`, invoice chuyển `Paid`; invoice Paid không nhận thêm payment.
+- Chỉ `Admin` và `Cashier` được ghi nhận thanh toán.
 
 ---
 
@@ -415,12 +430,12 @@ GET    /api/v1/reports/low-stock      parts có stockQuantity <= reorderLevel
 | FR-12 | `features/inventory/InventoryTransactionsPage.tsx`, `features/inventory/inventoryApi.ts` | `/dashboard/inventory` | ✅ UI + API thật đã có; ✅ Playwright import/export/adjustment/filter flow pass ngày 24/06/2026 |
 | FR-13 | Part Usage panel trong `features/work-orders/WorkOrderListPage.tsx` | `/dashboard/work-orders` | ✅ UI + API thật đã có; ✅ Playwright create/update/delete/stock rollback flow pass ngày 24/06/2026 |
 | FR-14 | `features/invoices/InvoiceListPage.tsx`, `features/invoices/invoiceApi.ts` | `/dashboard/invoices` | ✅ List/create/detail + immutable snapshot; ✅ Playwright service/part lines and duplicate rejection pass ngày 25/06/2026 |
+| FR-15 | Payment panel trong `features/invoices/InvoiceListPage.tsx` | `/dashboard/invoices` | ✅ Partial/final payment + history + remaining amount; ✅ Playwright overpayment/paid rejection pass ngày 25/06/2026 |
 
 ### ❌ Feature Pages chưa tạo
 
 | FR | Page | Route |
 |---|---|---|
-| FR-15 | Payment panel trong Invoice detail | `/dashboard/invoices` |
 | FR-16 | MaintenanceHistoryPage | `/dashboard/vehicles/:id/history` |
 | FR-17 | RemindersPage | `/dashboard/reminders` |
 | FR-18 | ReportsPage | `/dashboard/reports` |
@@ -451,7 +466,7 @@ Phase 2 — Operations (phụ thuộc Phase 1):
 
 Phase 3 — Billing & Reports (phụ thuộc Phase 2):
   [x] InvoiceModule + frontend + Playwright (FR-14)
-  [ ] Payment flow trong InvoiceModule (FR-15)
+  [x] Payment flow trong InvoiceModule + frontend + Playwright (FR-15)
   [ ] ReminderModule (backend FR-17)
   [ ] ReportModule (backend FR-18)
 
@@ -504,7 +519,7 @@ apps/backend/src/
     ├── work-order/                      ✅ FR-07~09 + FR-13
     ├── service-catalog/                 ✅ (4 files)
     ├── inventory/                       ✅ FR-11/FR-12
-    ├── invoice/                         ✅ FR-14, ⚠️ FR-15 chưa xong
+    ├── invoice/                         ✅ FR-14/FR-15
     ├── reminder/                        ❌ chưa tạo
     └── report/                          ❌ chưa tạo
 
@@ -535,7 +550,7 @@ apps/frontend/src/
 │   ├── appointments/                    ✅ UI + API thật, ✅ e2e pass
 │   ├── work-orders/                     ✅ UI + API thật, ✅ e2e pass
 │   └── inventory/                       ✅ UI + API thật, ✅ e2e pass
-│   └── invoices/                        ✅ FR-14 UI + API thật, ✅ e2e pass
+│   └── invoices/                        ✅ FR-14/FR-15 UI + API thật, ✅ e2e pass
 ├── services/
 │   └── api.ts                           ✅ (axios + refresh interceptor)
 ├── shared/
@@ -561,5 +576,6 @@ apps/frontend/
     ├── inventory-transactions.spec.ts   ✅ pass ngày 24/06/2026
     ├── part-usages.spec.ts              ✅ pass ngày 24/06/2026
     ├── invoices.spec.ts                 ✅ pass ngày 25/06/2026
+    ├── payments.spec.ts                 ✅ pass ngày 25/06/2026
     └── helpers/auth.ts                  ✅
 ```

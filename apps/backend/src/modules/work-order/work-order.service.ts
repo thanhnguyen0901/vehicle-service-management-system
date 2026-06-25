@@ -180,6 +180,15 @@ export class WorkOrderService {
     if (!this.canTransition(workOrder.status, dto.status)) {
       throw new BadRequestException(`Cannot change work order status from ${workOrder.status} to ${dto.status}`);
     }
+    if (dto.status === WorkOrderStatus.Delivered) {
+      const invoice = await this.prisma.invoice.findUnique({
+        where: { workOrderId: id },
+        select: { status: true },
+      });
+      if (!invoice || invoice.status !== 'Paid') {
+        throw new ConflictException('Work order requires a paid invoice before delivery');
+      }
+    }
 
     return this.prisma.workOrder.update({
       where: { id },

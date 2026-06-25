@@ -11,13 +11,19 @@ import { Message } from 'primereact/message';
 import { Tag } from 'primereact/tag';
 import { selectCurrentUser } from '../auth/authSlice';
 import { workOrderApi, type WorkOrder } from '../work-orders/workOrderApi';
-import { invoiceApi, type Invoice } from './invoiceApi';
+import { invoiceApi, type Invoice, type Payment, type PaymentMethod } from './invoiceApi';
 
 interface InvoiceFormState {
   workOrderId: string;
   discount: number;
   tax: number;
   notes: string;
+}
+
+interface PaymentFormState {
+  amount: number;
+  method: PaymentMethod;
+  transactionRef: string;
 }
 
 const emptyForm: InvoiceFormState = {
@@ -27,12 +33,19 @@ const emptyForm: InvoiceFormState = {
   notes: '',
 };
 
+const emptyPaymentForm: PaymentFormState = {
+  amount: 0,
+  method: 'Cash',
+  transactionRef: '',
+};
+
 export function InvoiceListPage() {
   const currentUser = useSelector(selectCurrentUser);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [form, setForm] = useState<InvoiceFormState>(emptyForm);
+  const [paymentForm, setPaymentForm] = useState<PaymentFormState>(emptyPaymentForm);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [createOpen, setCreateOpen] = useState(false);
@@ -43,6 +56,7 @@ export function InvoiceListPage() {
   const [success, setSuccess] = useState<string | null>(null);
 
   const canCreate = currentUser?.role === 'Admin' || currentUser?.role === 'Cashier';
+  const canPay = currentUser?.role === 'Admin' || currentUser?.role === 'Cashier';
   const invoicedWorkOrderIds = useMemo(
     () => new Set(invoices.map((invoice) => invoice.workOrderId)),
     [invoices],
@@ -120,6 +134,10 @@ export function InvoiceListPage() {
       setCreateOpen(false);
       await loadData();
       setSelectedInvoice(invoice);
+      setPaymentForm({
+        ...emptyPaymentForm,
+        amount: getRemainingAmount(invoice),
+      });
       setDetailOpen(true);
     } catch (err: unknown) {
       setError(getErrorMessage(err, 'Không lập được hóa đơn'));
@@ -131,7 +149,12 @@ export function InvoiceListPage() {
   const openDetailDialog = async (invoice: Invoice) => {
     setError(null);
     try {
-      setSelectedInvoice(await invoiceApi.get(invoice.id));
+      const detail = await invoiceApi.get(invoice.id);
+      setSelectedInvoice(detail);
+      setPaymentForm({
+        ...emptyPaymentForm,
+        amount: getRemainingAmount(detail),
+      });
       setDetailOpen(true);
     } catch (err: unknown) {
       setError(getErrorMessage(err, 'Không tải được chi tiết hóa đơn'));
@@ -140,6 +163,37 @@ export function InvoiceListPage() {
 
   const subtotal =
     selectedInvoice?.lines.reduce((sum, line) => sum + Number(line.amount), 0) ?? 0;
+  const paidAmount =
+    selectedInvoice?.payments.reduce((sum, payment) => sum + Number(payment.amount), 0) ?? 0;
+  const remainingAmount = selectedInvoice
+    ? Math.max(0, Number(selectedInvoice.totalAmount) - paidAmount)
+    : 0;
+
+  const handlePayment = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!selectedInvoice) return;
+    setIsSaving(true);
+    setError(null);
+    setSuccess(null);
+    try {
+      const updated = await invoiceApi.createPayment(selectedInvoice.id, {
+        amount: paymentForm.amount,
+        method: paymentForm.method,
+        transactionRef: paymentForm.transactionRef || null,
+      });
+      setSelectedInvoice(updated);
+      setPaymentForm({
+        ...emptyPaymentForm,
+        amount: getRemainingAmount(updated),
+      });
+      setSuccess(updated.status === 'Paid' ? 'Hóa đơn đã thanh toán đủ' : 'Đã ghi nhận thanh toán');
+      await loadData();
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, 'Không ghi nhận được thanh toán'));
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     <div className="p-4 sm:p-6 lg:p-8">
@@ -365,6 +419,14 @@ export function InvoiceListPage() {
                 <span>Tổng cộng</span>
                 <span>{formatMoney(Number(selectedInvoice.totalAmount))}</span>
               </div>
+              <div className="flex justify-between text-green-700">
+                <span>Đã thanh toán</span>
+                <span>{formatMoney(paidAmount)}</span>
+              </div>
+              <div className="flex justify-between font-semibold text-red-700">
+                <span>Còn lại</span>
+                <span>{formatMoney(remainingAmount)}</span>
+              </div>
             </div>
 
             {selectedInvoice.notes && (
@@ -373,6 +435,109 @@ export function InvoiceListPage() {
                 {selectedInvoice.notes}
               </div>
             )}
+
+            <div className="border-t border-gray-200 pt-5">
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-800">Thanh toán</h2>
+                  <p className="text-sm text-gray-500">Ghi nhận các lần thanh toán cho hóa đơn.</p>
+                </div>
+                <Tag
+                  value={selectedInvoice.status === 'Paid' ? 'Đã thanh toán' : 'Chưa thanh toán'}
+                  severity={selectedInvoice.status === 'Paid' ? 'success' : 'warning'}
+                />
+              </div>
+
+              {selectedInvoice.status !== 'Paid' && canPay && (
+                <form
+                  className="mb-4 grid gap-3 md:grid-cols-[11rem_1fr_1fr_auto]"
+                  onSubmit={handlePayment}
+                >
+                  <label
+                    htmlFor="payment-amount"
+                    className="flex flex-col gap-1 text-sm font-medium text-gray-700"
+                  >
+                    Số tiền
+                    <InputNumber
+                      inputId="payment-amount"
+                      value={paymentForm.amount}
+                      min={1}
+                      max={remainingAmount}
+                      useGrouping={false}
+                      onValueChange={(event) =>
+                        setPaymentForm((previous) => ({
+                          ...previous,
+                          amount: Number(event.value ?? 0),
+                        }))
+                      }
+                    />
+                  </label>
+                  <label className="flex flex-col gap-1 text-sm font-medium text-gray-700">
+                    Phương thức
+                    <select
+                      className="p-inputtext w-full"
+                      value={paymentForm.method}
+                      onChange={(event) =>
+                        setPaymentForm((previous) => ({
+                          ...previous,
+                          method: event.target.value as PaymentMethod,
+                        }))
+                      }
+                    >
+                      <option value="Cash">Tiền mặt</option>
+                      <option value="BankTransfer">Chuyển khoản</option>
+                      <option value="Card">Thẻ</option>
+                    </select>
+                  </label>
+                  <label className="flex flex-col gap-1 text-sm font-medium text-gray-700">
+                    Mã giao dịch
+                    <InputText
+                      value={paymentForm.transactionRef}
+                      onChange={(event) =>
+                        setPaymentForm((previous) => ({
+                          ...previous,
+                          transactionRef: event.target.value,
+                        }))
+                      }
+                    />
+                  </label>
+                  <div className="flex items-end">
+                    <Button
+                      type="submit"
+                      label="Ghi nhận"
+                      icon="pi pi-wallet"
+                      loading={isSaving}
+                      disabled={paymentForm.amount <= 0 || paymentForm.amount > remainingAmount}
+                    />
+                  </div>
+                </form>
+              )}
+
+              <DataTable
+                value={selectedInvoice.payments}
+                dataKey="id"
+                emptyMessage="Chưa có thanh toán"
+                tableStyle={{ minWidth: '44rem' }}
+              >
+                <Column
+                  header="Thời gian"
+                  body={(row: Payment) => formatDateTime(row.paidAt)}
+                />
+                <Column
+                  header="Số tiền"
+                  body={(row: Payment) => formatMoney(Number(row.amount))}
+                />
+                <Column
+                  header="Phương thức"
+                  body={(row: Payment) => paymentMethodLabel(row.method)}
+                />
+                <Column
+                  field="transactionRef"
+                  header="Mã giao dịch"
+                  body={(row: Payment) => row.transactionRef || '-'}
+                />
+              </DataTable>
+            </div>
           </div>
         )}
       </Dialog>
@@ -404,4 +569,17 @@ function getErrorMessage(error: unknown, fallback: string) {
     (error as { response?: { data?: { error?: { message?: string } } } })?.response?.data?.error
       ?.message ?? fallback
   );
+}
+
+function getRemainingAmount(invoice: Invoice) {
+  const paid = invoice.payments.reduce((sum, payment) => sum + Number(payment.amount), 0);
+  return Math.max(0, Number(invoice.totalAmount) - paid);
+}
+
+function paymentMethodLabel(method: PaymentMethod) {
+  return {
+    Cash: 'Tiền mặt',
+    BankTransfer: 'Chuyển khoản',
+    Card: 'Thẻ',
+  }[method];
 }

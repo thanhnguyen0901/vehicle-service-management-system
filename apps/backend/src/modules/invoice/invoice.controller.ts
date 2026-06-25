@@ -10,7 +10,8 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { Role } from '@prisma/client';
+import { Role, UserAccount } from '@prisma/client';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
@@ -18,6 +19,8 @@ import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import {
   CreateInvoiceDto,
   CreateInvoiceSchema,
+  CreatePaymentDto,
+  CreatePaymentSchema,
   InvoiceQueryDto,
   InvoiceQuerySchema,
 } from './dto/invoice.dto';
@@ -45,5 +48,16 @@ export class InvoiceController {
   @HttpCode(HttpStatus.CREATED)
   create(@Body(new ZodValidationPipe(CreateInvoiceSchema)) dto: CreateInvoiceDto) {
     return this.invoiceService.create(dto);
+  }
+
+  @Post(':id/payments')
+  @Roles(Role.Admin, Role.Cashier)
+  @HttpCode(HttpStatus.CREATED)
+  createPayment(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body(new ZodValidationPipe(CreatePaymentSchema)) dto: CreatePaymentDto,
+    @CurrentUser() user: UserAccount,
+  ) {
+    return this.invoiceService.createPayment(id, dto, user.id);
   }
 }

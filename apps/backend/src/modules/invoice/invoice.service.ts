@@ -1,7 +1,7 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma, WorkOrderStatus } from '@prisma/client';
+import { InvoiceStatus, Prisma, WorkOrderStatus } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
-import { CreateInvoiceDto, InvoiceQueryDto } from './dto/invoice.dto';
+import { CreateInvoiceDto, CreatePaymentDto, InvoiceQueryDto } from './dto/invoice.dto';
 
 const invoiceSelect = {
   id: true,
@@ -51,6 +51,18 @@ const invoiceSelect = {
       createdAt: true,
     },
     orderBy: { createdAt: 'asc' },
+  },
+  payments: {
+    select: {
+      id: true,
+      amount: true,
+      method: true,
+      transactionRef: true,
+      paidAt: true,
+      receivedBy: true,
+      createdAt: true,
+    },
+    orderBy: { paidAt: 'asc' },
   },
 } satisfies Prisma.InvoiceSelect;
 
@@ -203,5 +215,67 @@ export class InvoiceService {
       }
       throw error;
     }
+  }
+
+  async createPayment(invoiceId: string, dto: CreatePaymentDto, receivedBy: string) {
+    return this.prisma.$transaction(
+      async (tx) => {
+        const invoice = await tx.invoice.findUnique({
+          where: { id: invoiceId },
+          select: {
+            id: true,
+            status: true,
+            totalAmount: true,
+            payments: { select: { amount: true } },
+          },
+        });
+        if (!invoice) throw new NotFoundException(`Invoice ${invoiceId} not found`);
+        if (invoice.status === InvoiceStatus.Paid) {
+          throw new ConflictException('Invoice is already paid');
+        }
+
+        const paidAmount = invoice.payments.reduce(
+          (sum, payment) => sum.add(payment.amount),
+          new Prisma.Decimal(0),
+        );
+        const amount = new Prisma.Decimal(dto.amount);
+        const remaining = invoice.totalAmount.sub(paidAmount);
+        if (amount.gt(remaining)) {
+          throw new BadRequestException(`Payment exceeds remaining amount ${remaining.toString()}`);
+        }
+
+        const payment = await tx.payment.create({
+          data: {
+            invoiceId,
+            amount,
+            method: dto.method,
+            transactionRef: dto.transactionRef || null,
+            receivedBy,
+          },
+        });
+
+        const nextPaidAmount = paidAmount.add(amount);
+        const isPaid = nextPaidAmount.eq(invoice.totalAmount);
+        await tx.invoice.update({
+          where: { id: invoiceId },
+          data: {
+            status: isPaid ? InvoiceStatus.Paid : InvoiceStatus.Unpaid,
+            paidAt: isPaid ? payment.paidAt : null,
+          },
+        });
+
+        return this.findByIdWithClient(tx, invoiceId);
+      },
+      { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
+    );
+  }
+
+  private async findByIdWithClient(tx: Prisma.TransactionClient, id: string) {
+    const invoice = await tx.invoice.findUnique({
+      where: { id },
+      select: invoiceSelect,
+    });
+    if (!invoice) throw new NotFoundException(`Invoice ${id} not found`);
+    return invoice;
   }
 }

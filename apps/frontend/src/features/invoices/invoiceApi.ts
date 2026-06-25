@@ -2,6 +2,7 @@ import api from '../../services/api';
 import type { WorkOrderStatus } from '../work-orders/workOrderApi';
 
 export type InvoiceStatus = 'Unpaid' | 'Paid';
+export type PaymentMethod = 'Cash' | 'BankTransfer' | 'Card';
 
 export interface InvoiceLine {
   id: string;
@@ -9,6 +10,16 @@ export interface InvoiceLine {
   quantity: number;
   unitPrice: string;
   amount: string;
+  createdAt: string;
+}
+
+export interface Payment {
+  id: string;
+  amount: string;
+  method: PaymentMethod;
+  transactionRef: string | null;
+  paidAt: string;
+  receivedBy: string | null;
   createdAt: string;
 }
 
@@ -45,6 +56,7 @@ export interface Invoice {
     };
   };
   lines: InvoiceLine[];
+  payments: Payment[];
 }
 
 export interface CreateInvoiceInput {
@@ -61,6 +73,12 @@ export interface InvoiceListParams {
   to?: string;
 }
 
+export interface CreatePaymentInput {
+  amount: number;
+  method: PaymentMethod;
+  transactionRef?: string | null;
+}
+
 export const invoiceApi = {
   list: (params: InvoiceListParams = {}): Promise<Invoice[]> =>
     api.get<Invoice[]>('/invoices', { params }).then((response) => response.data),
@@ -70,4 +88,7 @@ export const invoiceApi = {
 
   create: (data: CreateInvoiceInput): Promise<Invoice> =>
     api.post<Invoice>('/invoices', data).then((response) => response.data),
+
+  createPayment: (id: string, data: CreatePaymentInput): Promise<Invoice> =>
+    api.post<Invoice>(`/invoices/${id}/payments`, data).then((response) => response.data),
 };

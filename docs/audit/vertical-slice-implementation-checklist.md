@@ -1,6 +1,6 @@
 # Vertical Slice Implementation Checklist
 
-> Last updated: 2026-06-25 10:00 +07
+> Last updated: 2026-06-25 11:30 +07
 >
 > Scope: MVP FR-01 to FR-19.
 >
@@ -50,7 +50,7 @@ Use this checklist for each module before marking it `DONE`.
 | 9 | Inventory Transaction | FR-12 | DONE | DONE | DONE | DONE | DONE | Import/export/adjustment/history E2E passed on 2026-06-24 |
 | 10 | Part Usage | FR-13 | DONE | DONE | DONE | DONE | DONE | Record/update/remove with transactional stock E2E passed on 2026-06-24 |
 | 11 | Invoice | FR-14 | DONE | DONE | DONE | DONE | DONE | Immutable service/part snapshot E2E passed on 2026-06-25 |
-| 12 | Payment | FR-15 | TODO | TODO | TODO | TODO | TODO | Cashier/Admin only |
+| 12 | Payment | FR-15 | DONE | DONE | DONE | DONE | DONE | Partial/final payment and overpayment rejection E2E passed on 2026-06-25 |
 | 13 | Maintenance History | FR-16 | TODO | TODO | TODO | TODO | TODO | Query by customer/vehicle |
 | 14 | Reminder | FR-17 | TODO | TODO | TODO | TODO | TODO | Due list and sent marker |
 | 15 | Reports | FR-18 | TODO | TODO | TODO | TODO | TODO | Revenue, work orders, top services/parts, low stock |
@@ -59,15 +59,15 @@ Use this checklist for each module before marking it `DONE`.
 
 ## Current Active Slice
 
-Active slice: None. Invoice is complete; next slice is Payment.
+Active slice: None. Payment is complete; next slice is Maintenance History.
 
 Next slice exit criteria:
-- [ ] Payment backend records payment and updates invoice status transactionally.
-- [ ] Payment frontend form/history uses real API.
-- [ ] Payment Playwright flow covers paid invoice and duplicate/overpayment rejection.
+- [ ] Maintenance History backend returns complete vehicle/customer service history.
+- [ ] Maintenance History frontend search/detail flow uses real API.
+- [ ] Maintenance History Playwright flow covers existing and empty history.
 - [ ] Backend build passes.
 - [ ] Frontend build passes.
-- [ ] `implementation-status.md` updated with Payment result.
+- [ ] `implementation-status.md` updated with Maintenance History result.
 
 Latest completed verification:
 - [x] `auth.spec.ts` passed on 2026-06-22.
@@ -81,6 +81,7 @@ Latest completed verification:
 - [x] `inventory-transactions.spec.ts` passed on 2026-06-24.
 - [x] `part-usages.spec.ts` passed on 2026-06-24.
 - [x] `invoices.spec.ts` passed on 2026-06-25.
+- [x] `payments.spec.ts` passed on 2026-06-25.
 - [x] Backend build passed on 2026-06-22.
 - [x] Frontend build passed on 2026-06-22.
 - [x] Backend build passed on 2026-06-23.
@@ -94,5 +95,6 @@ Latest completed verification:
 - [x] Backend build passed on 2026-06-25.
 - [x] Frontend build passed on 2026-06-25.
 - [x] Full frontend Playwright suite passed on 2026-06-25 (11/11).
+- [x] Full frontend Playwright suite passed on 2026-06-25 (12/12).
 
-Next slice after pass: Maintenance History.
+Next slice after pass: Reminder.
