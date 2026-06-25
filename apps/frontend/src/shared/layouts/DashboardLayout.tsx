@@ -20,6 +20,7 @@ const navItems: NavItem[] = [
   { to: '/dashboard/services', icon: 'pi-wrench', label: 'Dịch vụ' },
   { to: '/dashboard/parts', icon: 'pi-box', label: 'Phụ tùng' },
   { to: '/dashboard/inventory', icon: 'pi-arrow-right-arrow-left', label: 'Giao dịch kho' },
+  { to: '/dashboard/invoices', icon: 'pi-receipt', label: 'Hóa đơn' },
   { to: '/dashboard/users', icon: 'pi-users', label: 'Người dùng', roles: ['Admin', 'Manager'] },
 ];
 

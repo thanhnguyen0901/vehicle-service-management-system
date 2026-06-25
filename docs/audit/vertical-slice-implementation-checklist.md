@@ -1,6 +1,6 @@
 # Vertical Slice Implementation Checklist
 
-> Last updated: 2026-06-24 22:00 +07
+> Last updated: 2026-06-25 10:00 +07
 >
 > Scope: MVP FR-01 to FR-19.
 >
@@ -49,7 +49,7 @@ Use this checklist for each module before marking it `DONE`.
 | 8 | Work Order | FR-07, FR-08, FR-09 | DONE | DONE | DONE | DONE | DONE | Work order create/status/items E2E passed on 2026-06-23 |
 | 9 | Inventory Transaction | FR-12 | DONE | DONE | DONE | DONE | DONE | Import/export/adjustment/history E2E passed on 2026-06-24 |
 | 10 | Part Usage | FR-13 | DONE | DONE | DONE | DONE | DONE | Record/update/remove with transactional stock E2E passed on 2026-06-24 |
-| 11 | Invoice | FR-14 | TODO | TODO | TODO | TODO | TODO | Snapshot invoice lines from work order |
+| 11 | Invoice | FR-14 | DONE | DONE | DONE | DONE | DONE | Immutable service/part snapshot E2E passed on 2026-06-25 |
 | 12 | Payment | FR-15 | TODO | TODO | TODO | TODO | TODO | Cashier/Admin only |
 | 13 | Maintenance History | FR-16 | TODO | TODO | TODO | TODO | TODO | Query by customer/vehicle |
 | 14 | Reminder | FR-17 | TODO | TODO | TODO | TODO | TODO | Due list and sent marker |
@@ -59,15 +59,15 @@ Use this checklist for each module before marking it `DONE`.
 
 ## Current Active Slice
 
-Active slice: None. Part Usage is complete; next slice is Invoice.
+Active slice: None. Invoice is complete; next slice is Payment.
 
 Next slice exit criteria:
-- [ ] Invoice backend snapshots service and part lines from an eligible work order.
-- [ ] Invoice frontend list/create/detail flow uses real API.
-- [ ] Invoice Playwright flow covers duplicate/invalid invoice rejection.
+- [ ] Payment backend records payment and updates invoice status transactionally.
+- [ ] Payment frontend form/history uses real API.
+- [ ] Payment Playwright flow covers paid invoice and duplicate/overpayment rejection.
 - [ ] Backend build passes.
 - [ ] Frontend build passes.
-- [ ] `implementation-status.md` updated with Invoice result.
+- [ ] `implementation-status.md` updated with Payment result.
 
 Latest completed verification:
 - [x] `auth.spec.ts` passed on 2026-06-22.
@@ -80,6 +80,7 @@ Latest completed verification:
 - [x] `work-orders.spec.ts` passed on 2026-06-23.
 - [x] `inventory-transactions.spec.ts` passed on 2026-06-24.
 - [x] `part-usages.spec.ts` passed on 2026-06-24.
+- [x] `invoices.spec.ts` passed on 2026-06-25.
 - [x] Backend build passed on 2026-06-22.
 - [x] Frontend build passed on 2026-06-22.
 - [x] Backend build passed on 2026-06-23.
@@ -90,5 +91,8 @@ Latest completed verification:
 - [x] Frontend build passed on 2026-06-24.
 - [x] Full frontend Playwright suite passed on 2026-06-24 (9/9).
 - [x] Full frontend Playwright suite passed on 2026-06-24 (10/10).
+- [x] Backend build passed on 2026-06-25.
+- [x] Frontend build passed on 2026-06-25.
+- [x] Full frontend Playwright suite passed on 2026-06-25 (11/11).
 
-Next slice after pass: Payment.
+Next slice after pass: Maintenance History.

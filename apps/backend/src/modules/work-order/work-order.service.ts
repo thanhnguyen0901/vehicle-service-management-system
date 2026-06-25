@@ -408,11 +408,18 @@ export class WorkOrderService {
   private async assertEditableWorkOrder(id: string) {
     const workOrder = await this.prisma.workOrder.findUnique({
       where: { id },
-      select: { id: true, status: true },
+      select: {
+        id: true,
+        status: true,
+        invoice: { select: { id: true } },
+      },
     });
     if (!workOrder) throw new NotFoundException(`Work order ${id} not found`);
     if (workOrder.status === WorkOrderStatus.Delivered || workOrder.status === WorkOrderStatus.Cancelled) {
       throw new ConflictException('Delivered or cancelled work orders cannot be edited');
+    }
+    if (workOrder.invoice) {
+      throw new ConflictException('Invoiced work orders cannot be edited');
     }
     return workOrder;
   }

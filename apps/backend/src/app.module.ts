@@ -10,6 +10,7 @@ import { ServiceCatalogModule } from './modules/service-catalog/service-catalog.
 import { InventoryModule } from './modules/inventory/inventory.module';
 import { AppointmentModule } from './modules/appointment/appointment.module';
 import { WorkOrderModule } from './modules/work-order/work-order.module';
+import { InvoiceModule } from './modules/invoice/invoice.module';
 import { HealthController } from './health.controller';
 
 @Module({
@@ -33,6 +34,7 @@ import { HealthController } from './health.controller';
     InventoryModule,
     AppointmentModule,
     WorkOrderModule,
+    InvoiceModule,
   ],
   controllers: [HealthController],
 })

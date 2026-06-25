@@ -14,6 +14,7 @@ import { PartsPage } from './features/parts/PartsPage';
 import { AppointmentListPage } from './features/appointments/AppointmentListPage';
 import { WorkOrderListPage } from './features/work-orders/WorkOrderListPage';
 import { InventoryTransactionsPage } from './features/inventory/InventoryTransactionsPage';
+import { InvoiceListPage } from './features/invoices/InvoiceListPage';
 
 export default function App() {
   const dispatch = useDispatch();
@@ -46,6 +47,7 @@ export default function App() {
         <Route path="services" element={<ServiceCatalogPage />} />
         <Route path="parts" element={<PartsPage />} />
         <Route path="inventory" element={<InventoryTransactionsPage />} />
+        <Route path="invoices" element={<InvoiceListPage />} />
       </Route>
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="*" element={<Navigate to="/dashboard" replace />} />

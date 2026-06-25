@@ -11,6 +11,29 @@
 
 ---
 
+## 2026-06-25
+### Đã hoàn thành hôm nay
+- [DONE] Hoàn thành Invoice slice FR-14: backend list/detail/create với RBAC và Zod.
+- [DONE] Chỉ cho lập hóa đơn từ Work Order `ReadyForDelivery`, có dữ liệu tính tiền và chưa có invoice.
+- [DONE] Snapshot service item và part usage thành immutable `InvoiceLine` trong cùng Prisma transaction.
+- [DONE] Tính `totalAmount` từ invoice lines, discount và tax; chặn duplicate invoice và tổng tiền âm.
+- [DONE] Khóa sửa/xóa billable data của Work Order sau khi đã lập invoice.
+- [DONE] Hoàn thành frontend Invoice list/create/detail, tìm kiếm/lọc trạng thái và API thật.
+- [DONE] `invoices.spec.ts` pass cho service/part snapshot, tổng tiền và duplicate rejection.
+- [DONE] Backend build pass, frontend build pass, full Playwright regression pass 11/11.
+
+### Đang làm
+- [DONE] Không còn slice đang dở.
+
+### Kế hoạch tiếp theo
+- [TODO] Implement Payment FR-15 theo full flow trong Invoice detail, cập nhật trạng thái thanh toán transactionally và có Playwright E2E.
+
+### Rủi ro/Ghi chú
+- Schema `Invoice` và `InvoiceLine` đã tồn tại nên FR-14 không cần migration mới.
+- Migration chính thức cho schema hiện tại vẫn cần được tạo trước khi chốt release/demo.
+
+---
+
 ## 2026-06-24
 ### Đã hoàn thành hôm nay
 - [DONE] Hoàn thành Inventory Transaction slice FR-12: backend nhập/xuất/điều chỉnh/list lịch sử với RBAC và Zod.
