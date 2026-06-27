@@ -1,22 +1,134 @@
-export function DashboardHome() {
-  return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold text-gray-800 mb-2">Tổng quan</h1>
-      <p className="text-gray-500">Chào mừng đến với Hệ Thống Quản Lý Dịch Vụ Xe.</p>
+import { useEffect, useMemo, useState } from 'react';
+import { Message } from 'primereact/message';
+import { appointmentApi } from '../appointments/appointmentApi';
+import { invoiceApi } from '../invoices/invoiceApi';
+import { workOrderApi } from '../work-orders/workOrderApi';
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
-        {[
-          { label: 'Lịch hẹn hôm nay', value: '—', icon: 'pi-calendar', color: 'bg-blue-500' },
-          { label: 'Xe đang sửa chữa', value: '—', icon: 'pi-car', color: 'bg-orange-500' },
-          { label: 'Hoàn thành hôm nay', value: '—', icon: 'pi-check-circle', color: 'bg-green-500' },
-          { label: 'Doanh thu tháng', value: '—', icon: 'pi-dollar', color: 'bg-purple-500' },
-        ].map((card) => (
-          <div key={card.label} className="bg-white rounded-xl shadow-sm p-6 flex items-center gap-4">
-            <div className={`${card.color} w-12 h-12 rounded-full flex items-center justify-center`}>
+const activeWorkOrderStatuses = new Set(['Diagnosing', 'Repairing', 'WaitingParts']);
+const currencyFormatter = new Intl.NumberFormat('vi-VN');
+
+export function DashboardHome() {
+  const [todayAppointments, setTodayAppointments] = useState(0);
+  const [activeWorkOrders, setActiveWorkOrders] = useState(0);
+  const [completedToday, setCompletedToday] = useState(0);
+  const [monthlyRevenue, setMonthlyRevenue] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const cards = useMemo(
+    () => [
+      {
+        label: 'Lịch hẹn hôm nay',
+        value: isLoading ? '...' : String(todayAppointments),
+        icon: 'pi-calendar',
+        color: 'bg-sky-600',
+      },
+      {
+        label: 'Xe đang sửa chữa',
+        value: isLoading ? '...' : String(activeWorkOrders),
+        icon: 'pi-car',
+        color: 'bg-amber-600',
+      },
+      {
+        label: 'Hoàn thành hôm nay',
+        value: isLoading ? '...' : String(completedToday),
+        icon: 'pi-check-circle',
+        color: 'bg-emerald-600',
+      },
+      {
+        label: 'Doanh thu tháng',
+        value: isLoading ? '...' : formatMoney(monthlyRevenue),
+        icon: 'pi-dollar',
+        color: 'bg-indigo-600',
+      },
+    ],
+    [activeWorkOrders, completedToday, isLoading, monthlyRevenue, todayAppointments],
+  );
+
+  const loadDashboard = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const now = new Date();
+      const todayStart = startOfDay(now);
+      const tomorrowStart = addDays(todayStart, 1);
+      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+      const [appointments, workOrders, invoices] = await Promise.all([
+        appointmentApi.list({
+          from: todayStart.toISOString(),
+          to: tomorrowStart.toISOString(),
+        }),
+        workOrderApi.list(),
+        invoiceApi.list(),
+      ]);
+
+      setTodayAppointments(appointments.length);
+      setActiveWorkOrders(
+        workOrders.filter((workOrder) => activeWorkOrderStatuses.has(workOrder.status)).length,
+      );
+      setCompletedToday(
+        workOrders.filter(
+          (workOrder) =>
+            workOrder.status === 'Delivered' &&
+            workOrder.deliveredAt &&
+            isSameLocalDate(new Date(workOrder.deliveredAt), now),
+        ).length,
+      );
+      setMonthlyRevenue(
+        invoices.reduce((sum, invoice) => {
+          const paidThisMonth = invoice.payments
+            .filter((payment) => {
+              const paidAt = new Date(payment.paidAt);
+              return paidAt >= monthStart && paidAt <= now;
+            })
+            .reduce((paymentSum, payment) => paymentSum + Number(payment.amount), 0);
+          return sum + paidThisMonth;
+        }, 0),
+      );
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, 'Không tải được dữ liệu tổng quan'));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    void loadDashboard();
+  }, []);
+
+  return (
+    <div className="p-4 sm:p-6 lg:p-8">
+      <div className="mb-6 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+        <div>
+          <h1 className="mb-2 text-2xl font-bold text-gray-800">Tổng quan</h1>
+          <p className="text-sm text-gray-500">Theo dõi nhanh lịch hẹn, tiến độ sửa chữa và doanh thu hiện tại.</p>
+        </div>
+        <button
+          type="button"
+          className="inline-flex items-center justify-center gap-2 rounded-md bg-primary-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-primary-800 disabled:cursor-not-allowed disabled:opacity-60"
+          onClick={() => void loadDashboard()}
+          disabled={isLoading}
+        >
+          <i className="pi pi-refresh" />
+          Cập nhật
+        </button>
+      </div>
+
+      {error && (
+        <div className="mb-4">
+          <Message severity="error" text={error} />
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {cards.map((card) => (
+          <div key={card.label} className="flex items-center gap-4 rounded-md bg-white p-5 shadow-sm">
+            <div className={`${card.color} flex h-12 w-12 shrink-0 items-center justify-center rounded-md`}>
               <i className={`pi ${card.icon} text-white text-xl`} />
             </div>
-            <div>
-              <div className="text-2xl font-bold text-gray-800">{card.value}</div>
+            <div className="min-w-0">
+              <div className="break-words text-2xl font-bold text-gray-800">{card.value}</div>
               <div className="text-sm text-gray-500">{card.label}</div>
             </div>
           </div>
@@ -24,4 +136,38 @@ export function DashboardHome() {
       </div>
     </div>
   );
+}
+
+function startOfDay(value: Date) {
+  const next = new Date(value);
+  next.setHours(0, 0, 0, 0);
+  return next;
+}
+
+function addDays(value: Date, days: number) {
+  const next = new Date(value);
+  next.setDate(next.getDate() + days);
+  return next;
+}
+
+function isSameLocalDate(left: Date, right: Date) {
+  return (
+    left.getFullYear() === right.getFullYear() &&
+    left.getMonth() === right.getMonth() &&
+    left.getDate() === right.getDate()
+  );
+}
+
+function formatMoney(value: number) {
+  return `${currencyFormatter.format(value)} đ`;
+}
+
+function getErrorMessage(err: unknown, fallback: string) {
+  if (typeof err === 'object' && err !== null && 'response' in err) {
+    const response = (err as { response?: { data?: { message?: string | string[] } } }).response;
+    const message = response?.data?.message;
+    if (Array.isArray(message)) return message.join(', ');
+    if (message) return message;
+  }
+  return fallback;
 }

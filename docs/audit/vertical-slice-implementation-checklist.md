@@ -1,6 +1,6 @@
 # Vertical Slice Implementation Checklist
 
-> Last updated: 2026-06-27 19:10 +07
+> Last updated: 2026-06-27 19:40 +07
 >
 > Scope: MVP FR-01 to FR-19.
 >
@@ -55,19 +55,16 @@ Use this checklist for each module before marking it `DONE`.
 | 14 | Reminder | FR-17 | DONE | DONE | DONE | DONE | DONE | Due list and sent marker E2E passed on 2026-06-27 |
 | 15 | Reports | FR-18 | DONE | DONE | DONE | DONE | DONE | Revenue, work orders, top services/parts, low stock E2E passed on 2026-06-27 |
 | 16 | Audit Log API/UI | FR-19 | DONE | DONE | DONE | DONE | DONE | Read API/UI and audit entry E2E passed on 2026-06-27 |
-| 17 | Dashboard Real Data | FR-18 | TODO | TODO | TODO | TODO | TODO | Replace placeholder KPI cards |
+| 17 | Dashboard Real Data | FR-18 | DONE | DONE | DONE | DONE | DONE | Real KPI cards E2E passed on 2026-06-27 |
 
 ## Current Active Slice
 
-Active slice: None. Audit Log API/UI is complete; next slice is Dashboard Real Data.
+Active slice: None. MVP vertical slices are complete.
 
 Next slice exit criteria:
-- [ ] Dashboard replaces placeholder KPI cards with real report data.
-- [ ] Dashboard frontend uses real API and handles loading/error states.
-- [ ] Dashboard Playwright flow covers real KPI rendering.
-- [ ] Backend build passes.
-- [ ] Frontend build passes.
-- [ ] `implementation-status.md` updated with Dashboard result.
+- [ ] Create official Prisma migration for current schema.
+- [ ] Run final demo/release verification.
+- [ ] Review report/demo documentation for consistency.
 
 Latest completed verification:
 - [x] `auth.spec.ts` passed on 2026-06-22.
@@ -86,6 +83,7 @@ Latest completed verification:
 - [x] `reminders.spec.ts` passed on 2026-06-27.
 - [x] `reports.spec.ts` passed on 2026-06-27.
 - [x] `audit-logs.spec.ts` passed on 2026-06-27.
+- [x] `dashboard.spec.ts` passed on 2026-06-27.
 - [x] Backend build passed on 2026-06-22.
 - [x] Frontend build passed on 2026-06-22.
 - [x] Backend build passed on 2026-06-23.
@@ -106,5 +104,6 @@ Latest completed verification:
 - [x] Full frontend Playwright suite passed on 2026-06-27 (14/14).
 - [x] Full frontend Playwright suite passed on 2026-06-27 (15/15).
 - [x] Full frontend Playwright suite passed on 2026-06-27 (16/16).
+- [x] Full frontend Playwright suite passed on 2026-06-27 (17/17).
 
-Next slice after pass: Dashboard Real Data.
+Next slice after pass: None. MVP feature slices are complete.

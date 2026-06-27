@@ -36,12 +36,17 @@
 - [DONE] Hoàn thành frontend `AuditLogPage` tại `/dashboard/audit-logs`, thêm menu, bảng filter và dialog payload JSON.
 - [DONE] `audit-logs.spec.ts` pass cho tạo customer sinh audit entry và lọc/xem payload.
 - [DONE] Backend build pass, frontend build pass, full Playwright regression pass 16/16.
+- [DONE] Hoàn thành Dashboard Real Data: thay KPI placeholder bằng dữ liệu thật từ appointments/work-orders/invoices.
+- [DONE] Dashboard hiển thị lịch hẹn hôm nay, xe đang sửa chữa, hoàn thành hôm nay và doanh thu tháng.
+- [DONE] Bổ sung loading/error state và nút cập nhật dữ liệu tổng quan.
+- [DONE] `dashboard.spec.ts` pass: tạo dữ liệu thật, tính expected từ API và so KPI trên UI.
+- [DONE] Backend build pass, frontend build pass, full Playwright regression pass 17/17.
 
 ### Đang làm
 - [DONE] Không còn slice đang dở.
 
 ### Kế hoạch tiếp theo
-- [TODO] Implement Dashboard Real Data theo full flow: thay placeholder KPI bằng dữ liệu report thật.
+- [TODO] Tạo migration Prisma chính thức cho schema hiện tại và chạy final demo/release verification.
 
 ### Rủi ro/Ghi chú
 - FR-16 dùng các bảng hiện có nên không cần migration mới.

@@ -8,20 +8,25 @@
 ## Tổng quan tiến độ
 
 ```
-Backend  ████████████████████  ~98%  (Auth/User/Customer/Vehicle/ServiceCatalog/Parts/Appointment/WorkOrder/Inventory/Part Usage/Invoice/Payment/Maintenance History/Reminder/Reports/Audit Log + shared infra)
-Frontend ████████████████████  ~98%  (auth + layout + User/Customer/Vehicle/Service/Parts/Appointment/WorkOrder/Inventory/Part Usage/Invoice/Payment/Maintenance History/Reminder/Reports/Audit Log)
+Backend  ████████████████████  ~99%  (Auth/User/Customer/Vehicle/ServiceCatalog/Parts/Appointment/WorkOrder/Inventory/Part Usage/Invoice/Payment/Maintenance History/Reminder/Reports/Audit Log + shared infra)
+Frontend ████████████████████  ~99%  (auth + layout + User/Customer/Vehicle/Service/Parts/Appointment/WorkOrder/Inventory/Part Usage/Invoice/Payment/Maintenance History/Reminder/Reports/Audit Log/Dashboard real data)
 Schema   ██████████████████░░  ~90%  (15/15 bảng, đã bổ sung CustomerType và Part.unit; còn thiếu migration file chính thức)
 Infra    ████████████████████  100%  (filters, guards, pipes, interceptors, health endpoint)
-E2E      ███████████████████░  Auth/User/Customer/Vehicle/Service/Parts/Appointment/WorkOrder/Inventory/Part Usage/Invoice/Payment/Maintenance History/Reminder/Reports/Audit Log specs pass
+E2E      ████████████████████  Auth/User/Customer/Vehicle/Service/Parts/Appointment/WorkOrder/Inventory/Part Usage/Invoice/Payment/Maintenance History/Reminder/Reports/Audit Log/Dashboard specs pass
 ```
 
 **Recheck 27/06/2026:**
+- ✅ Dashboard Real Data DONE: `DashboardHome` không còn KPI placeholder `—`, dùng API thật.
+- ✅ KPI lấy từ `appointments`, `work-orders`, `invoices`: lịch hẹn hôm nay, xe đang sửa, hoàn thành hôm nay và doanh thu tháng.
+- ✅ Dashboard có loading/error state và nút cập nhật lại dữ liệu.
+- ✅ `dashboard.spec.ts` pass: tạo dữ liệu thật, tính expected từ API và so KPI trên UI.
+- ✅ Backend build pass; frontend build pass; full Playwright regression pass 17/17.
 - ✅ Audit Log FR-19 DONE: registered global `AuditInterceptor` and backend read API `/api/v1/audit-logs`.
 - ✅ Audit Log list supports action/entity/user/date/search filters; Admin/Manager see all, other roles see own logs.
 - ✅ Frontend Audit Log DONE: menu/route `/dashboard/audit-logs`, filter table and JSON detail dialog.
 - ✅ `audit-logs.spec.ts` pass cho tạo customer sinh audit entry và lọc/xem payload.
 - ✅ Backend build pass; frontend build pass; full Playwright regression pass 16/16.
-- ▶️ Active slice tiếp theo: Dashboard Real Data (FR-18).
+- ✅ MVP vertical feature slices complete; việc còn lại là migration chính thức và final demo/release verification.
 - ✅ Reports FR-18 DONE: backend report API cho revenue, work orders, top services, top parts và low stock với RBAC/Zod.
 - ✅ Revenue tính theo payment thực thu trong khoảng ngày; date range `to` bao gồm toàn bộ ngày được chọn.
 - ✅ Frontend Reports DONE: menu/route `/dashboard/reports`, filter ngày, KPI và bảng report dùng API thật.
@@ -464,7 +469,7 @@ GET    /api/v1/reports/low-stock      parts có stockQuantity <= reorderLevel [A
 | `features/auth/authApi.ts` | ✅ axios calls: login, logout, me, refresh |
 | `shared/components/ProtectedRoute.tsx` | ✅ Loading khi authCheck, redirect /login nếu chưa auth |
 | `shared/layouts/DashboardLayout.tsx` | ✅ Sidebar + Outlet, logout button, menu `/dashboard/users` theo role |
-| `features/dashboard/DashboardHome.tsx` | ✅ Placeholder cards (data hardcoded `—`) |
+| `features/dashboard/DashboardHome.tsx` | ✅ KPI thật từ API, loading/error và refresh |
 | `services/api.ts` | ✅ Axios instance + auto refresh interceptor (retry on 401) |
 | `store/index.ts` | ✅ Redux store + sagaMiddleware |
 | `store/rootSaga.ts` | ✅ Root saga, combine authSaga |
@@ -488,12 +493,11 @@ GET    /api/v1/reports/low-stock      parts có stockQuantity <= reorderLevel [A
 | FR-17 | `features/reminders/ReminderListPage.tsx`, `features/reminders/reminderApi.ts` | `/dashboard/reminders` | ✅ Due list + create/edit/delete/mark sent; ✅ Playwright create/search/mark sent flow pass ngày 27/06/2026 |
 | FR-18 | `features/reports/ReportsPage.tsx`, `features/reports/reportApi.ts` | `/dashboard/reports` | ✅ KPI + revenue/work order/top service/top part/low stock reports; ✅ Playwright generated report data pass ngày 27/06/2026 |
 | FR-19 | `features/audit-logs/AuditLogPage.tsx`, `features/audit-logs/auditLogApi.ts` | `/dashboard/audit-logs` | ✅ List/search/filter + detail payload; ✅ Playwright audit entry flow pass ngày 27/06/2026 |
+| FR-18 | `features/dashboard/DashboardHome.tsx` | `/dashboard` | ✅ KPI thật từ appointments/work-orders/invoices; ✅ Playwright dashboard real data pass ngày 27/06/2026 |
 
 ### ❌ Feature Pages chưa tạo
 
-| FR | Page | Route |
-|---|---|---|
-| FR-18 | DashboardHome real data | `/dashboard` |
+Không còn feature page MVP nào đang thiếu.
 
 **Mỗi feature page cần thêm vào store:**
 - `slice.ts` — state management
@@ -538,7 +542,7 @@ Phase 4 — Frontend pages (có thể làm song song từ Phase 1):
   [x] InvoiceListPage + detail dialog
   [ ] RemindersPage
   [ ] ReportsPage (Recharts charts)
-  [ ] DashboardHome — kết nối dữ liệu thật từ /reports
+  [x] DashboardHome — kết nối dữ liệu thật
 ```
 
 ---

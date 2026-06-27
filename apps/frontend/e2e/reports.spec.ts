@@ -27,15 +27,15 @@ test('admin can view real revenue, top item and low stock reports', async ({ pag
   });
   const service = await postJson<{ id: string }>(page, '/api/v1/services', {
     name: serviceName,
-    unitPrice: 90000000,
+    unitPrice: 8000000000,
     durationMin: 120,
   });
   const part = await postJson<{ id: string }>(page, '/api/v1/parts', {
     partNumber,
     name: partName,
     unit: 'piece',
-    unitCost: 8000000,
-    unitPrice: 12000000,
+    unitCost: 700000000,
+    unitPrice: 900000000,
     stockQuantity: 2,
     reorderLevel: 5,
   });
@@ -47,13 +47,13 @@ test('admin can view real revenue, top item and low stock reports', async ({ pag
     serviceId: service.id,
     description: serviceName,
     quantity: 1,
-    unitPrice: 90000000,
+    unitPrice: 8000000000,
   });
   await postJson(page, `/api/v1/work-orders/${workOrder.id}/part-usages`, {
     workOrderItemId: item.id,
     partId: part.id,
     quantity: 2,
-    unitPrice: 12000000,
+    unitPrice: 900000000,
   });
   for (const status of ['Diagnosing', 'Repairing', 'ReadyForDelivery']) {
     await patchJson(page, `/api/v1/work-orders/${workOrder.id}/status`, { status });
@@ -65,14 +65,14 @@ test('admin can view real revenue, top item and low stock reports', async ({ pag
     notes: 'E2E report invoice',
   });
   await postJson(page, `/api/v1/invoices/${invoice.id}/payments`, {
-    amount: 114000000,
+    amount: 9800000000,
     method: 'Cash',
   });
 
   await page.getByRole('link', { name: /Báo cáo/ }).click();
   await expect(page.getByRole('heading', { name: 'Báo cáo' })).toBeVisible();
-  await expect(page.getByRole('row', { name: new RegExp(serviceName) })).toContainText('90.000.000 đ');
-  await expect(page.getByRole('row', { name: new RegExp(`${partNumber}.*24\\.000\\.000 đ`) })).toBeVisible();
+  await expect(page.getByRole('row', { name: new RegExp(serviceName) })).toContainText('8.000.000.000 đ');
+  await expect(page.getByRole('row', { name: new RegExp(`${partNumber}.*1\\.800\\.000\\.000 đ`) })).toBeVisible();
   await expect(page.getByRole('row', { name: new RegExp(`${partName}.*Tồn thấp`) })).toBeVisible();
   await expect(page.getByRole('row', { name: /Sẵn sàng giao/ })).toContainText(/\d+/);
 });
