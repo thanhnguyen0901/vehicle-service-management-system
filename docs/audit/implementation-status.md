@@ -8,20 +8,25 @@
 ## Tổng quan tiến độ
 
 ```
-Backend  ███████████████████░  ~95%  (Auth/User/Customer/Vehicle/ServiceCatalog/Parts/Appointment/WorkOrder/Inventory/Part Usage/Invoice/Payment/Maintenance History/Reminder/Reports + shared infra)
-Frontend ███████████████████░  ~95%  (auth + layout + User/Customer/Vehicle/Service/Parts/Appointment/WorkOrder/Inventory/Part Usage/Invoice/Payment/Maintenance History/Reminder/Reports)
+Backend  ████████████████████  ~98%  (Auth/User/Customer/Vehicle/ServiceCatalog/Parts/Appointment/WorkOrder/Inventory/Part Usage/Invoice/Payment/Maintenance History/Reminder/Reports/Audit Log + shared infra)
+Frontend ████████████████████  ~98%  (auth + layout + User/Customer/Vehicle/Service/Parts/Appointment/WorkOrder/Inventory/Part Usage/Invoice/Payment/Maintenance History/Reminder/Reports/Audit Log)
 Schema   ██████████████████░░  ~90%  (15/15 bảng, đã bổ sung CustomerType và Part.unit; còn thiếu migration file chính thức)
 Infra    ████████████████████  100%  (filters, guards, pipes, interceptors, health endpoint)
-E2E      ██████████████████░░  Auth/User/Customer/Vehicle/Service/Parts/Appointment/WorkOrder/Inventory/Part Usage/Invoice/Payment/Maintenance History/Reminder/Reports specs pass
+E2E      ███████████████████░  Auth/User/Customer/Vehicle/Service/Parts/Appointment/WorkOrder/Inventory/Part Usage/Invoice/Payment/Maintenance History/Reminder/Reports/Audit Log specs pass
 ```
 
 **Recheck 27/06/2026:**
+- ✅ Audit Log FR-19 DONE: registered global `AuditInterceptor` and backend read API `/api/v1/audit-logs`.
+- ✅ Audit Log list supports action/entity/user/date/search filters; Admin/Manager see all, other roles see own logs.
+- ✅ Frontend Audit Log DONE: menu/route `/dashboard/audit-logs`, filter table and JSON detail dialog.
+- ✅ `audit-logs.spec.ts` pass cho tạo customer sinh audit entry và lọc/xem payload.
+- ✅ Backend build pass; frontend build pass; full Playwright regression pass 16/16.
+- ▶️ Active slice tiếp theo: Dashboard Real Data (FR-18).
 - ✅ Reports FR-18 DONE: backend report API cho revenue, work orders, top services, top parts và low stock với RBAC/Zod.
 - ✅ Revenue tính theo payment thực thu trong khoảng ngày; date range `to` bao gồm toàn bộ ngày được chọn.
 - ✅ Frontend Reports DONE: menu/route `/dashboard/reports`, filter ngày, KPI và bảng report dùng API thật.
 - ✅ `reports.spec.ts` pass cho dữ liệu doanh thu, top service, top part và low-stock.
 - ✅ Backend build pass; frontend build pass; full Playwright regression pass 15/15.
-- ▶️ Active slice tiếp theo: Audit Log API/UI (FR-19).
 - ✅ Reminder FR-17 DONE: backend CRUD/list/filter + mark sent với RBAC và Zod.
 - ✅ Reminder chặn tạo nhắc khi xe không thuộc khách hàng đã chọn.
 - ✅ Frontend Reminder DONE: menu/route `/dashboard/reminders`, filter chưa nhắc/đến hạn/đã nhắc, tạo/sửa/xóa và đánh dấu đã nhắc.
@@ -482,12 +487,13 @@ GET    /api/v1/reports/low-stock      parts có stockQuantity <= reorderLevel [A
 | FR-16 | `features/maintenance-history/MaintenanceHistoryPage.tsx`, `features/maintenance-history/maintenanceHistoryApi.ts` | `/dashboard/maintenance-history` | ✅ Filter khách hàng/xe/search + detail lịch sử; ✅ Playwright existing/empty history flow pass ngày 27/06/2026 |
 | FR-17 | `features/reminders/ReminderListPage.tsx`, `features/reminders/reminderApi.ts` | `/dashboard/reminders` | ✅ Due list + create/edit/delete/mark sent; ✅ Playwright create/search/mark sent flow pass ngày 27/06/2026 |
 | FR-18 | `features/reports/ReportsPage.tsx`, `features/reports/reportApi.ts` | `/dashboard/reports` | ✅ KPI + revenue/work order/top service/top part/low stock reports; ✅ Playwright generated report data pass ngày 27/06/2026 |
+| FR-19 | `features/audit-logs/AuditLogPage.tsx`, `features/audit-logs/auditLogApi.ts` | `/dashboard/audit-logs` | ✅ List/search/filter + detail payload; ✅ Playwright audit entry flow pass ngày 27/06/2026 |
 
 ### ❌ Feature Pages chưa tạo
 
 | FR | Page | Route |
 |---|---|---|
-| FR-19 | AuditLogPage | `/dashboard/audit-logs` |
+| FR-18 | DashboardHome real data | `/dashboard` |
 
 **Mỗi feature page cần thêm vào store:**
 - `slice.ts` — state management

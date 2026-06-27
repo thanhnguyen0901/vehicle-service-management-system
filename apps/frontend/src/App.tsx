@@ -18,6 +18,7 @@ import { InvoiceListPage } from './features/invoices/InvoiceListPage';
 import { MaintenanceHistoryPage } from './features/maintenance-history/MaintenanceHistoryPage';
 import { ReminderListPage } from './features/reminders/ReminderListPage';
 import { ReportsPage } from './features/reports/ReportsPage';
+import { AuditLogPage } from './features/audit-logs/AuditLogPage';
 
 export default function App() {
   const dispatch = useDispatch();
@@ -54,6 +55,7 @@ export default function App() {
         <Route path="maintenance-history" element={<MaintenanceHistoryPage />} />
         <Route path="reminders" element={<ReminderListPage />} />
         <Route path="reports" element={<ReportsPage />} />
+        <Route path="audit-logs" element={<AuditLogPage />} />
       </Route>
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="*" element={<Navigate to="/dashboard" replace />} />

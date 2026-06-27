@@ -31,17 +31,23 @@
 - [DONE] Bổ sung KPI doanh thu/thanh toán/phiếu, bảng doanh thu theo ngày, phiếu theo trạng thái, top dịch vụ/phụ tùng và tồn thấp.
 - [DONE] `reports.spec.ts` pass cho dữ liệu doanh thu, top service, top part và low-stock.
 - [DONE] Backend build pass, frontend build pass, full Playwright regression pass 15/15.
+- [DONE] Hoàn thành Audit Log API/UI FR-19: đăng ký global `AuditInterceptor` và thêm read API `/api/v1/audit-logs`.
+- [DONE] Audit Log API hỗ trợ filter action/entity/user/date/search; Admin/Manager xem full, role khác xem log của chính mình.
+- [DONE] Hoàn thành frontend `AuditLogPage` tại `/dashboard/audit-logs`, thêm menu, bảng filter và dialog payload JSON.
+- [DONE] `audit-logs.spec.ts` pass cho tạo customer sinh audit entry và lọc/xem payload.
+- [DONE] Backend build pass, frontend build pass, full Playwright regression pass 16/16.
 
 ### Đang làm
 - [DONE] Không còn slice đang dở.
 
 ### Kế hoạch tiếp theo
-- [TODO] Implement Audit Log API/UI FR-19 theo full flow: list/search/filter audit entries.
+- [TODO] Implement Dashboard Real Data theo full flow: thay placeholder KPI bằng dữ liệu report thật.
 
 ### Rủi ro/Ghi chú
 - FR-16 dùng các bảng hiện có nên không cần migration mới.
 - FR-17 dùng bảng `maintenance_reminders` đã có nên không cần migration mới.
 - FR-18 dùng dữ liệu hiện có nên không cần migration mới.
+- FR-19 dùng bảng `audit_logs` đã có nên không cần migration mới.
 - Migration chính thức cho schema hiện tại vẫn cần được tạo trước khi chốt release/demo.
 
 ---

@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { PrismaModule } from './prisma/prisma.module';
@@ -14,6 +15,8 @@ import { InvoiceModule } from './modules/invoice/invoice.module';
 import { MaintenanceHistoryModule } from './modules/maintenance-history/maintenance-history.module';
 import { ReminderModule } from './modules/reminder/reminder.module';
 import { ReportModule } from './modules/report/report.module';
+import { AuditLogModule } from './modules/audit-log/audit-log.module';
+import { AuditInterceptor } from './common/interceptors/audit.interceptor';
 import { HealthController } from './health.controller';
 
 @Module({
@@ -41,7 +44,14 @@ import { HealthController } from './health.controller';
     MaintenanceHistoryModule,
     ReminderModule,
     ReportModule,
+    AuditLogModule,
   ],
   controllers: [HealthController],
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: AuditInterceptor,
+    },
+  ],
 })
 export class AppModule {}
