@@ -41,18 +41,24 @@
 - [DONE] Bổ sung loading/error state và nút cập nhật dữ liệu tổng quan.
 - [DONE] `dashboard.spec.ts` pass: tạo dữ liệu thật, tính expected từ API và so KPI trên UI.
 - [DONE] Backend build pass, frontend build pass, full Playwright regression pass 17/17.
+- [DONE] Hoàn thành cleanup/seed data: `seed:e2e` tạo bộ dữ liệu sạch cho Playwright và `seed:demo` tạo bộ dữ liệu full-flow để demo.
+- [DONE] Bộ demo có đủ account 6 vai trò, khách hàng, xe, lịch hẹn, dịch vụ, phụ tùng, giao dịch kho, phiếu sửa chữa, hóa đơn, thanh toán, reminder và audit log bằng tiếng Việt có dấu.
+- [DONE] Ghi thông tin user/password và hướng dẫn chạy seed tại `docs/demo/seed-data.md`.
+- [DONE] Full Playwright regression pass 17/17 sau khi reset database bằng `seed:e2e`.
+- [DONE] Đã chạy `seed:e2e` và `seed:demo` thành công; database local hiện đang ở trạng thái demo.
 
 ### Đang làm
 - [DONE] Không còn slice đang dở.
 
 ### Kế hoạch tiếp theo
-- [TODO] Tạo migration Prisma chính thức cho schema hiện tại và chạy final demo/release verification.
+- [TODO] Tạo migration Prisma chính thức cho schema hiện tại và chạy final demo/release verification trên bộ demo data.
 
 ### Rủi ro/Ghi chú
 - FR-16 dùng các bảng hiện có nên không cần migration mới.
 - FR-17 dùng bảng `maintenance_reminders` đã có nên không cần migration mới.
 - FR-18 dùng dữ liệu hiện có nên không cần migration mới.
 - FR-19 dùng bảng `audit_logs` đã có nên không cần migration mới.
+- Seed script hiện cleanup toàn bộ database trước khi tạo dữ liệu mới; cần tránh chạy trên database production.
 - Migration chính thức cho schema hiện tại vẫn cần được tạo trước khi chốt release/demo.
 
 ---
