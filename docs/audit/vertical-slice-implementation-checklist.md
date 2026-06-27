@@ -1,6 +1,6 @@
 # Vertical Slice Implementation Checklist
 
-> Last updated: 2026-06-25 11:30 +07
+> Last updated: 2026-06-27 16:30 +07
 >
 > Scope: MVP FR-01 to FR-19.
 >
@@ -51,7 +51,7 @@ Use this checklist for each module before marking it `DONE`.
 | 10 | Part Usage | FR-13 | DONE | DONE | DONE | DONE | DONE | Record/update/remove with transactional stock E2E passed on 2026-06-24 |
 | 11 | Invoice | FR-14 | DONE | DONE | DONE | DONE | DONE | Immutable service/part snapshot E2E passed on 2026-06-25 |
 | 12 | Payment | FR-15 | DONE | DONE | DONE | DONE | DONE | Partial/final payment and overpayment rejection E2E passed on 2026-06-25 |
-| 13 | Maintenance History | FR-16 | TODO | TODO | TODO | TODO | TODO | Query by customer/vehicle |
+| 13 | Maintenance History | FR-16 | DONE | DONE | DONE | DONE | DONE | Query by customer/vehicle E2E passed on 2026-06-27 |
 | 14 | Reminder | FR-17 | TODO | TODO | TODO | TODO | TODO | Due list and sent marker |
 | 15 | Reports | FR-18 | TODO | TODO | TODO | TODO | TODO | Revenue, work orders, top services/parts, low stock |
 | 16 | Audit Log API/UI | FR-19 | DONE | TODO | TODO | TODO | IN_PROGRESS | Audit write interceptor exists; read API/UI missing |
@@ -59,15 +59,15 @@ Use this checklist for each module before marking it `DONE`.
 
 ## Current Active Slice
 
-Active slice: None. Payment is complete; next slice is Maintenance History.
+Active slice: None. Maintenance History is complete; next slice is Reminder.
 
 Next slice exit criteria:
-- [ ] Maintenance History backend returns complete vehicle/customer service history.
-- [ ] Maintenance History frontend search/detail flow uses real API.
-- [ ] Maintenance History Playwright flow covers existing and empty history.
+- [ ] Reminder backend supports due list and sent marker.
+- [ ] Reminder frontend create/list/mark-sent flow uses real API.
+- [ ] Reminder Playwright flow covers due reminder and mark sent.
 - [ ] Backend build passes.
 - [ ] Frontend build passes.
-- [ ] `implementation-status.md` updated with Maintenance History result.
+- [ ] `implementation-status.md` updated with Reminder result.
 
 Latest completed verification:
 - [x] `auth.spec.ts` passed on 2026-06-22.
@@ -82,6 +82,7 @@ Latest completed verification:
 - [x] `part-usages.spec.ts` passed on 2026-06-24.
 - [x] `invoices.spec.ts` passed on 2026-06-25.
 - [x] `payments.spec.ts` passed on 2026-06-25.
+- [x] `maintenance-history.spec.ts` passed on 2026-06-27.
 - [x] Backend build passed on 2026-06-22.
 - [x] Frontend build passed on 2026-06-22.
 - [x] Backend build passed on 2026-06-23.
@@ -96,5 +97,8 @@ Latest completed verification:
 - [x] Frontend build passed on 2026-06-25.
 - [x] Full frontend Playwright suite passed on 2026-06-25 (11/11).
 - [x] Full frontend Playwright suite passed on 2026-06-25 (12/12).
+- [x] Backend build passed on 2026-06-27.
+- [x] Frontend build passed on 2026-06-27.
+- [x] Full frontend Playwright suite passed on 2026-06-27 (13/13).
 
-Next slice after pass: Reminder.
+Next slice after pass: Reports.

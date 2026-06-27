@@ -11,6 +11,27 @@
 
 ---
 
+## 2026-06-27
+### Đã hoàn thành hôm nay
+- [DONE] Hoàn thành Maintenance History slice FR-16: backend API `/api/v1/maintenance-history` filter theo khách hàng, xe và keyword.
+- [DONE] Response lịch sử gồm Work Order đã `Delivered`, thông tin xe/khách hàng, dịch vụ, phụ tùng, hóa đơn và lịch sử thanh toán.
+- [DONE] Hoàn thành frontend `MaintenanceHistoryPage` tại `/dashboard/maintenance-history`, thêm menu và API thật.
+- [DONE] Bổ sung filter khách hàng/phương tiện/search, table lịch sử và dialog chi tiết service/part/payment.
+- [DONE] `maintenance-history.spec.ts` pass cho case có lịch sử và khách hàng chưa có lịch sử.
+- [DONE] Backend build pass, frontend build pass, full Playwright regression pass 13/13.
+
+### Đang làm
+- [DONE] Không còn slice đang dở.
+
+### Kế hoạch tiếp theo
+- [TODO] Implement Reminder FR-17 theo full flow: due list, tạo reminder và đánh dấu đã nhắc.
+
+### Rủi ro/Ghi chú
+- FR-16 dùng các bảng hiện có nên không cần migration mới.
+- Migration chính thức cho schema hiện tại vẫn cần được tạo trước khi chốt release/demo.
+
+---
+
 ## 2026-06-25
 ### Đã hoàn thành hôm nay
 - [DONE] Hoàn thành Invoice slice FR-14: backend list/detail/create với RBAC và Zod.
