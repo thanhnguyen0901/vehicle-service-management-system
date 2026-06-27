@@ -17,6 +17,7 @@ import { InventoryTransactionsPage } from './features/inventory/InventoryTransac
 import { InvoiceListPage } from './features/invoices/InvoiceListPage';
 import { MaintenanceHistoryPage } from './features/maintenance-history/MaintenanceHistoryPage';
 import { ReminderListPage } from './features/reminders/ReminderListPage';
+import { ReportsPage } from './features/reports/ReportsPage';
 
 export default function App() {
   const dispatch = useDispatch();
@@ -52,6 +53,7 @@ export default function App() {
         <Route path="invoices" element={<InvoiceListPage />} />
         <Route path="maintenance-history" element={<MaintenanceHistoryPage />} />
         <Route path="reminders" element={<ReminderListPage />} />
+        <Route path="reports" element={<ReportsPage />} />
       </Route>
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="*" element={<Navigate to="/dashboard" replace />} />

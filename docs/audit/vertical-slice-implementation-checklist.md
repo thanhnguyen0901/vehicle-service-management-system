@@ -1,6 +1,6 @@
 # Vertical Slice Implementation Checklist
 
-> Last updated: 2026-06-27 17:30 +07
+> Last updated: 2026-06-27 18:30 +07
 >
 > Scope: MVP FR-01 to FR-19.
 >
@@ -53,21 +53,21 @@ Use this checklist for each module before marking it `DONE`.
 | 12 | Payment | FR-15 | DONE | DONE | DONE | DONE | DONE | Partial/final payment and overpayment rejection E2E passed on 2026-06-25 |
 | 13 | Maintenance History | FR-16 | DONE | DONE | DONE | DONE | DONE | Query by customer/vehicle E2E passed on 2026-06-27 |
 | 14 | Reminder | FR-17 | DONE | DONE | DONE | DONE | DONE | Due list and sent marker E2E passed on 2026-06-27 |
-| 15 | Reports | FR-18 | TODO | TODO | TODO | TODO | TODO | Revenue, work orders, top services/parts, low stock |
+| 15 | Reports | FR-18 | DONE | DONE | DONE | DONE | DONE | Revenue, work orders, top services/parts, low stock E2E passed on 2026-06-27 |
 | 16 | Audit Log API/UI | FR-19 | DONE | TODO | TODO | TODO | IN_PROGRESS | Audit write interceptor exists; read API/UI missing |
 | 17 | Dashboard Real Data | FR-18 | TODO | TODO | TODO | TODO | TODO | Replace placeholder KPI cards |
 
 ## Current Active Slice
 
-Active slice: None. Reminder is complete; next slice is Reports.
+Active slice: None. Reports is complete; next slice is Audit Log API/UI.
 
 Next slice exit criteria:
-- [ ] Reports backend returns revenue, work order, top service/part and low-stock data.
-- [ ] Reports frontend dashboard/report flow uses real API.
-- [ ] Reports Playwright flow covers generated report data.
+- [ ] Audit Log backend read API supports list/search/filter.
+- [ ] Audit Log frontend page uses real API.
+- [ ] Audit Log Playwright flow covers audit entries.
 - [ ] Backend build passes.
 - [ ] Frontend build passes.
-- [ ] `implementation-status.md` updated with Reports result.
+- [ ] `implementation-status.md` updated with Audit Log result.
 
 Latest completed verification:
 - [x] `auth.spec.ts` passed on 2026-06-22.
@@ -84,6 +84,7 @@ Latest completed verification:
 - [x] `payments.spec.ts` passed on 2026-06-25.
 - [x] `maintenance-history.spec.ts` passed on 2026-06-27.
 - [x] `reminders.spec.ts` passed on 2026-06-27.
+- [x] `reports.spec.ts` passed on 2026-06-27.
 - [x] Backend build passed on 2026-06-22.
 - [x] Frontend build passed on 2026-06-22.
 - [x] Backend build passed on 2026-06-23.
@@ -102,5 +103,6 @@ Latest completed verification:
 - [x] Frontend build passed on 2026-06-27.
 - [x] Full frontend Playwright suite passed on 2026-06-27 (13/13).
 - [x] Full frontend Playwright suite passed on 2026-06-27 (14/14).
+- [x] Full frontend Playwright suite passed on 2026-06-27 (15/15).
 
-Next slice after pass: Audit Log API/UI.
+Next slice after pass: Dashboard Real Data.

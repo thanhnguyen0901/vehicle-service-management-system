@@ -8,20 +8,25 @@
 ## Tổng quan tiến độ
 
 ```
-Backend  ██████████████████░░  ~90%  (Auth/User/Customer/Vehicle/ServiceCatalog/Parts/Appointment/WorkOrder/Inventory/Part Usage/Invoice/Payment/Maintenance History/Reminder + shared infra)
-Frontend ██████████████████░░  ~90%  (auth + layout + User/Customer/Vehicle/Service/Parts/Appointment/WorkOrder/Inventory/Part Usage/Invoice/Payment/Maintenance History/Reminder)
+Backend  ███████████████████░  ~95%  (Auth/User/Customer/Vehicle/ServiceCatalog/Parts/Appointment/WorkOrder/Inventory/Part Usage/Invoice/Payment/Maintenance History/Reminder/Reports + shared infra)
+Frontend ███████████████████░  ~95%  (auth + layout + User/Customer/Vehicle/Service/Parts/Appointment/WorkOrder/Inventory/Part Usage/Invoice/Payment/Maintenance History/Reminder/Reports)
 Schema   ██████████████████░░  ~90%  (15/15 bảng, đã bổ sung CustomerType và Part.unit; còn thiếu migration file chính thức)
 Infra    ████████████████████  100%  (filters, guards, pipes, interceptors, health endpoint)
-E2E      █████████████████░░░  Auth/User/Customer/Vehicle/Service/Parts/Appointment/WorkOrder/Inventory/Part Usage/Invoice/Payment/Maintenance History/Reminder specs pass
+E2E      ██████████████████░░  Auth/User/Customer/Vehicle/Service/Parts/Appointment/WorkOrder/Inventory/Part Usage/Invoice/Payment/Maintenance History/Reminder/Reports specs pass
 ```
 
 **Recheck 27/06/2026:**
+- ✅ Reports FR-18 DONE: backend report API cho revenue, work orders, top services, top parts và low stock với RBAC/Zod.
+- ✅ Revenue tính theo payment thực thu trong khoảng ngày; date range `to` bao gồm toàn bộ ngày được chọn.
+- ✅ Frontend Reports DONE: menu/route `/dashboard/reports`, filter ngày, KPI và bảng report dùng API thật.
+- ✅ `reports.spec.ts` pass cho dữ liệu doanh thu, top service, top part và low-stock.
+- ✅ Backend build pass; frontend build pass; full Playwright regression pass 15/15.
+- ▶️ Active slice tiếp theo: Audit Log API/UI (FR-19).
 - ✅ Reminder FR-17 DONE: backend CRUD/list/filter + mark sent với RBAC và Zod.
 - ✅ Reminder chặn tạo nhắc khi xe không thuộc khách hàng đã chọn.
 - ✅ Frontend Reminder DONE: menu/route `/dashboard/reminders`, filter chưa nhắc/đến hạn/đã nhắc, tạo/sửa/xóa và đánh dấu đã nhắc.
 - ✅ `reminders.spec.ts` pass cho tạo nhắc đến hạn, search, mark sent và validation xe/khách.
 - ✅ Backend build pass; frontend build pass; full Playwright regression pass 14/14.
-- ▶️ Active slice tiếp theo: Reports (FR-18).
 - ✅ Maintenance History FR-16 DONE: backend API `/api/v1/maintenance-history` với filter `customerId`, `vehicleId`, `search`, RBAC và Zod.
 - ✅ Response trả lịch sử work order đã `Delivered` kèm xe, khách hàng, service items, part usages, invoice và payments.
 - ✅ Frontend Maintenance History DONE: menu/route `/dashboard/maintenance-history`, filter khách hàng/xe/search, table và detail dialog dùng API thật.
@@ -420,20 +425,25 @@ DELETE /api/v1/reminders/:id          [Admin]
 
 ---
 
-### ❌ ReportModule — CHƯA IMPLEMENT
+### ✅ ReportModule — `src/modules/report/`
 
 **Cần cho:** FR-18
 
-**Endpoints cần tạo:**
+**Endpoints đã có:**
 ```
-GET    /api/v1/reports/revenue        doanh thu theo khoảng ngày (group by day/month)
-GET    /api/v1/reports/work-orders    số phiếu theo trạng thái, theo kỳ
-GET    /api/v1/reports/top-services   top N dịch vụ theo doanh thu/số lần
-GET    /api/v1/reports/top-parts      top N phụ tùng theo số lần sử dụng
-GET    /api/v1/reports/low-stock      parts có stockQuantity <= reorderLevel
+GET    /api/v1/reports/revenue        doanh thu theo khoảng ngày [Admin, Manager]
+GET    /api/v1/reports/work-orders    số phiếu theo trạng thái, theo kỳ [Admin, Manager]
+GET    /api/v1/reports/top-services   top N dịch vụ theo doanh thu/số lần [Admin, Manager]
+GET    /api/v1/reports/top-parts      top N phụ tùng theo số lần sử dụng [Admin, Manager]
+GET    /api/v1/reports/low-stock      parts có stockQuantity <= reorderLevel [Admin, Manager]
 ```
 
-**Lưu ý:** Các query report dùng Prisma `groupBy` + `aggregate`, không raw SQL.
+**Business rules FR-18 đã có:**
+- Revenue tính theo `Payment.paidAt` và tổng amount thực thu.
+- Work order report group theo `WorkOrder.status`.
+- Top services/parts tính từ work order đã có invoice trong khoảng ngày.
+- Low stock trả phụ tùng active có `stockQuantity <= reorderLevel`.
+- Không dùng raw SQL; aggregate bằng Prisma query/groupBy và xử lý trong service.
 
 ---
 
@@ -471,12 +481,13 @@ GET    /api/v1/reports/low-stock      parts có stockQuantity <= reorderLevel
 | FR-15 | Payment panel trong `features/invoices/InvoiceListPage.tsx` | `/dashboard/invoices` | ✅ Partial/final payment + history + remaining amount; ✅ Playwright overpayment/paid rejection pass ngày 25/06/2026 |
 | FR-16 | `features/maintenance-history/MaintenanceHistoryPage.tsx`, `features/maintenance-history/maintenanceHistoryApi.ts` | `/dashboard/maintenance-history` | ✅ Filter khách hàng/xe/search + detail lịch sử; ✅ Playwright existing/empty history flow pass ngày 27/06/2026 |
 | FR-17 | `features/reminders/ReminderListPage.tsx`, `features/reminders/reminderApi.ts` | `/dashboard/reminders` | ✅ Due list + create/edit/delete/mark sent; ✅ Playwright create/search/mark sent flow pass ngày 27/06/2026 |
+| FR-18 | `features/reports/ReportsPage.tsx`, `features/reports/reportApi.ts` | `/dashboard/reports` | ✅ KPI + revenue/work order/top service/top part/low stock reports; ✅ Playwright generated report data pass ngày 27/06/2026 |
 
 ### ❌ Feature Pages chưa tạo
 
 | FR | Page | Route |
 |---|---|---|
-| FR-18 | ReportsPage | `/dashboard/reports` |
+| FR-19 | AuditLogPage | `/dashboard/audit-logs` |
 
 **Mỗi feature page cần thêm vào store:**
 - `slice.ts` — state management
@@ -507,7 +518,7 @@ Phase 3 — Billing & Reports (phụ thuộc Phase 2):
   [x] Payment flow trong InvoiceModule + frontend + Playwright (FR-15)
   [x] MaintenanceHistoryModule + frontend + Playwright (FR-16)
   [x] ReminderModule + frontend + Playwright (FR-17)
-  [ ] ReportModule (backend FR-18)
+  [x] ReportModule + frontend + Playwright (FR-18)
 
 Phase 4 — Frontend pages (có thể làm song song từ Phase 1):
   [ ] Sidebar navigation đầy đủ (thêm routes vào DashboardLayout)

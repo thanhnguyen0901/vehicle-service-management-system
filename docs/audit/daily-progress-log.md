@@ -25,16 +25,23 @@
 - [DONE] Bổ sung filter chưa nhắc/đến hạn/đã nhắc, tạo/sửa/xóa reminder và đánh dấu đã nhắc.
 - [DONE] `reminders.spec.ts` pass cho tạo nhắc đến hạn, search, mark sent và validation xe/khách.
 - [DONE] Backend build pass, frontend build pass, full Playwright regression pass 14/14.
+- [DONE] Hoàn thành Reports slice FR-18: backend report API cho revenue, work orders, top services, top parts và low stock.
+- [DONE] Revenue tính theo payment thực thu; date range `to` bao gồm toàn bộ ngày được chọn.
+- [DONE] Hoàn thành frontend `ReportsPage` tại `/dashboard/reports`, thêm menu và API thật.
+- [DONE] Bổ sung KPI doanh thu/thanh toán/phiếu, bảng doanh thu theo ngày, phiếu theo trạng thái, top dịch vụ/phụ tùng và tồn thấp.
+- [DONE] `reports.spec.ts` pass cho dữ liệu doanh thu, top service, top part và low-stock.
+- [DONE] Backend build pass, frontend build pass, full Playwright regression pass 15/15.
 
 ### Đang làm
 - [DONE] Không còn slice đang dở.
 
 ### Kế hoạch tiếp theo
-- [TODO] Implement Reports FR-18 theo full flow: revenue, work orders, top services/parts và low stock.
+- [TODO] Implement Audit Log API/UI FR-19 theo full flow: list/search/filter audit entries.
 
 ### Rủi ro/Ghi chú
 - FR-16 dùng các bảng hiện có nên không cần migration mới.
 - FR-17 dùng bảng `maintenance_reminders` đã có nên không cần migration mới.
+- FR-18 dùng dữ liệu hiện có nên không cần migration mới.
 - Migration chính thức cho schema hiện tại vẫn cần được tạo trước khi chốt release/demo.
 
 ---
