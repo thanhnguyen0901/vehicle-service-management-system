@@ -19,15 +19,22 @@
 - [DONE] Bổ sung filter khách hàng/phương tiện/search, table lịch sử và dialog chi tiết service/part/payment.
 - [DONE] `maintenance-history.spec.ts` pass cho case có lịch sử và khách hàng chưa có lịch sử.
 - [DONE] Backend build pass, frontend build pass, full Playwright regression pass 13/13.
+- [DONE] Hoàn thành Reminder slice FR-17: backend list/filter/create/update/delete và mark sent với RBAC/Zod.
+- [DONE] Chặn tạo/cập nhật nhắc bảo dưỡng nếu xe không thuộc khách hàng được chọn.
+- [DONE] Hoàn thành frontend `ReminderListPage` tại `/dashboard/reminders`, thêm menu và API thật.
+- [DONE] Bổ sung filter chưa nhắc/đến hạn/đã nhắc, tạo/sửa/xóa reminder và đánh dấu đã nhắc.
+- [DONE] `reminders.spec.ts` pass cho tạo nhắc đến hạn, search, mark sent và validation xe/khách.
+- [DONE] Backend build pass, frontend build pass, full Playwright regression pass 14/14.
 
 ### Đang làm
 - [DONE] Không còn slice đang dở.
 
 ### Kế hoạch tiếp theo
-- [TODO] Implement Reminder FR-17 theo full flow: due list, tạo reminder và đánh dấu đã nhắc.
+- [TODO] Implement Reports FR-18 theo full flow: revenue, work orders, top services/parts và low stock.
 
 ### Rủi ro/Ghi chú
 - FR-16 dùng các bảng hiện có nên không cần migration mới.
+- FR-17 dùng bảng `maintenance_reminders` đã có nên không cần migration mới.
 - Migration chính thức cho schema hiện tại vẫn cần được tạo trước khi chốt release/demo.
 
 ---

@@ -8,20 +8,25 @@
 ## Tổng quan tiến độ
 
 ```
-Backend  █████████████████░░░  ~85%  (Auth/User/Customer/Vehicle/ServiceCatalog/Parts/Appointment/WorkOrder/Inventory/Part Usage/Invoice/Payment/Maintenance History + shared infra)
-Frontend █████████████████░░░  ~85%  (auth + layout + User/Customer/Vehicle/Service/Parts/Appointment/WorkOrder/Inventory/Part Usage/Invoice/Payment/Maintenance History)
+Backend  ██████████████████░░  ~90%  (Auth/User/Customer/Vehicle/ServiceCatalog/Parts/Appointment/WorkOrder/Inventory/Part Usage/Invoice/Payment/Maintenance History/Reminder + shared infra)
+Frontend ██████████████████░░  ~90%  (auth + layout + User/Customer/Vehicle/Service/Parts/Appointment/WorkOrder/Inventory/Part Usage/Invoice/Payment/Maintenance History/Reminder)
 Schema   ██████████████████░░  ~90%  (15/15 bảng, đã bổ sung CustomerType và Part.unit; còn thiếu migration file chính thức)
 Infra    ████████████████████  100%  (filters, guards, pipes, interceptors, health endpoint)
-E2E      ████████████████░░░░  Auth/User/Customer/Vehicle/Service/Parts/Appointment/WorkOrder/Inventory/Part Usage/Invoice/Payment/Maintenance History specs pass
+E2E      █████████████████░░░  Auth/User/Customer/Vehicle/Service/Parts/Appointment/WorkOrder/Inventory/Part Usage/Invoice/Payment/Maintenance History/Reminder specs pass
 ```
 
 **Recheck 27/06/2026:**
+- ✅ Reminder FR-17 DONE: backend CRUD/list/filter + mark sent với RBAC và Zod.
+- ✅ Reminder chặn tạo nhắc khi xe không thuộc khách hàng đã chọn.
+- ✅ Frontend Reminder DONE: menu/route `/dashboard/reminders`, filter chưa nhắc/đến hạn/đã nhắc, tạo/sửa/xóa và đánh dấu đã nhắc.
+- ✅ `reminders.spec.ts` pass cho tạo nhắc đến hạn, search, mark sent và validation xe/khách.
+- ✅ Backend build pass; frontend build pass; full Playwright regression pass 14/14.
+- ▶️ Active slice tiếp theo: Reports (FR-18).
 - ✅ Maintenance History FR-16 DONE: backend API `/api/v1/maintenance-history` với filter `customerId`, `vehicleId`, `search`, RBAC và Zod.
 - ✅ Response trả lịch sử work order đã `Delivered` kèm xe, khách hàng, service items, part usages, invoice và payments.
 - ✅ Frontend Maintenance History DONE: menu/route `/dashboard/maintenance-history`, filter khách hàng/xe/search, table và detail dialog dùng API thật.
 - ✅ `maintenance-history.spec.ts` pass cho case có lịch sử và empty history.
 - ✅ Backend build pass; frontend build pass; full Playwright regression pass 13/13.
-- ▶️ Active slice tiếp theo: Reminder (FR-17).
 
 **Recheck 25/06/2026:**
 - ✅ Payment FR-15 DONE: backend create payment + payment history trong invoice response, RBAC và Zod.
@@ -391,18 +396,27 @@ GET    /api/v1/maintenance-history    filter customerId/vehicleId/search [mọi 
 
 ---
 
-### ❌ ReminderModule — CHƯA IMPLEMENT
+### ✅ ReminderModule — `src/modules/reminder/`
 
 **Cần cho:** FR-17
 
-**Endpoints cần tạo:**
+**Endpoints đã có:**
 ```
-GET    /api/v1/reminders              filter isSent, dueDate
+GET    /api/v1/reminders              filter search/customerId/vehicleId/isSent/dueFrom/dueTo [mọi role]
 GET    /api/v1/reminders/:id
 POST   /api/v1/reminders              [ServiceAdvisor, Admin]
+PATCH  /api/v1/reminders/:id          [ServiceAdvisor, Admin]
 PATCH  /api/v1/reminders/:id/send     đánh dấu đã nhắc (isSent=true, sentAt=now)
 DELETE /api/v1/reminders/:id          [Admin]
 ```
+
+**Business rules FR-17 đã có:**
+- Reminder luôn gắn với customer và vehicle thật.
+- Chặn tạo/cập nhật nếu vehicle không thuộc customer đã chọn.
+- Mark sent cập nhật `isSent=true` và `sentAt=now`.
+- List hỗ trợ due list bằng filter `dueTo` và trạng thái `isSent=false`.
+
+---
 
 ---
 
@@ -456,12 +470,12 @@ GET    /api/v1/reports/low-stock      parts có stockQuantity <= reorderLevel
 | FR-14 | `features/invoices/InvoiceListPage.tsx`, `features/invoices/invoiceApi.ts` | `/dashboard/invoices` | ✅ List/create/detail + immutable snapshot; ✅ Playwright service/part lines and duplicate rejection pass ngày 25/06/2026 |
 | FR-15 | Payment panel trong `features/invoices/InvoiceListPage.tsx` | `/dashboard/invoices` | ✅ Partial/final payment + history + remaining amount; ✅ Playwright overpayment/paid rejection pass ngày 25/06/2026 |
 | FR-16 | `features/maintenance-history/MaintenanceHistoryPage.tsx`, `features/maintenance-history/maintenanceHistoryApi.ts` | `/dashboard/maintenance-history` | ✅ Filter khách hàng/xe/search + detail lịch sử; ✅ Playwright existing/empty history flow pass ngày 27/06/2026 |
+| FR-17 | `features/reminders/ReminderListPage.tsx`, `features/reminders/reminderApi.ts` | `/dashboard/reminders` | ✅ Due list + create/edit/delete/mark sent; ✅ Playwright create/search/mark sent flow pass ngày 27/06/2026 |
 
 ### ❌ Feature Pages chưa tạo
 
 | FR | Page | Route |
 |---|---|---|
-| FR-17 | RemindersPage | `/dashboard/reminders` |
 | FR-18 | ReportsPage | `/dashboard/reports` |
 
 **Mỗi feature page cần thêm vào store:**
@@ -492,7 +506,7 @@ Phase 3 — Billing & Reports (phụ thuộc Phase 2):
   [x] InvoiceModule + frontend + Playwright (FR-14)
   [x] Payment flow trong InvoiceModule + frontend + Playwright (FR-15)
   [x] MaintenanceHistoryModule + frontend + Playwright (FR-16)
-  [ ] ReminderModule (backend FR-17)
+  [x] ReminderModule + frontend + Playwright (FR-17)
   [ ] ReportModule (backend FR-18)
 
 Phase 4 — Frontend pages (có thể làm song song từ Phase 1):

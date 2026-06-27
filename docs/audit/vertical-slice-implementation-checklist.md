@@ -1,6 +1,6 @@
 # Vertical Slice Implementation Checklist
 
-> Last updated: 2026-06-27 16:30 +07
+> Last updated: 2026-06-27 17:30 +07
 >
 > Scope: MVP FR-01 to FR-19.
 >
@@ -52,22 +52,22 @@ Use this checklist for each module before marking it `DONE`.
 | 11 | Invoice | FR-14 | DONE | DONE | DONE | DONE | DONE | Immutable service/part snapshot E2E passed on 2026-06-25 |
 | 12 | Payment | FR-15 | DONE | DONE | DONE | DONE | DONE | Partial/final payment and overpayment rejection E2E passed on 2026-06-25 |
 | 13 | Maintenance History | FR-16 | DONE | DONE | DONE | DONE | DONE | Query by customer/vehicle E2E passed on 2026-06-27 |
-| 14 | Reminder | FR-17 | TODO | TODO | TODO | TODO | TODO | Due list and sent marker |
+| 14 | Reminder | FR-17 | DONE | DONE | DONE | DONE | DONE | Due list and sent marker E2E passed on 2026-06-27 |
 | 15 | Reports | FR-18 | TODO | TODO | TODO | TODO | TODO | Revenue, work orders, top services/parts, low stock |
 | 16 | Audit Log API/UI | FR-19 | DONE | TODO | TODO | TODO | IN_PROGRESS | Audit write interceptor exists; read API/UI missing |
 | 17 | Dashboard Real Data | FR-18 | TODO | TODO | TODO | TODO | TODO | Replace placeholder KPI cards |
 
 ## Current Active Slice
 
-Active slice: None. Maintenance History is complete; next slice is Reminder.
+Active slice: None. Reminder is complete; next slice is Reports.
 
 Next slice exit criteria:
-- [ ] Reminder backend supports due list and sent marker.
-- [ ] Reminder frontend create/list/mark-sent flow uses real API.
-- [ ] Reminder Playwright flow covers due reminder and mark sent.
+- [ ] Reports backend returns revenue, work order, top service/part and low-stock data.
+- [ ] Reports frontend dashboard/report flow uses real API.
+- [ ] Reports Playwright flow covers generated report data.
 - [ ] Backend build passes.
 - [ ] Frontend build passes.
-- [ ] `implementation-status.md` updated with Reminder result.
+- [ ] `implementation-status.md` updated with Reports result.
 
 Latest completed verification:
 - [x] `auth.spec.ts` passed on 2026-06-22.
@@ -83,6 +83,7 @@ Latest completed verification:
 - [x] `invoices.spec.ts` passed on 2026-06-25.
 - [x] `payments.spec.ts` passed on 2026-06-25.
 - [x] `maintenance-history.spec.ts` passed on 2026-06-27.
+- [x] `reminders.spec.ts` passed on 2026-06-27.
 - [x] Backend build passed on 2026-06-22.
 - [x] Frontend build passed on 2026-06-22.
 - [x] Backend build passed on 2026-06-23.
@@ -100,5 +101,6 @@ Latest completed verification:
 - [x] Backend build passed on 2026-06-27.
 - [x] Frontend build passed on 2026-06-27.
 - [x] Full frontend Playwright suite passed on 2026-06-27 (13/13).
+- [x] Full frontend Playwright suite passed on 2026-06-27 (14/14).
 
-Next slice after pass: Reports.
+Next slice after pass: Audit Log API/UI.

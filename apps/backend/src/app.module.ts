@@ -12,6 +12,7 @@ import { AppointmentModule } from './modules/appointment/appointment.module';
 import { WorkOrderModule } from './modules/work-order/work-order.module';
 import { InvoiceModule } from './modules/invoice/invoice.module';
 import { MaintenanceHistoryModule } from './modules/maintenance-history/maintenance-history.module';
+import { ReminderModule } from './modules/reminder/reminder.module';
 import { HealthController } from './health.controller';
 
 @Module({
@@ -37,6 +38,7 @@ import { HealthController } from './health.controller';
     WorkOrderModule,
     InvoiceModule,
     MaintenanceHistoryModule,
+    ReminderModule,
   ],
   controllers: [HealthController],
 })
