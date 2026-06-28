@@ -635,7 +635,7 @@ export function WorkOrderListPage() {
               </div>
             </div>
 
-            <form className="grid gap-3 md:grid-cols-[1fr_1fr_8rem_10rem_auto]" onSubmit={handleSaveItem}>
+            <form className="grid gap-3 sm:grid-cols-2" onSubmit={handleSaveItem}>
               <div className="flex flex-col gap-1 text-sm font-medium text-gray-700">
                 <label htmlFor="work-order-service">Dịch vụ</label>
                 <Dropdown
@@ -678,7 +678,7 @@ export function WorkOrderListPage() {
                   onValueChange={(event) => setItemForm((prev) => ({ ...prev, unitPrice: Number(event.value ?? 0) }))}
                 />
               </label>
-              <div className="flex items-end gap-2">
+              <div className="flex items-end gap-2 sm:col-span-2">
                 <Button
                   type="submit"
                   label={editingItem ? 'Lưu' : 'Thêm'}
@@ -739,7 +739,7 @@ export function WorkOrderListPage() {
               </div>
 
               <form
-                className="mb-4 grid gap-3 md:grid-cols-[1fr_1.4fr_7rem_10rem_auto]"
+                className="mb-4 grid gap-3 sm:grid-cols-2"
                 onSubmit={handleSavePartUsage}
               >
                 <div className="flex flex-col gap-1 text-sm font-medium text-gray-700">
@@ -800,7 +800,7 @@ export function WorkOrderListPage() {
                     }
                   />
                 </label>
-                <div className="flex items-end gap-2">
+                <div className="flex items-end gap-2 sm:col-span-2">
                   <Button
                     type="submit"
                     label={editingPartUsage ? 'Lưu' : 'Ghi nhận'}

@@ -46,6 +46,9 @@
 - [DONE] Ghi thông tin user/password và hướng dẫn chạy seed tại `docs/demo/seed-data.md`.
 - [DONE] Full Playwright regression pass 17/17 sau khi reset database bằng `seed:e2e`.
 - [DONE] Đã chạy `seed:e2e` và `seed:demo` thành công; database local hiện đang ở trạng thái demo.
+- [DONE] Hoàn thành UI/UX polish toàn app: input/dropdown/textarea có border rõ, button có background/border, search icon căn giữa đúng.
+- [DONE] Dialog lớn như Phiếu sửa chữa và Lịch sử bảo dưỡng không còn scroll ngang; nội dung bảng/form trong dialog wrap và chỉ scroll dọc.
+- [DONE] Frontend build pass và full Playwright regression pass 17/17 sau UI/UX polish; database local đã reset lại `seed:demo`.
 
 ### Đang làm
 - [DONE] Không còn slice đang dở.
