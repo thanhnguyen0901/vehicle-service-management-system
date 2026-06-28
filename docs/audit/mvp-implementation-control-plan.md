@@ -3,7 +3,7 @@
 > Muc dich: lam tai lieu dieu khien trien khai code cho Vehicle Service Management System, dam bao source code bam dung `garage-thesis-report.md`, `mvp-functional-requirements.md`, `role-permission-matrix-v1.md` va trang thai hien tai trong `implementation-status.md`.
 >
 > Pham vi: MVP FR-01 den FR-19.
-> Trang thai code hien tai: backend da co AuthModule, UserModule, CustomerModule, VehicleModule, ServiceCatalogModule, InventoryModule parts catalog, infrastructure chung va health endpoint; frontend da co login, protected route, dashboard layout, UserManagementPage, CustomerListPage, VehicleListPage, ServiceCatalogPage, PartsPage; Playwright Auth/User/Customer/Vehicle/Service/Parts specs da pass ngay 22/06/2026; active slice tiep theo la Appointment.
+> Trang thai code hien tai: MVP vertical slices FR-01 den FR-19 da hoan thanh full flow backend/frontend/E2E. Full Playwright regression da pass 17/17 ngay 28/06/2026 sau khi reset database bang `seed:e2e`; database local da duoc reset ve bo `seed:demo` de phuc vu demo. Active slice hien tai: khong co. Viec con lai truoc release/demo la tao Prisma migration chinh thuc cho schema hien tai va chay final demo/release verification.
 
 ---
 
@@ -70,17 +70,24 @@ Bang status hien tai, dua tren code da recheck:
 | Vehicle | FR-05, FR-16 | DONE | DONE | DONE | DONE | Vehicle CRUD/search flow pass ngay 22/06/2026 |
 | Service catalog | FR-10 | DONE | DONE | DONE | DONE | Service CRUD/toggle flow pass ngay 22/06/2026 |
 | Parts catalog | FR-11 | DONE | DONE | DONE | DONE | Parts CRUD/low-stock flow pass ngay 22/06/2026 |
-| Inventory transactions | FR-12 | NEW | NEW | NEW | NEW | Phu thuoc Parts; parts CRUD da xong |
-| Appointment | FR-06 | NEW | NEW | NEW | NEW | Phu thuoc Customer/Vehicle |
-| Work order | FR-07, FR-08, FR-09 | NEW | NEW | NEW | NEW | Module nghiep vu loi |
-| Part usage | FR-13 | NEW | NEW | NEW | NEW | Phu thuoc WorkOrder + Parts + Inventory |
-| Invoice | FR-14 | NEW | NEW | NEW | NEW | Phu thuoc WorkOrder/PartUsage |
-| Payment | FR-15 | NEW | NEW | NEW | NEW | Phu thuoc Invoice |
-| Maintenance history | FR-16 | NEW | NEW | NEW | NEW | Query tu WorkOrder/Invoice |
-| Reminder | FR-17 | NEW | NEW | NEW | NEW | Co the lam sau history |
-| Reports | FR-18 | NEW | NEW | NEW | NEW | Phu thuoc du lieu invoice/workorder/inventory |
-| Audit log API/UI | FR-19 | IN_PROGRESS | NEW | NEW | IN_PROGRESS | AuditInterceptor da co, chua co API read/UI/test |
-| Dashboard real data | FR-18 | NEW | NEW | NEW | NEW | Hien tai chi placeholder |
+| Appointment | FR-06 | DONE | DONE | DONE | DONE | Appointment create/update/cancel/list flow pass ngay 23/06/2026 |
+| Work order | FR-07, FR-08, FR-09 | DONE | DONE | DONE | DONE | Work order create/status/items flow pass ngay 23/06/2026 |
+| Inventory transactions | FR-12 | DONE | DONE | DONE | DONE | Import/export/adjustment/history flow pass ngay 24/06/2026 |
+| Part usage | FR-13 | DONE | DONE | DONE | DONE | Record/update/remove with transactional stock flow pass ngay 24/06/2026 |
+| Invoice | FR-14 | DONE | DONE | DONE | DONE | Immutable service/part snapshot flow pass ngay 25/06/2026 |
+| Payment | FR-15 | DONE | DONE | DONE | DONE | Partial/final payment and overpayment rejection flow pass ngay 25/06/2026 |
+| Maintenance history | FR-16 | DONE | DONE | DONE | DONE | Query by customer/vehicle flow pass ngay 27/06/2026 |
+| Reminder | FR-17 | DONE | DONE | DONE | DONE | Due list and sent marker flow pass ngay 27/06/2026 |
+| Reports | FR-18 | DONE | DONE | DONE | DONE | Revenue, top service/part, low stock report flow pass ngay 27/06/2026 |
+| Audit log API/UI | FR-19 | DONE | DONE | DONE | DONE | Audit read API/UI and filter flow pass ngay 27/06/2026 |
+| Dashboard real data | FR-18 | DONE | DONE | DONE | DONE | Dashboard KPI dung API that, flow pass ngay 27/06/2026 |
+| Clean seed data | Demo/E2E | DONE | N/A | DONE | DONE | `seed:e2e` va `seed:demo` da pass ngay 28/06/2026; account demo ghi tai `docs/demo/seed-data.md` |
+
+Trang thai tong ket:
+- Active slice: khong co.
+- MVP feature slices: DONE.
+- Database schema: du bang/model cho MVP, con thieu Prisma migration file chinh thuc.
+- Final release/demo gate: chua chot, can migration chinh thuc + final verification.
 
 Quy tac cap nhat status:
 - Khi bat dau lam module: doi `Overall` thanh `IN_PROGRESS`.
@@ -139,14 +146,16 @@ Quy tac cap nhat status:
 
 | Flow | FR bao phu | Tieu chi pass |
 |---|---|---|
-| Login va doi mat khau | FR-01 | Login set cookie, refresh ok, logout revoke token, doi password revoke refresh |
-| Tiep nhan xe | FR-03, FR-04, FR-05, FR-06, FR-07 | Tao customer -> vehicle -> appointment -> work order |
-| Xu ly ky thuat | FR-08, FR-09 | Them hang muc, cap nhat trang thai dung state machine |
-| Xuat phu tung | FR-11, FR-12, FR-13 | Nhap kho -> dung phu tung -> ton kho giam dung, khong am |
-| Lap hoa don | FR-14 | Invoice lines snapshot dung voi work order items va part usage |
-| Thanh toan | FR-15 | Ghi payment, invoice status dung voi tong tien da tra |
-| Lich su/nhac lich | FR-16, FR-17 | Tra cuu theo xe/khach, tao va danh dau reminder |
-| Bao cao/audit | FR-18, FR-19 | Report co du lieu, audit log ghi thao tac quan trong |
+| Login va doi mat khau | FR-01 | DONE - auth/user Playwright flow da pass |
+| Tiep nhan xe | FR-03, FR-04, FR-05, FR-06, FR-07 | DONE - customer -> vehicle -> appointment -> work order da co UI/API/E2E |
+| Xu ly ky thuat | FR-08, FR-09 | DONE - service items va state machine da co UI/API/E2E |
+| Xuat phu tung | FR-11, FR-12, FR-13 | DONE - inventory transaction/part usage cap nhat ton kho atomically va E2E pass |
+| Lap hoa don | FR-14 | DONE - invoice snapshot tu work order da co UI/API/E2E |
+| Thanh toan | FR-15 | DONE - partial/final payment va overpayment rejection da co UI/API/E2E |
+| Lich su/nhac lich | FR-16, FR-17 | DONE - maintenance history/reminder da co UI/API/E2E |
+| Bao cao/audit | FR-18, FR-19 | DONE - reports/dashboard/audit log da co UI/API/E2E |
+| Seed demo data | Demo | DONE - `seed:demo` tao full-flow data va account demo |
+| Release verification | Release | TODO - can Prisma migration chinh thuc va final demo/release verification |
 
 ---
 
@@ -292,23 +301,28 @@ Yeu cau Playwright:
 
 | Cap do | Bat buoc toi thieu |
 |---|---|
-| Build | `apps/backend npm run build`, `apps/frontend npm run build` pass |
-| Unit | WorkOrder state machine, invoice calculation, stock deduction, payment status |
-| Integration | Auth, Customer, Vehicle, Appointment, WorkOrder, PartUsage, Invoice, Payment |
-| RBAC | Thu role khong du quyen voi endpoint nhay cam phai ra 403 |
-| Playwright UI | Moi module co UI phai co test luong chinh va pass |
-| Manual UAT | 8 demo flow o Phase 5 pass end-to-end sau khi Playwright pass |
-| Data integrity | Khong stock am, invoice snapshot khong doi khi service/part price doi sau do |
+| Build | DONE - backend/frontend build da pass trong cac dot slice; can chay lai trong final release verification |
+| Unit | RUI RO CON LAI - cac rule quan trong duoc bao phu chu yeu bang service logic va E2E, chua tach day du unit test |
+| Integration | DONE theo UI/E2E cho Auth, Customer, Vehicle, Appointment, WorkOrder, Inventory, PartUsage, Invoice, Payment, History, Reminder, Reports, Audit |
+| RBAC | DONE o muc route/role guard theo module; can smoke lai cac role demo trong final verification |
+| Playwright UI | DONE - full suite pass 17/17 ngay 28/06/2026 sau `seed:e2e` |
+| Manual UAT | TODO - chay demo flow tren `seed:demo` sau khi co migration chinh thuc |
+| Data integrity | DONE theo E2E chinh: khong stock am, invoice snapshot, payment status; can final smoke tren demo data |
 
 Lenh verify hien tai:
 
 ```bash
-source ~/.nvm/nvm.sh && npm run build
+DATABASE_URL='postgresql://vsms_user:vsms_password@localhost:5434/vsms_db?schema=public' npm run seed:e2e --prefix apps/backend
+DATABASE_URL='postgresql://vsms_user:vsms_password@localhost:5434/vsms_db?schema=public' FRONTEND_URL='http://localhost:5173,http://127.0.0.1:5173' VITE_API_URL='http://127.0.0.1:3000/api/v1' npm run test:e2e --prefix apps/frontend
+DATABASE_URL='postgresql://vsms_user:vsms_password@localhost:5434/vsms_db?schema=public' npm run seed:demo --prefix apps/backend
 ```
 
-Chay trong tung thu muc:
-- `apps/backend`
-- `apps/frontend`
+Build:
+
+```bash
+npm run build --prefix apps/backend
+npm run build --prefix apps/frontend
+```
 
 ---
 
@@ -327,14 +341,12 @@ Sau moi module/phase, cap nhat:
 
 ---
 
-## 13. Roadmap Ngan Gon De Bat Dau Code
+## 13. Roadmap Ngan Gon Tiep Theo
 
 Thu tu nen lam ngay:
-1. Phase 0: fix `change-password`, patch Customer schema, migration, them Playwright setup neu chua co.
-2. Phase 1A: CustomerModule + Customer pages + Playwright customer flow.
-3. Phase 1B: VehicleModule + Vehicle pages/history + Playwright vehicle flow.
-4. Phase 1C: ServiceCatalogModule + Inventory parts CRUD + Playwright service/parts flow.
-5. Phase 2: Appointment -> WorkOrder -> PartUsage/InventoryTransaction, moi module kem UI va Playwright.
-6. Phase 3: Invoice -> Payment -> Reminder, moi module kem UI va Playwright.
-7. Phase 4: Reports -> AuditLog page -> Dashboard real data + Playwright report/audit flow.
-8. Phase 5: seed demo data, full Playwright regression, manual UAT flow, final status update.
+1. Tao Prisma migration chinh thuc cho schema hien tai.
+2. Chay migration tren database local sach va verify Prisma client.
+3. Chay `seed:e2e` + full Playwright regression 17/17.
+4. Chay `seed:demo` va manual smoke full-flow demo bang account trong `docs/demo/seed-data.md`.
+5. Cap nhat `implementation-status.md`, `vertical-slice-implementation-checklist.md`, `daily-progress-log.md` voi ket qua final verification.
+6. Commit/push final release/demo verification.

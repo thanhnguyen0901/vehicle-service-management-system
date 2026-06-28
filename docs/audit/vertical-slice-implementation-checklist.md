@@ -1,6 +1,6 @@
 # Vertical Slice Implementation Checklist
 
-> Last updated: 2026-06-27 19:40 +07
+> Last updated: 2026-06-28 00:00 +07
 >
 > Scope: MVP FR-01 to FR-19.
 >
@@ -56,6 +56,7 @@ Use this checklist for each module before marking it `DONE`.
 | 15 | Reports | FR-18 | DONE | DONE | DONE | DONE | DONE | Revenue, work orders, top services/parts, low stock E2E passed on 2026-06-27 |
 | 16 | Audit Log API/UI | FR-19 | DONE | DONE | DONE | DONE | DONE | Read API/UI and audit entry E2E passed on 2026-06-27 |
 | 17 | Dashboard Real Data | FR-18 | DONE | DONE | DONE | DONE | DONE | Real KPI cards E2E passed on 2026-06-27 |
+| 18 | Clean E2E/Demo Seed Data | Demo/E2E | DONE | DONE | N/A | DONE | DONE | `seed:e2e` and `seed:demo` passed on 2026-06-28; demo accounts documented |
 
 ## Current Active Slice
 
@@ -105,5 +106,8 @@ Latest completed verification:
 - [x] Full frontend Playwright suite passed on 2026-06-27 (15/15).
 - [x] Full frontend Playwright suite passed on 2026-06-27 (16/16).
 - [x] Full frontend Playwright suite passed on 2026-06-27 (17/17).
+- [x] Clean E2E seed passed on 2026-06-28.
+- [x] Full frontend Playwright suite passed on 2026-06-28 (17/17) after `seed:e2e`.
+- [x] Clean demo seed passed on 2026-06-28; local database left in demo state.
 
 Next slice after pass: None. MVP feature slices are complete.

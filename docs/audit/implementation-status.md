@@ -1,6 +1,6 @@
 # Implementation Status — Vehicle Service Management System
 
-> Cập nhật: 27/06/2026
+> Cập nhật: 28/06/2026
 > Phiên bản MVP: FR-01 → FR-19
 
 ---
@@ -14,6 +14,13 @@ Schema   ██████████████████░░  ~90%  (15
 Infra    ████████████████████  100%  (filters, guards, pipes, interceptors, health endpoint)
 E2E      ████████████████████  Auth/User/Customer/Vehicle/Service/Parts/Appointment/WorkOrder/Inventory/Part Usage/Invoice/Payment/Maintenance History/Reminder/Reports/Audit Log/Dashboard specs pass
 ```
+
+**Recheck 28/06/2026:**
+- ✅ Clean seed data DONE ngày 28/06/2026: `seed:e2e` cleanup database và tạo bộ dữ liệu ổn định cho Playwright; `seed:demo` cleanup database và tạo bộ dữ liệu full-flow để demo.
+- ✅ Thông tin account/password E2E và demo đã ghi tại `docs/demo/seed-data.md`.
+- ✅ Full Playwright regression pass 17/17 sau khi reset database bằng `seed:e2e`.
+- ✅ Database local hiện đang ở trạng thái demo sau khi chạy `seed:demo`.
+- ✅ Control plan đã đồng bộ: không còn active feature slice; việc còn lại là Prisma migration chính thức và final demo/release verification.
 
 **Recheck 27/06/2026:**
 - ✅ Dashboard Real Data DONE: `DashboardHome` không còn KPI placeholder `—`, dùng API thật.
@@ -51,7 +58,7 @@ E2E      ████████████████████  Auth/User
 - ✅ Frontend Payment panel DONE: số đã trả/còn lại, form phương thức/mã giao dịch và lịch sử thanh toán.
 - ✅ `payments.spec.ts` pass; full Playwright regression pass 12/12.
 - ✅ Backend build pass; frontend build pass.
-- ▶️ Active slice tiếp theo: Maintenance History (FR-16).
+- ✅ Mốc tiếp theo tại thời điểm đó: Maintenance History (FR-16) — đã hoàn tất ngày 27/06/2026.
 - ✅ Invoice FR-14 DONE: backend list/detail/create + RBAC + Zod validation.
 - ✅ Chỉ tạo từ Work Order `ReadyForDelivery`, có dòng tính tiền và chưa có invoice.
 - ✅ Snapshot service items và part usages thành immutable `InvoiceLine` trong cùng Prisma transaction.
@@ -60,7 +67,7 @@ E2E      ████████████████████  Auth/User
 - ✅ Frontend Invoice DONE: menu/route/list/create/detail/API thật, tìm kiếm và lọc trạng thái.
 - ✅ `invoices.spec.ts` pass; full Playwright regression pass 11/11.
 - ✅ Backend build pass; frontend build pass.
-- ▶️ Active slice tiếp theo: Payment (FR-15).
+- ✅ Mốc tiếp theo tại thời điểm đó: Payment (FR-15) — đã hoàn tất ngày 25/06/2026.
 
 **Recheck 24/06/2026:**
 - ✅ Part Usage FR-13 DONE: backend add/update/delete + RBAC + Zod validation.
@@ -70,14 +77,14 @@ E2E      ████████████████████  Auth/User
 - ✅ Frontend Part Usage tích hợp trong Work Order detail, gắn usage với từng service item và snapshot đơn giá.
 - ✅ `part-usages.spec.ts` pass; full Playwright regression pass 10/10.
 - ✅ Backend build pass; frontend build pass.
-- ▶️ Active slice tiếp theo: Invoice (FR-14).
+- ✅ Mốc tiếp theo tại thời điểm đó: Invoice (FR-14) — đã hoàn tất ngày 25/06/2026.
 - ✅ Inventory Transaction FR-12 DONE: backend import/export/adjustment/list + RBAC + Zod validation.
 - ✅ Cập nhật tồn kho và tạo lịch sử chạy trong cùng Prisma transaction; chặn xuất/điều chỉnh làm tồn âm và chặn phụ tùng ngưng hoạt động.
 - ✅ Frontend DONE: menu/route/page/API thật, lọc theo phụ tùng/loại, hiển thị tồn và lịch sử giao dịch.
 - ✅ `inventory-transactions.spec.ts` pass: nhập, xuất, điều chỉnh, lọc và kiểm tra insufficient stock.
 - ✅ Backend build pass; frontend build pass.
 - ✅ Full Playwright regression pass 9/9.
-- ▶️ Active slice tiếp theo: Part Usage (FR-13).
+- ✅ Mốc tiếp theo tại thời điểm đó: Part Usage (FR-13) — đã hoàn tất ngày 24/06/2026.
 
 **Recheck 23/06/2026:**
 - ✅ Work Order slice DONE: backend create/list/detail/status/items + RBAC + Zod validation + state machine.
@@ -86,7 +93,7 @@ E2E      ████████████████████  Auth/User
 - ✅ `npm run test:e2e` trong `apps/frontend` pass: `auth.spec.ts`, `users.spec.ts`, `customers.spec.ts`, `vehicles.spec.ts`, `services.spec.ts`, `parts.spec.ts`, `appointments.spec.ts`, `work-orders.spec.ts` (8/8).
 - ✅ Backend build pass sau Work Order.
 - ✅ Frontend build pass sau Work Order.
-- ▶️ Active slice tiếp theo: Inventory Transaction (FR-12).
+- ✅ Mốc tiếp theo tại thời điểm đó: Inventory Transaction (FR-12) — đã hoàn tất ngày 24/06/2026.
 - ✅ Appointment slice DONE: backend create/list/detail/update/cancel/delete + RBAC + Zod validation.
 - ✅ Appointment frontend DONE: menu/route/page/API thật, chọn xe thật, list/search/filter/create/update/cancel/delete flow.
 - ✅ `appointments.spec.ts` pass.
@@ -495,11 +502,11 @@ GET    /api/v1/reports/low-stock      parts có stockQuantity <= reorderLevel [A
 | FR-19 | `features/audit-logs/AuditLogPage.tsx`, `features/audit-logs/auditLogApi.ts` | `/dashboard/audit-logs` | ✅ List/search/filter + detail payload; ✅ Playwright audit entry flow pass ngày 27/06/2026 |
 | FR-18 | `features/dashboard/DashboardHome.tsx` | `/dashboard` | ✅ KPI thật từ appointments/work-orders/invoices; ✅ Playwright dashboard real data pass ngày 27/06/2026 |
 
-### ❌ Feature Pages chưa tạo
+### ✅ Feature Pages còn thiếu
 
 Không còn feature page MVP nào đang thiếu.
 
-**Mỗi feature page cần thêm vào store:**
+**Pattern áp dụng cho feature page:**
 - `slice.ts` — state management
 - `saga.ts` — API call effects
 - `api.ts` — axios calls tới backend
@@ -531,7 +538,7 @@ Phase 3 — Billing & Reports (phụ thuộc Phase 2):
   [x] ReportModule + frontend + Playwright (FR-18)
 
 Phase 4 — Frontend pages (có thể làm song song từ Phase 1):
-  [ ] Sidebar navigation đầy đủ (thêm routes vào DashboardLayout)
+  [x] Sidebar navigation đầy đủ (thêm routes vào DashboardLayout)
   [x] CustomerListPage + form dialog
   [x] VehicleListPage + form dialog
   [x] ServiceCatalogPage
@@ -540,8 +547,10 @@ Phase 4 — Frontend pages (có thể làm song song từ Phase 1):
   [x] WorkOrderListPage + detail dialog
   [x] InventoryTransactionsPage
   [x] InvoiceListPage + detail dialog
-  [ ] RemindersPage
-  [ ] ReportsPage (Recharts charts)
+  [x] RemindersPage
+  [x] ReportsPage
+  [x] AuditLogPage
+  [x] MaintenanceHistoryPage
   [x] DashboardHome — kết nối dữ liệu thật
 ```
 
@@ -580,18 +589,18 @@ apps/backend/src/
     ├── service-catalog/                 ✅ (4 files)
     ├── inventory/                       ✅ FR-11/FR-12
     ├── invoice/                         ✅ FR-14/FR-15
-    ├── reminder/                        ❌ chưa tạo
-    └── report/                          ❌ chưa tạo
+    ├── reminder/                        ✅ FR-17
+    └── report/                          ✅ FR-18
 
 apps/frontend/src/
-├── App.tsx                              ✅ (routes đến Invoice)
+├── App.tsx                              ✅ (routes đầy đủ MVP)
 ├── main.tsx                             ✅
 ├── index.css                            ✅
 ├── vite-env.d.ts                        ✅
 ├── features/
 │   ├── auth/                            ✅ (5 files)
 │   ├── dashboard/
-│   │   └── DashboardHome.tsx            ✅ (placeholder)
+│   │   └── DashboardHome.tsx            ✅ API thật
 │   ├── users/                           ✅ UI + API thật, ✅ e2e pass
 │       ├── UserManagementPage.tsx       ✅
 │       └── userApi.ts                   ✅
@@ -611,6 +620,10 @@ apps/frontend/src/
 │   ├── work-orders/                     ✅ UI + API thật, ✅ e2e pass
 │   └── inventory/                       ✅ UI + API thật, ✅ e2e pass
 │   └── invoices/                        ✅ FR-14/FR-15 UI + API thật, ✅ e2e pass
+│   └── maintenance-history/             ✅ UI + API thật, ✅ e2e pass
+│   └── reminders/                       ✅ UI + API thật, ✅ e2e pass
+│   └── reports/                         ✅ UI + API thật, ✅ e2e pass
+│   └── audit-logs/                      ✅ UI + API thật, ✅ e2e pass
 ├── services/
 │   └── api.ts                           ✅ (axios + refresh interceptor)
 ├── shared/
@@ -637,5 +650,10 @@ apps/frontend/
     ├── part-usages.spec.ts              ✅ pass ngày 24/06/2026
     ├── invoices.spec.ts                 ✅ pass ngày 25/06/2026
     ├── payments.spec.ts                 ✅ pass ngày 25/06/2026
+    ├── maintenance-history.spec.ts      ✅ pass ngày 27/06/2026
+    ├── reminders.spec.ts                ✅ pass ngày 27/06/2026
+    ├── reports.spec.ts                  ✅ pass ngày 27/06/2026
+    ├── audit-logs.spec.ts               ✅ pass ngày 27/06/2026
+    ├── dashboard.spec.ts                ✅ pass ngày 27/06/2026
     └── helpers/auth.ts                  ✅
 ```
