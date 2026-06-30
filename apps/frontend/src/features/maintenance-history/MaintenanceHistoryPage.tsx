@@ -98,8 +98,8 @@ export function MaintenanceHistoryPage() {
     entry.items.reduce((sum, item) => sum + item.partUsages.length, 0);
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8">
-      <div className="mb-6 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+    <div className="page-shell">
+      <div className="page-header">
         <div>
           <h1 className="mb-2 text-2xl font-bold text-gray-800">Lịch sử bảo dưỡng</h1>
           <p className="text-sm text-gray-500">Tra cứu các lần sửa chữa đã giao xe theo khách hàng hoặc phương tiện.</p>
@@ -112,7 +112,7 @@ export function MaintenanceHistoryPage() {
         </div>
       )}
 
-      <form onSubmit={handleSearch} className="mb-4 grid gap-3 bg-white p-4 shadow-sm lg:grid-cols-[1fr_1fr_1.4fr_auto]">
+      <form onSubmit={handleSearch} className="filter-panel lg:grid-cols-[1fr_1fr_1.4fr_auto]">
         <label className="flex flex-col gap-1 text-sm font-medium text-gray-700">
           Khách hàng
           <select
@@ -151,13 +151,13 @@ export function MaintenanceHistoryPage() {
             placeholder="Biển số, khách hàng, SĐT"
           />
         </label>
-        <div className="flex items-end gap-2">
+        <div className="filter-actions">
           <Button type="submit" label="Tìm" icon="pi pi-search" loading={isLoading} />
           <Button type="button" icon="pi pi-filter-slash" severity="secondary" aria-label="Xóa lọc" onClick={resetFilters} />
         </div>
       </form>
 
-      <div className="overflow-x-auto bg-white shadow-sm">
+      <div className="page-table-surface">
         <DataTable
           value={entries}
           dataKey="id"

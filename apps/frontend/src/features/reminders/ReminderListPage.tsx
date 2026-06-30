@@ -8,6 +8,7 @@ import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Message } from 'primereact/message';
 import { Tag } from 'primereact/tag';
+import { confirmDelete } from '../../shared/utils/confirmDelete';
 import { selectCurrentUser } from '../auth/authSlice';
 import { customerApi, type Customer } from '../customers/customerApi';
 import { vehicleApi, type Vehicle } from '../vehicles/vehicleApi';
@@ -177,8 +178,8 @@ export function ReminderListPage() {
   };
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8">
-      <div className="mb-6 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+    <div className="page-shell">
+      <div className="page-header">
         <div>
           <h1 className="mb-2 text-2xl font-bold text-gray-800">Nhắc bảo dưỡng</h1>
           <p className="text-sm text-gray-500">Theo dõi lịch nhắc khách hàng quay lại bảo dưỡng xe.</p>
@@ -186,6 +187,7 @@ export function ReminderListPage() {
         <Button
           label="Tạo nhắc"
           icon="pi pi-bell"
+          className="page-create-button"
           onClick={openCreateDialog}
           disabled={!canWrite || vehicles.length === 0}
         />
@@ -207,7 +209,7 @@ export function ReminderListPage() {
         </div>
       )}
 
-      <form onSubmit={handleSearch} className="mb-4 grid gap-3 bg-white p-4 shadow-sm md:grid-cols-[1fr_1fr_auto]">
+      <form onSubmit={handleSearch} className="filter-panel md:grid-cols-[1fr_1fr_auto]">
         <label className="flex flex-col gap-1 text-sm font-medium text-gray-700">
           Trạng thái
           <select
@@ -229,12 +231,12 @@ export function ReminderListPage() {
             placeholder="Biển số, khách hàng, nội dung"
           />
         </label>
-        <div className="flex items-end">
+        <div className="filter-actions">
           <Button type="submit" label="Tìm" icon="pi pi-search" loading={isLoading} />
         </div>
       </form>
 
-      <div className="overflow-x-auto bg-white shadow-sm">
+      <div className="page-table-surface">
         <DataTable
           value={reminders}
           dataKey="id"
@@ -286,7 +288,12 @@ export function ReminderListPage() {
                   rounded
                   severity="danger"
                   aria-label={`Xóa nhắc ${row.vehicle.licensePlate}`}
-                  onClick={() => handleDelete(row)}
+                  onClick={() =>
+                    confirmDelete({
+                      itemName: `nhắc bảo dưỡng ${row.vehicle.licensePlate}`,
+                      accept: () => void handleDelete(row),
+                    })
+                  }
                   disabled={!canDelete || isSaving}
                 />
               </div>

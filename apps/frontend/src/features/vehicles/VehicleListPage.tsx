@@ -8,6 +8,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { InputNumber } from 'primereact/inputnumber';
 import { InputText } from 'primereact/inputtext';
 import { Message } from 'primereact/message';
+import { confirmDelete } from '../../shared/utils/confirmDelete';
 import { selectCurrentUser } from '../auth/authSlice';
 import { customerApi, type Customer } from '../customers/customerApi';
 import { vehicleApi, type Vehicle } from './vehicleApi';
@@ -167,25 +168,25 @@ export function VehicleListPage() {
   };
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8">
-      <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+    <div className="page-shell">
+      <div className="page-header">
         <div>
           <h1 className="mb-2 text-2xl font-bold text-gray-800">Phương tiện</h1>
           <p className="text-sm text-gray-500">Quản lý xe theo khách hàng, biển số và thông tin nhận diện.</p>
         </div>
-        <div className="flex flex-col gap-3 sm:flex-row">
-          <span className="p-input-icon-left">
+        <div className="page-toolbar">
+          <span className="p-input-icon-left page-search">
             <i className="pi pi-search" />
             <InputText
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Tìm xe"
-              className="w-full sm:w-72"
             />
           </span>
           <Button
             label="Tạo xe"
             icon="pi pi-plus"
+            className="page-create-button"
             onClick={openCreateDialog}
             disabled={!canWrite || customers.length === 0}
           />
@@ -204,7 +205,7 @@ export function VehicleListPage() {
         </div>
       )}
 
-      <div className="overflow-x-auto rounded-lg bg-white shadow-sm">
+      <div className="page-table-surface">
         <DataTable
           value={filteredVehicles}
           loading={isLoading}
@@ -241,7 +242,12 @@ export function VehicleListPage() {
                   severity="danger"
                   aria-label={`Xóa ${row.licensePlate}`}
                   disabled={!canDelete}
-                  onClick={() => void handleDelete(row)}
+                  onClick={() =>
+                    confirmDelete({
+                      itemName: `xe ${row.licensePlate}`,
+                      accept: () => void handleDelete(row),
+                    })
+                  }
                 />
               </div>
             )}
@@ -348,4 +354,3 @@ function getErrorMessage(err: unknown, fallback: string): string {
       ?.message ?? fallback
   );
 }
-

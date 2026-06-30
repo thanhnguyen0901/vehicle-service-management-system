@@ -26,11 +26,11 @@ export function LoginPage() {
   });
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-700 to-primary-900">
-      <div className="bg-white rounded-2xl shadow-2xl p-10 w-full max-w-md">
+    <div className="flex min-h-screen items-center justify-center bg-slate-100 px-4">
+      <div className="login-card">
         {/* Logo / Title */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary-600 mb-4">
+          <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-lg bg-primary-700">
             <i className="pi pi-car text-white text-2xl" />
           </div>
           <h1 className="text-2xl font-bold text-gray-800">VSMS</h1>

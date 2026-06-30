@@ -143,32 +143,32 @@ export function UserManagementPage() {
 
   if (!canRead) {
     return (
-      <div className="p-4 sm:p-6 lg:p-8">
+      <div className="page-shell">
         <Message severity="warn" text="Bạn không có quyền truy cập quản lý người dùng." />
       </div>
     );
   }
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8">
-      <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+    <div className="page-shell">
+      <div className="page-header">
         <div>
           <h1 className="mb-2 text-2xl font-bold text-gray-800">Người dùng</h1>
           <p className="text-sm text-gray-500">Quản lý tài khoản nội bộ và vai trò nghiệp vụ.</p>
         </div>
-        <div className="flex flex-col gap-3 sm:flex-row">
-          <span className="p-input-icon-left">
+        <div className="page-toolbar">
+          <span className="p-input-icon-left page-search">
             <i className="pi pi-search" />
             <InputText
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Tìm người dùng"
-              className="w-full sm:w-72"
             />
           </span>
           <Button
             label="Tạo người dùng"
             icon="pi pi-plus"
+            className="page-create-button"
             onClick={openCreateDialog}
             disabled={!canCreate}
           />
@@ -181,7 +181,7 @@ export function UserManagementPage() {
         </div>
       )}
 
-      <div className="overflow-x-auto rounded-lg bg-white shadow-sm">
+      <div className="page-table-surface">
         <DataTable
           value={filteredUsers}
           loading={isLoading}

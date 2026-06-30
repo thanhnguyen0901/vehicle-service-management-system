@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { ConfirmDialog } from 'primereact/confirmdialog';
 import { authCheckRequest, selectIsAuthenticated } from './features/auth/authSlice';
 import { LoginPage } from './features/auth/LoginPage';
 import { ProtectedRoute } from './shared/components/ProtectedRoute';
@@ -29,36 +30,39 @@ export default function App() {
   }, [dispatch]);
 
   return (
-    <Routes>
-      <Route
-        path="/login"
-        element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginPage />}
-      />
-      <Route
-        path="/dashboard"
-        element={
-          <ProtectedRoute>
-            <DashboardLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<DashboardHome />} />
-        <Route path="users" element={<UserManagementPage />} />
-        <Route path="customers" element={<CustomerListPage />} />
-        <Route path="vehicles" element={<VehicleListPage />} />
-        <Route path="appointments" element={<AppointmentListPage />} />
-        <Route path="work-orders" element={<WorkOrderListPage />} />
-        <Route path="services" element={<ServiceCatalogPage />} />
-        <Route path="parts" element={<PartsPage />} />
-        <Route path="inventory" element={<InventoryTransactionsPage />} />
-        <Route path="invoices" element={<InvoiceListPage />} />
-        <Route path="maintenance-history" element={<MaintenanceHistoryPage />} />
-        <Route path="reminders" element={<ReminderListPage />} />
-        <Route path="reports" element={<ReportsPage />} />
-        <Route path="audit-logs" element={<AuditLogPage />} />
-      </Route>
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
-    </Routes>
+    <>
+      <ConfirmDialog />
+      <Routes>
+        <Route
+          path="/login"
+          element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginPage />}
+        />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<DashboardHome />} />
+          <Route path="users" element={<UserManagementPage />} />
+          <Route path="customers" element={<CustomerListPage />} />
+          <Route path="vehicles" element={<VehicleListPage />} />
+          <Route path="appointments" element={<AppointmentListPage />} />
+          <Route path="work-orders" element={<WorkOrderListPage />} />
+          <Route path="services" element={<ServiceCatalogPage />} />
+          <Route path="parts" element={<PartsPage />} />
+          <Route path="inventory" element={<InventoryTransactionsPage />} />
+          <Route path="invoices" element={<InvoiceListPage />} />
+          <Route path="maintenance-history" element={<MaintenanceHistoryPage />} />
+          <Route path="reminders" element={<ReminderListPage />} />
+          <Route path="reports" element={<ReportsPage />} />
+          <Route path="audit-logs" element={<AuditLogPage />} />
+        </Route>
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      </Routes>
+    </>
   );
 }

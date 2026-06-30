@@ -1,6 +1,7 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Button } from 'primereact/button';
+import { Checkbox } from 'primereact/checkbox';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { Dialog } from 'primereact/dialog';
@@ -9,7 +10,6 @@ import { InputTextarea } from 'primereact/inputtextarea';
 import { InputText } from 'primereact/inputtext';
 import { Message } from 'primereact/message';
 import { Tag } from 'primereact/tag';
-import { ToggleButton } from 'primereact/togglebutton';
 import { selectCurrentUser } from '../auth/authSlice';
 import { partApi, type Part } from './partApi';
 
@@ -146,33 +146,36 @@ export function PartsPage() {
   };
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8">
-      <div className="mb-6 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+    <div className="page-shell">
+      <div className="page-header">
         <div>
           <h1 className="mb-2 text-2xl font-bold text-gray-800">Phụ tùng</h1>
           <p className="text-sm text-gray-500">Quản lý mã phụ tùng, đơn vị tính, giá chuẩn và tồn kho hiện tại.</p>
         </div>
-        <div className="flex flex-col gap-3 md:flex-row">
-          <span className="p-input-icon-left">
+        <div className="page-toolbar">
+          <span className="p-input-icon-left page-search">
             <i className="pi pi-search" />
             <InputText
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Tìm phụ tùng"
-              className="w-full md:w-72"
             />
           </span>
-          <ToggleButton
-            checked={lowStockOnly}
-            onChange={(event) => setLowStockOnly(Boolean(event.value))}
-            aria-label="Lọc tồn thấp"
-            onLabel="Tồn thấp"
-            offLabel="Tất cả tồn kho"
-            onIcon="pi pi-exclamation-triangle"
-            offIcon="pi pi-box"
-            className="w-full md:w-44"
+          <label htmlFor="parts-low-stock" className="page-check-filter">
+            <Checkbox
+              inputId="parts-low-stock"
+              checked={lowStockOnly}
+              onChange={(event) => setLowStockOnly(Boolean(event.checked))}
+            />
+            <span>Tồn thấp</span>
+          </label>
+          <Button
+            label="Tạo phụ tùng"
+            icon="pi pi-plus"
+            className="page-create-button"
+            onClick={openCreateDialog}
+            disabled={!canWrite}
           />
-          <Button label="Tạo phụ tùng" icon="pi pi-plus" onClick={openCreateDialog} disabled={!canWrite} />
         </div>
       </div>
 
@@ -182,7 +185,7 @@ export function PartsPage() {
         </div>
       )}
 
-      <div className="overflow-x-auto rounded-lg bg-white shadow-sm">
+      <div className="page-table-surface">
         <DataTable
           value={filteredParts}
           loading={isLoading}

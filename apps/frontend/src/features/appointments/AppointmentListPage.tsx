@@ -7,6 +7,7 @@ import { Dialog } from 'primereact/dialog';
 import { Dropdown } from 'primereact/dropdown';
 import { InputText } from 'primereact/inputtext';
 import { Message } from 'primereact/message';
+import { confirmDelete } from '../../shared/utils/confirmDelete';
 import { selectCurrentUser } from '../auth/authSlice';
 import { vehicleApi, type Vehicle } from '../vehicles/vehicleApi';
 import {
@@ -190,20 +191,19 @@ export function AppointmentListPage() {
   };
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8">
-      <div className="mb-6 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+    <div className="page-shell">
+      <div className="page-header">
         <div>
           <h1 className="mb-2 text-2xl font-bold text-gray-800">Lịch hẹn</h1>
           <p className="text-sm text-gray-500">Theo dõi lịch đặt dịch vụ, xe đến xưởng và lịch đã hủy.</p>
         </div>
-        <div className="flex flex-col gap-3 sm:flex-row">
-          <span className="p-input-icon-left">
+        <div className="page-toolbar">
+          <span className="p-input-icon-left page-search">
             <i className="pi pi-search" />
             <InputText
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Tìm lịch hẹn"
-              className="w-full sm:w-64"
             />
           </span>
           <Dropdown
@@ -211,12 +211,13 @@ export function AppointmentListPage() {
             options={statusOptions}
             showClear
             placeholder="Trạng thái"
-            className="w-full sm:w-48"
+            className="page-filter"
             onChange={(event) => setStatusFilter((event.value as AppointmentStatus | null) ?? null)}
           />
           <Button
             label="Tạo lịch hẹn"
             icon="pi pi-calendar-plus"
+            className="page-create-button"
             onClick={openCreateDialog}
             disabled={!canWrite || vehicles.length === 0}
           />
@@ -241,7 +242,7 @@ export function AppointmentListPage() {
         </div>
       )}
 
-      <div className="overflow-x-auto rounded-lg bg-white shadow-sm">
+      <div className="page-table-surface">
         <DataTable
           value={filteredAppointments}
           loading={isLoading}
@@ -289,7 +290,12 @@ export function AppointmentListPage() {
                   severity="danger"
                   aria-label={`Xóa lịch ${row.vehicle.licensePlate}`}
                   disabled={!canDelete}
-                  onClick={() => void handleDelete(row)}
+                  onClick={() =>
+                    confirmDelete({
+                      itemName: `lịch hẹn ${row.vehicle.licensePlate}`,
+                      accept: () => void handleDelete(row),
+                    })
+                  }
                 />
               </div>
             )}

@@ -75,8 +75,8 @@ export function ReportsPage() {
   };
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8">
-      <div className="mb-6 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+    <div className="page-shell">
+      <div className="page-header">
         <div>
           <h1 className="mb-2 text-2xl font-bold text-gray-800">Báo cáo</h1>
           <p className="text-sm text-gray-500">Theo dõi doanh thu, khối lượng phiếu và hiệu quả dịch vụ/phụ tùng.</p>
@@ -89,7 +89,7 @@ export function ReportsPage() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="mb-4 grid gap-3 bg-white p-4 shadow-sm md:grid-cols-[1fr_1fr_auto]">
+      <form onSubmit={handleSubmit} className="filter-panel md:grid-cols-[1fr_1fr_auto]">
         <label className="flex flex-col gap-1 text-sm font-medium text-gray-700">
           Từ ngày
           <InputText type="date" value={from} onChange={(event) => setFrom(event.target.value)} />
@@ -98,7 +98,7 @@ export function ReportsPage() {
           Đến ngày
           <InputText type="date" value={to} onChange={(event) => setTo(event.target.value)} />
         </label>
-        <div className="flex items-end">
+        <div className="filter-actions">
           <Button type="submit" label="Cập nhật" icon="pi pi-refresh" loading={isLoading} />
         </div>
       </form>
@@ -110,7 +110,7 @@ export function ReportsPage() {
       </div>
 
       <div className="grid gap-4 xl:grid-cols-2">
-        <section className="bg-white p-4 shadow-sm">
+        <section className="content-panel">
           <h2 className="mb-3 text-base font-semibold text-gray-800">Doanh thu theo ngày</h2>
           <DataTable
             value={revenue?.series ?? []}
@@ -124,7 +124,7 @@ export function ReportsPage() {
           </DataTable>
         </section>
 
-        <section className="bg-white p-4 shadow-sm">
+        <section className="content-panel">
           <h2 className="mb-3 text-base font-semibold text-gray-800">Phiếu theo trạng thái</h2>
           <DataTable
             value={workOrders?.counts ?? []}
@@ -138,7 +138,7 @@ export function ReportsPage() {
           </DataTable>
         </section>
 
-        <section className="bg-white p-4 shadow-sm">
+        <section className="content-panel">
           <h2 className="mb-3 text-base font-semibold text-gray-800">Top dịch vụ</h2>
           <DataTable
             value={topServices}
@@ -153,7 +153,7 @@ export function ReportsPage() {
           </DataTable>
         </section>
 
-        <section className="bg-white p-4 shadow-sm">
+        <section className="content-panel">
           <h2 className="mb-3 text-base font-semibold text-gray-800">Top phụ tùng</h2>
           <DataTable
             value={topParts}
@@ -170,7 +170,7 @@ export function ReportsPage() {
         </section>
       </div>
 
-      <section className="mt-4 bg-white p-4 shadow-sm">
+      <section className="content-panel mt-4">
         <h2 className="mb-3 text-base font-semibold text-gray-800">Tồn kho thấp</h2>
         <DataTable
           value={lowStock}
@@ -192,7 +192,7 @@ export function ReportsPage() {
 
 function Metric({ title, value, icon }: { title: string; value: string; icon: string }) {
   return (
-    <div className="flex items-center gap-3 bg-white p-4 shadow-sm">
+    <div className="metric-card">
       <span className="flex h-11 w-11 items-center justify-center rounded bg-primary-50 text-primary-700">
         <i className={icon} />
       </span>

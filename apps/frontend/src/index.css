@@ -18,13 +18,28 @@ body {
 .p-dropdown,
 .p-multiselect,
 .p-calendar,
-.p-inputnumber,
 .p-password,
 .p-inputnumber-input,
 .p-password-input,
 select.p-inputtext,
 textarea.p-inputtext {
-  @apply border border-slate-400 bg-white text-slate-800 shadow-sm transition-colors;
+  @apply rounded-md border border-slate-300 bg-white text-slate-800 shadow-none transition-colors;
+  box-sizing: border-box;
+}
+
+.p-inputtext,
+.p-inputtextarea,
+.p-inputnumber-input,
+.p-password-input,
+select.p-inputtext,
+textarea.p-inputtext {
+  padding: 0.5rem 0.75rem;
+}
+
+.p-inputtext::placeholder,
+.p-inputtextarea::placeholder,
+.p-password-input::placeholder {
+  @apply text-slate-400;
 }
 
 .p-inputtext,
@@ -32,11 +47,13 @@ textarea.p-inputtext {
 .p-multiselect,
 .p-inputnumber-input,
 .p-password-input {
-  min-height: 2.625rem;
+  height: 2.5rem;
+  min-height: 2.5rem;
 }
 
 .p-inputtextarea {
   min-height: 5.5rem;
+  line-height: 1.5;
 }
 
 .p-inputtext:hover,
@@ -45,7 +62,7 @@ textarea.p-inputtext {
 .p-multiselect:not(.p-disabled):hover,
 .p-inputnumber-input:hover,
 .p-password-input:hover {
-  @apply border-slate-500;
+  @apply border-slate-400;
 }
 
 .p-inputtext:enabled:focus,
@@ -57,6 +74,17 @@ textarea.p-inputtext {
   @apply border-primary-600 shadow-none ring-2 ring-primary-100;
 }
 
+.p-inputnumber,
+.p-password {
+  @apply w-full border-0 bg-transparent shadow-none;
+}
+
+.p-dropdown,
+.p-multiselect {
+  box-sizing: border-box;
+  height: 2.5rem;
+}
+
 .p-disabled,
 .p-component:disabled,
 .p-inputtext:disabled,
@@ -66,12 +94,23 @@ textarea.p-inputtext {
 
 .p-dropdown-label,
 .p-multiselect-label {
-  @apply flex items-center;
+  @apply flex items-center border-0 bg-transparent shadow-none;
+  min-height: 0;
 }
 
 .p-dropdown-trigger,
 .p-multiselect-trigger {
   @apply text-slate-500;
+}
+
+.p-dropdown .p-dropdown-label,
+.p-multiselect .p-multiselect-label {
+  padding: 0.5rem 0.75rem;
+}
+
+.p-dropdown-trigger,
+.p-multiselect-trigger {
+  width: 2.5rem;
 }
 
 .p-input-icon-left,
@@ -102,7 +141,12 @@ textarea.p-inputtext {
 }
 
 .p-button {
-  @apply inline-flex items-center justify-center gap-2 rounded-md border font-semibold shadow-sm transition-colors;
+  @apply inline-flex items-center justify-center gap-2 rounded-md border px-4 text-sm font-semibold shadow-none transition-colors;
+  min-height: 2.5rem;
+}
+
+.p-button.p-button-icon-only {
+  @apply h-10 w-10 px-0;
   min-height: 2.5rem;
 }
 
@@ -127,11 +171,11 @@ textarea.p-inputtext {
 }
 
 .p-button.p-button-text {
-  @apply border-slate-300 bg-slate-100 text-slate-700 shadow-none;
+  @apply border-0 bg-transparent text-slate-600 shadow-none;
 }
 
 .p-button.p-button-text:enabled:hover {
-  @apply border-slate-400 bg-slate-200 text-slate-900;
+  @apply border-0 bg-slate-100 text-slate-900;
 }
 
 .p-button.p-button-danger,
@@ -140,10 +184,22 @@ textarea.p-inputtext {
   @apply border-red-300 bg-red-50 text-red-700;
 }
 
+.p-button.p-button-danger.p-button-text {
+  @apply border-0 bg-transparent text-red-600;
+}
+
 .p-button.p-button-danger:enabled:hover,
 .p-button.p-button-danger.p-button-text:enabled:hover,
 .p-button.p-button-danger.p-button-outlined:enabled:hover {
   @apply border-red-400 bg-red-100 text-red-800;
+}
+
+.p-button.p-button-warning.p-button-text {
+  @apply border-0 bg-transparent text-amber-700;
+}
+
+.p-button.p-button-warning.p-button-text:enabled:hover {
+  @apply border-0 bg-amber-50 text-amber-800;
 }
 
 .p-button:disabled {
@@ -151,24 +207,57 @@ textarea.p-inputtext {
 }
 
 .p-togglebutton {
-  @apply border border-slate-400 bg-white text-slate-800 shadow-sm;
+  @apply inline-flex h-10 items-center justify-center rounded-md border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 shadow-none;
+}
+
+.p-togglebutton .p-button {
+  @apply h-full min-h-0 border-0 bg-transparent px-0 py-0 text-inherit shadow-none;
+}
+
+.p-togglebutton .p-button:enabled:hover {
+  @apply border-0 bg-transparent text-inherit;
 }
 
 .p-togglebutton.p-highlight {
   @apply border-primary-700 bg-primary-700 text-white;
 }
 
+.p-togglebutton .p-button-label {
+  @apply leading-5;
+}
+
 .p-dialog {
-  @apply max-h-[92vh] overflow-hidden rounded-lg;
+  @apply max-h-[92vh] overflow-hidden rounded-lg shadow-xl;
 }
 
 .p-dialog .p-dialog-content {
-  @apply overflow-x-hidden;
+  @apply overflow-x-hidden px-5 py-5 sm:px-6;
   max-height: calc(92vh - 7rem);
 }
 
 .p-dialog .p-dialog-header {
-  @apply border-b border-slate-200;
+  @apply border-b border-slate-200 px-5 py-4 sm:px-6;
+}
+
+.p-dialog .p-dialog-title {
+  @apply text-base font-semibold text-slate-800;
+}
+
+.p-dialog form {
+  @apply space-y-5;
+}
+
+.p-dialog form label,
+.p-dialog form .flex.flex-col {
+  @apply gap-2 text-sm font-medium text-slate-700;
+}
+
+.p-dialog form .grid {
+  @apply gap-4;
+}
+
+.p-dialog form .p-button {
+  @apply min-w-24;
 }
 
 .p-dialog .p-datatable-wrapper {
@@ -188,7 +277,7 @@ textarea.p-inputtext {
 }
 
 .p-datatable .p-datatable-thead > tr > th {
-  @apply border-b border-slate-200 bg-slate-100 text-slate-700;
+  @apply border-b border-slate-200 bg-slate-50 text-slate-600;
 }
 
 .p-datatable .p-datatable-tbody > tr > td {
@@ -197,4 +286,97 @@ textarea.p-inputtext {
 
 .p-datatable .p-datatable-tbody > tr:hover {
   @apply bg-slate-50;
+}
+
+.page-shell {
+  @apply p-4 sm:p-6 lg:p-8;
+}
+
+.page-header {
+  @apply mb-6 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between;
+}
+
+.page-toolbar {
+  @apply grid w-full grid-cols-1 gap-3 md:grid-cols-[minmax(16rem,1fr)_max-content_max-content] xl:w-auto xl:items-center;
+}
+
+.page-toolbar .p-input-icon-left,
+.page-toolbar .p-dropdown,
+.page-toolbar .p-togglebutton {
+  @apply w-full;
+}
+
+.page-search .p-inputtext {
+  @apply w-full;
+}
+
+.page-filter {
+  @apply md:min-w-52;
+}
+
+.page-check-filter {
+  @apply flex h-10 w-full cursor-pointer items-center gap-2 rounded-md border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-700 md:w-auto md:min-w-32;
+}
+
+.page-check-filter:hover {
+  @apply border-slate-400 bg-slate-50;
+}
+
+.page-check-filter .p-checkbox {
+  @apply h-5 w-5 shrink-0;
+}
+
+.page-check-filter .p-checkbox-box {
+  @apply h-5 w-5 rounded border-slate-300 shadow-none;
+}
+
+.page-check-filter .p-checkbox-box.p-highlight {
+  @apply border-primary-700 bg-primary-700;
+}
+
+.page-create-button {
+  @apply w-full whitespace-nowrap sm:w-auto;
+}
+
+.page-table-surface {
+  @apply overflow-x-auto rounded-lg bg-white shadow-sm ring-1 ring-slate-100;
+}
+
+.page-actions {
+  @apply grid w-full grid-cols-1 gap-3 sm:grid-flow-col sm:grid-cols-none sm:items-center xl:w-auto;
+}
+
+.filter-panel {
+  @apply mb-4 grid gap-3 rounded-lg bg-white p-4 shadow-sm ring-1 ring-slate-100 xl:items-end;
+}
+
+.filter-panel label {
+  @apply gap-2 text-sm font-medium text-slate-700;
+}
+
+.filter-panel .p-inputtext,
+.filter-panel select.p-inputtext,
+.filter-panel .p-dropdown,
+.filter-panel .p-button {
+  @apply w-full;
+}
+
+.filter-actions {
+  @apply flex items-end gap-2;
+}
+
+.filter-actions .p-button {
+  @apply w-full sm:w-auto;
+}
+
+.content-panel {
+  @apply rounded-lg bg-white p-4 shadow-sm ring-1 ring-slate-100;
+}
+
+.metric-card {
+  @apply flex items-center gap-4 rounded-lg bg-white p-5 shadow-sm ring-1 ring-slate-100;
+}
+
+.login-card {
+  @apply w-full max-w-md rounded-lg bg-white p-8 shadow-xl ring-1 ring-slate-100 sm:p-10;
 }

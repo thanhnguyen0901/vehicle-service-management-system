@@ -8,6 +8,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { InputNumber } from 'primereact/inputnumber';
 import { InputText } from 'primereact/inputtext';
 import { Message } from 'primereact/message';
+import { confirmDelete } from '../../shared/utils/confirmDelete';
 import { selectCurrentUser } from '../auth/authSlice';
 import { appointmentApi, type Appointment } from '../appointments/appointmentApi';
 import { partApi, type Part } from '../parts/partApi';
@@ -471,20 +472,19 @@ export function WorkOrderListPage() {
   const totalAmount = selectedWorkOrder?.items.reduce((sum, item) => sum + Number(item.amount), 0) ?? 0;
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8">
-      <div className="mb-6 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+    <div className="page-shell">
+      <div className="page-header">
         <div>
           <h1 className="mb-2 text-2xl font-bold text-gray-800">Phiếu sửa chữa</h1>
           <p className="text-sm text-gray-500">Tiếp nhận xe, theo dõi trạng thái và hạng mục dịch vụ.</p>
         </div>
-        <div className="flex flex-col gap-3 sm:flex-row">
-          <span className="p-input-icon-left">
+        <div className="page-toolbar">
+          <span className="p-input-icon-left page-search">
             <i className="pi pi-search" />
             <InputText
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Tìm phiếu"
-              className="w-full sm:w-64"
             />
           </span>
           <Dropdown
@@ -492,12 +492,13 @@ export function WorkOrderListPage() {
             options={statusOptions}
             showClear
             placeholder="Trạng thái"
-            className="w-full sm:w-48"
+            className="page-filter"
             onChange={(event) => setStatusFilter((event.value as WorkOrderStatus | null) ?? null)}
           />
           <Button
             label="Tạo phiếu"
             icon="pi pi-file-plus"
+            className="page-create-button"
             onClick={openCreateDialog}
             disabled={!canCreate || vehicles.length === 0}
           />
@@ -516,7 +517,7 @@ export function WorkOrderListPage() {
         </div>
       )}
 
-      <div className="overflow-x-auto rounded-lg bg-white shadow-sm">
+      <div className="page-table-surface">
         <DataTable
           value={filteredWorkOrders}
           loading={isLoading}
@@ -721,7 +722,12 @@ export function WorkOrderListPage() {
                       severity="danger"
                       aria-label={`Xóa hạng mục ${row.description}`}
                       disabled={!canWrite || detailIsLocked}
-                      onClick={() => void handleDeleteItem(row)}
+                      onClick={() =>
+                        confirmDelete({
+                          itemName: `hạng mục ${row.description}`,
+                          accept: () => void handleDeleteItem(row),
+                        })
+                      }
                     />
                   </div>
                 )}
@@ -863,7 +869,12 @@ export function WorkOrderListPage() {
                         severity="danger"
                         aria-label={`Xóa phụ tùng ${row.part.partNumber}`}
                         disabled={!canManageParts || detailIsLocked}
-                        onClick={() => void handleDeletePartUsage(row)}
+                        onClick={() =>
+                          confirmDelete({
+                            itemName: `phụ tùng ${row.part.partNumber}`,
+                            accept: () => void handleDeletePartUsage(row),
+                          })
+                        }
                       />
                     </div>
                   )}

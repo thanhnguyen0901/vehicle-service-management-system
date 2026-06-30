@@ -9,6 +9,7 @@ import { InputTextarea } from 'primereact/inputtextarea';
 import { InputText } from 'primereact/inputtext';
 import { Message } from 'primereact/message';
 import { Tag } from 'primereact/tag';
+import { confirmDelete } from '../../shared/utils/confirmDelete';
 import { selectCurrentUser } from '../auth/authSlice';
 import { customerApi, type Customer, type CustomerType } from './customerApi';
 
@@ -49,7 +50,7 @@ export function CustomerListPage() {
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [form, setForm] = useState<CustomerFormState>(emptyForm);
   const [search, setSearch] = useState('');
-  const [typeFilter, setTypeFilter] = useState<CustomerType | ''>('');
+  const [typeFilter, setTypeFilter] = useState<CustomerType | null>(null);
 
   const canRead = Boolean(currentUser);
   const canWrite = currentUser?.role === 'Admin' || currentUser?.role === 'ServiceAdvisor';
@@ -160,29 +161,35 @@ export function CustomerListPage() {
   };
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8">
-      <div className="mb-6 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+    <div className="page-shell">
+      <div className="page-header">
         <div>
           <h1 className="mb-2 text-2xl font-bold text-gray-800">Khách hàng</h1>
           <p className="text-sm text-gray-500">Quản lý hồ sơ cá nhân, doanh nghiệp và thông tin xuất hóa đơn.</p>
         </div>
-        <div className="flex flex-col gap-3 md:flex-row">
-          <span className="p-input-icon-left">
+        <div className="page-toolbar">
+          <span className="p-input-icon-left page-search">
             <i className="pi pi-search" />
             <InputText
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Tìm khách hàng"
-              className="w-full md:w-72"
             />
           </span>
           <Dropdown
             value={typeFilter}
-            options={[{ label: 'Tất cả loại', value: '' }, ...typeOptions]}
-            onChange={(event) => setTypeFilter(event.value as CustomerType | '')}
-            className="w-full md:w-52"
+            options={[{ label: 'Tất cả loại', value: null }, ...typeOptions]}
+            placeholder="Tất cả loại"
+            onChange={(event) => setTypeFilter((event.value as CustomerType | null) ?? null)}
+            className="page-filter"
           />
-          <Button label="Tạo khách hàng" icon="pi pi-plus" onClick={openCreateDialog} disabled={!canWrite} />
+          <Button
+            label="Tạo khách hàng"
+            icon="pi pi-plus"
+            className="page-create-button"
+            onClick={openCreateDialog}
+            disabled={!canWrite}
+          />
         </div>
       </div>
 
@@ -192,7 +199,7 @@ export function CustomerListPage() {
         </div>
       )}
 
-      <div className="overflow-x-auto rounded-lg bg-white shadow-sm">
+      <div className="page-table-surface">
         <DataTable
           value={filteredCustomers}
           loading={isLoading}
@@ -233,7 +240,12 @@ export function CustomerListPage() {
                   severity="danger"
                   aria-label={`Xóa ${row.fullName}`}
                   disabled={!canDelete}
-                  onClick={() => void handleDelete(row)}
+                  onClick={() =>
+                    confirmDelete({
+                      itemName: `khách hàng ${row.fullName}`,
+                      accept: () => void handleDelete(row),
+                    })
+                  }
                 />
               </div>
             )}

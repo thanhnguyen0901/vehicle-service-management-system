@@ -123,16 +123,17 @@ export function InventoryTransactionsPage() {
   };
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8">
-      <div className="mb-6 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+    <div className="page-shell">
+      <div className="page-header">
         <div>
           <h1 className="mb-2 text-2xl font-bold text-gray-800">Giao dịch kho</h1>
           <p className="text-sm text-gray-500">Theo dõi nhập, xuất và điều chỉnh tồn kho phụ tùng.</p>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="page-actions">
           <Button
             label="Nhập kho"
             icon="pi pi-download"
+            className="page-create-button"
             onClick={() => openDialog('import')}
             disabled={!canWrite || activeParts.length === 0}
           />
@@ -140,6 +141,7 @@ export function InventoryTransactionsPage() {
             label="Xuất kho"
             icon="pi pi-upload"
             severity="warning"
+            className="page-create-button"
             onClick={() => openDialog('export')}
             disabled={!canWrite || activeParts.length === 0}
           />
@@ -147,6 +149,7 @@ export function InventoryTransactionsPage() {
             label="Điều chỉnh"
             icon="pi pi-sliders-h"
             severity="secondary"
+            className="page-create-button"
             onClick={() => openDialog('adjustment')}
             disabled={!canWrite || activeParts.length === 0}
           />
@@ -159,7 +162,7 @@ export function InventoryTransactionsPage() {
         </div>
       )}
 
-      <div className="mb-4 grid gap-3 bg-white p-4 shadow-sm sm:grid-cols-2">
+      <div className="filter-panel sm:grid-cols-2">
         <label className="flex flex-col gap-1 text-sm font-medium text-gray-700">
           Lọc theo phụ tùng
           <select
@@ -190,7 +193,7 @@ export function InventoryTransactionsPage() {
         </label>
       </div>
 
-      <div className="overflow-x-auto bg-white shadow-sm">
+      <div className="page-table-surface">
         <DataTable
           value={transactions}
           loading={isLoading}

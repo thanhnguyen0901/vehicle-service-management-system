@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Button } from 'primereact/button';
 import { Message } from 'primereact/message';
 import { appointmentApi } from '../appointments/appointmentApi';
 import { invoiceApi } from '../invoices/invoiceApi';
@@ -98,21 +99,19 @@ export function DashboardHome() {
   }, []);
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8">
-      <div className="mb-6 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+    <div className="page-shell">
+      <div className="page-header">
         <div>
           <h1 className="mb-2 text-2xl font-bold text-gray-800">Tổng quan</h1>
           <p className="text-sm text-gray-500">Theo dõi nhanh lịch hẹn, tiến độ sửa chữa và doanh thu hiện tại.</p>
         </div>
-        <button
-          type="button"
-          className="inline-flex items-center justify-center gap-2 rounded-md bg-primary-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-primary-800 disabled:cursor-not-allowed disabled:opacity-60"
+        <Button
+          label="Cập nhật"
+          icon="pi pi-refresh"
+          className="page-create-button"
           onClick={() => void loadDashboard()}
           disabled={isLoading}
-        >
-          <i className="pi pi-refresh" />
-          Cập nhật
-        </button>
+        />
       </div>
 
       {error && (
@@ -123,7 +122,7 @@ export function DashboardHome() {
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
         {cards.map((card) => (
-          <div key={card.label} className="flex items-center gap-4 rounded-md bg-white p-5 shadow-sm">
+          <div key={card.label} className="metric-card">
             <div className={`${card.color} flex h-12 w-12 shrink-0 items-center justify-center rounded-md`}>
               <i className={`pi ${card.icon} text-white text-xl`} />
             </div>

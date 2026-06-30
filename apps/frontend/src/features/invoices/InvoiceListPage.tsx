@@ -196,25 +196,24 @@ export function InvoiceListPage() {
   };
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8">
-      <div className="mb-6 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+    <div className="page-shell">
+      <div className="page-header">
         <div>
           <h1 className="mb-2 text-2xl font-bold text-gray-800">Hóa đơn</h1>
           <p className="text-sm text-gray-500">Lập hóa đơn snapshot từ phiếu sửa chữa đã hoàn tất kỹ thuật.</p>
         </div>
-        <div className="flex flex-col gap-3 sm:flex-row">
-          <span className="p-input-icon-left">
+        <div className="page-toolbar">
+          <span className="p-input-icon-left page-search">
             <i className="pi pi-search" />
             <InputText
               value={search}
               placeholder="Tìm hóa đơn"
-              className="w-full sm:w-64"
               onChange={(event) => setSearch(event.target.value)}
             />
           </span>
           <select
             aria-label="Lọc trạng thái hóa đơn"
-            className="p-inputtext w-full sm:w-44"
+            className="p-inputtext page-filter"
             value={statusFilter}
             onChange={(event) => setStatusFilter(event.target.value)}
           >
@@ -225,6 +224,7 @@ export function InvoiceListPage() {
           <Button
             label="Lập hóa đơn"
             icon="pi pi-receipt"
+            className="page-create-button"
             disabled={!canCreate || eligibleWorkOrders.length === 0}
             onClick={openCreateDialog}
           />
@@ -242,7 +242,7 @@ export function InvoiceListPage() {
         </div>
       )}
 
-      <div className="overflow-x-auto bg-white shadow-sm">
+      <div className="page-table-surface">
         <DataTable
           value={filteredInvoices}
           loading={isLoading}
