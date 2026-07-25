@@ -247,6 +247,11 @@ textarea.p-inputtext {
   @apply space-y-5;
 }
 
+.p-dialog form.dialog-grid-form > :not([hidden]) ~ :not([hidden]) {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
 .p-dialog form label,
 .p-dialog form .flex.flex-col {
   @apply gap-2 text-sm font-medium text-slate-700;

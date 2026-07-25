@@ -450,7 +450,7 @@ export function InvoiceListPage() {
 
               {selectedInvoice.status !== 'Paid' && canPay && (
                 <form
-                  className="mb-4 grid items-end gap-3 md:grid-cols-[minmax(10rem,0.8fr)_minmax(12rem,1fr)_minmax(12rem,1fr)_auto]"
+                  className="dialog-grid-form mb-4 grid items-end gap-3 md:grid-cols-[minmax(10rem,0.8fr)_minmax(12rem,1fr)_minmax(12rem,1fr)_auto]"
                   onSubmit={handlePayment}
                 >
                   <label

@@ -636,10 +636,13 @@ export function WorkOrderListPage() {
               </div>
             </div>
 
-            <form className="grid gap-3 sm:grid-cols-2" onSubmit={handleSaveItem}>
-              <div className="flex flex-col gap-1 text-sm font-medium text-gray-700">
-                <label htmlFor="work-order-service">Dịch vụ</label>
+            <form className="dialog-grid-form grid gap-3 sm:grid-cols-2" onSubmit={handleSaveItem}>
+              <div className="flex min-w-0 flex-col gap-1 text-sm font-medium text-gray-700">
+                <label htmlFor="work-order-service" className="min-h-6">
+                  Dịch vụ
+                </label>
                 <Dropdown
+                  className="w-full"
                   inputId="work-order-service"
                   value={itemForm.serviceId}
                   options={serviceOptions}
@@ -648,18 +651,26 @@ export function WorkOrderListPage() {
                   onChange={(event) => handleServiceSelect(event.value as string)}
                 />
               </div>
-              <label className="flex flex-col gap-1 text-sm font-medium text-gray-700">
-                Hạng mục
+              <div className="flex min-w-0 flex-col gap-1 text-sm font-medium text-gray-700">
+                <label htmlFor="work-order-item-description" className="min-h-6">
+                  Hạng mục
+                </label>
                 <InputText
+                  id="work-order-item-description"
+                  className="w-full"
                   value={itemForm.description}
                   required
                   disabled={detailIsLocked}
                   onChange={(event) => setItemForm((prev) => ({ ...prev, description: event.target.value }))}
                 />
-              </label>
-              <label className="flex flex-col gap-1 text-sm font-medium text-gray-700">
-                SL
+              </div>
+              <div className="flex min-w-0 flex-col gap-1 text-sm font-medium text-gray-700">
+                <label htmlFor="work-order-item-quantity" className="min-h-6">
+                  SL
+                </label>
                 <InputNumber
+                  className="w-full"
+                  inputId="work-order-item-quantity"
                   value={itemForm.quantity}
                   min={1}
                   useGrouping={false}
@@ -667,10 +678,14 @@ export function WorkOrderListPage() {
                   inputClassName="w-full"
                   onValueChange={(event) => setItemForm((prev) => ({ ...prev, quantity: Number(event.value ?? 1) }))}
                 />
-              </label>
-              <label className="flex flex-col gap-1 text-sm font-medium text-gray-700">
-                Đơn giá
+              </div>
+              <div className="flex min-w-0 flex-col gap-1 text-sm font-medium text-gray-700">
+                <label htmlFor="work-order-item-unit-price" className="min-h-6">
+                  Đơn giá
+                </label>
                 <InputNumber
+                  className="w-full"
+                  inputId="work-order-item-unit-price"
                   value={itemForm.unitPrice}
                   min={0}
                   useGrouping={false}
@@ -678,7 +693,7 @@ export function WorkOrderListPage() {
                   inputClassName="w-full"
                   onValueChange={(event) => setItemForm((prev) => ({ ...prev, unitPrice: Number(event.value ?? 0) }))}
                 />
-              </label>
+              </div>
               <div className="flex items-end gap-2 sm:col-span-2">
                 <Button
                   type="submit"
@@ -745,12 +760,15 @@ export function WorkOrderListPage() {
               </div>
 
               <form
-                className="mb-4 grid gap-3 sm:grid-cols-2"
+                className="dialog-grid-form mb-4 grid gap-3 sm:grid-cols-2"
                 onSubmit={handleSavePartUsage}
               >
-                <div className="flex flex-col gap-1 text-sm font-medium text-gray-700">
-                  <label htmlFor="part-usage-item">Hạng mục</label>
+                <div className="flex min-w-0 flex-col gap-1 text-sm font-medium text-gray-700">
+                  <label htmlFor="part-usage-item" className="min-h-6">
+                    Hạng mục
+                  </label>
                   <Dropdown
+                    className="w-full"
                     inputId="part-usage-item"
                     value={partUsageForm.workOrderItemId}
                     options={workOrderItemOptions}
@@ -763,9 +781,12 @@ export function WorkOrderListPage() {
                     }
                   />
                 </div>
-                <div className="flex flex-col gap-1 text-sm font-medium text-gray-700">
-                  <label htmlFor="part-usage-part">Phụ tùng</label>
+                <div className="flex min-w-0 flex-col gap-1 text-sm font-medium text-gray-700">
+                  <label htmlFor="part-usage-part" className="min-h-6">
+                    Phụ tùng
+                  </label>
                   <Dropdown
+                    className="w-full"
                     inputId="part-usage-part"
                     value={partUsageForm.partId}
                     options={partOptions}
@@ -774,9 +795,13 @@ export function WorkOrderListPage() {
                     onChange={(event) => handlePartSelect(event.value as string)}
                   />
                 </div>
-                <label className="flex flex-col gap-1 text-sm font-medium text-gray-700">
-                  SL phụ tùng
+                <div className="flex min-w-0 flex-col gap-1 text-sm font-medium text-gray-700">
+                  <label htmlFor="part-usage-quantity" className="min-h-6">
+                    SL phụ tùng
+                  </label>
                   <InputNumber
+                    className="w-full"
+                    inputId="part-usage-quantity"
                     value={partUsageForm.quantity}
                     min={1}
                     useGrouping={false}
@@ -789,10 +814,14 @@ export function WorkOrderListPage() {
                       }))
                     }
                   />
-                </label>
-                <label className="flex flex-col gap-1 text-sm font-medium text-gray-700">
-                  Giá phụ tùng
+                </div>
+                <div className="flex min-w-0 flex-col gap-1 text-sm font-medium text-gray-700">
+                  <label htmlFor="part-usage-unit-price" className="min-h-6">
+                    Giá phụ tùng
+                  </label>
                   <InputNumber
+                    className="w-full"
+                    inputId="part-usage-unit-price"
                     value={partUsageForm.unitPrice}
                     min={0}
                     useGrouping={false}
@@ -805,7 +834,7 @@ export function WorkOrderListPage() {
                       }))
                     }
                   />
-                </label>
+                </div>
                 <div className="flex items-end gap-2 sm:col-span-2">
                   <Button
                     type="submit"
