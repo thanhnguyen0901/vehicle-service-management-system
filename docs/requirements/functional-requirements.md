@@ -1,7 +1,7 @@
-# MVP Functional Requirements v1
+# Functional Requirements v1
 
 ## Phạm vi
-Tài liệu này chốt danh sách Functional Requirements cho phiên bản MVP của đề tài:
+Tài liệu này chốt danh sách Functional Requirements của đề tài:
 **Quản lý Hồ sơ & Bảo dưỡng Phương tiện (Garage)**.
 
 ## Danh sách FR đã chốt
@@ -26,5 +26,4 @@ Tài liệu này chốt danh sách Functional Requirements cho phiên bản MVP 
 - FR-19 Nhật ký thao tác nghiệp vụ quan trọng (audit log cơ bản).
 
 ## Ghi chú phạm vi
-- Danh sách trên là **MVP v1** đã chốt.
 - Chi tiết từng FR (Actor, Preconditions, Main Flow, Exception, Acceptance Criteria) sẽ được viết ở bước SRS chi tiết tiếp theo.
