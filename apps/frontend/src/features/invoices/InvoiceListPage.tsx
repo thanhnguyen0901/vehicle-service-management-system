@@ -450,15 +450,17 @@ export function InvoiceListPage() {
 
               {selectedInvoice.status !== 'Paid' && canPay && (
                 <form
-                  className="mb-4 grid gap-3 md:grid-cols-[11rem_1fr_1fr_auto]"
+                  className="mb-4 grid items-end gap-3 md:grid-cols-[minmax(10rem,0.8fr)_minmax(12rem,1fr)_minmax(12rem,1fr)_auto]"
                   onSubmit={handlePayment}
                 >
                   <label
                     htmlFor="payment-amount"
-                    className="flex flex-col gap-1 text-sm font-medium text-gray-700"
+                    className="flex min-w-0 flex-col gap-1 text-sm font-medium text-gray-700"
                   >
                     Số tiền
                     <InputNumber
+                      className="w-full"
+                      inputClassName="w-full"
                       inputId="payment-amount"
                       value={paymentForm.amount}
                       min={1}
@@ -472,10 +474,10 @@ export function InvoiceListPage() {
                       }
                     />
                   </label>
-                  <label className="flex flex-col gap-1 text-sm font-medium text-gray-700">
+                  <label className="flex min-w-0 flex-col gap-1 text-sm font-medium text-gray-700">
                     Phương thức
                     <select
-                      className="p-inputtext w-full"
+                      className="p-inputtext h-[42px] w-full"
                       value={paymentForm.method}
                       onChange={(event) =>
                         setPaymentForm((previous) => ({
@@ -489,9 +491,10 @@ export function InvoiceListPage() {
                       <option value="Card">Thẻ</option>
                     </select>
                   </label>
-                  <label className="flex flex-col gap-1 text-sm font-medium text-gray-700">
+                  <label className="flex min-w-0 flex-col gap-1 text-sm font-medium text-gray-700">
                     Mã giao dịch
                     <InputText
+                      className="w-full"
                       value={paymentForm.transactionRef}
                       onChange={(event) =>
                         setPaymentForm((previous) => ({
@@ -501,11 +504,12 @@ export function InvoiceListPage() {
                       }
                     />
                   </label>
-                  <div className="flex items-end">
+                  <div className="flex min-w-0">
                     <Button
                       type="submit"
                       label="Ghi nhận"
                       icon="pi pi-wallet"
+                      className="w-full whitespace-nowrap"
                       loading={isSaving}
                       disabled={paymentForm.amount <= 0 || paymentForm.amount > remainingAmount}
                     />
